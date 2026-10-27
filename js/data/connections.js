@@ -21,7 +21,7 @@
         type: 'wireless',
         color: TOPOLOGY_CONFIG.colors.wireless,
         dashed: true,
-        label: 'Internet / 4G MQTT',
+        label: 'Internet / Mobile Network',
         pathType: 'orthogonal',
         points: [[215, 460], [330, 460], [330, 140], [440, 140]]
     },
@@ -57,7 +57,7 @@
         type: 'lan',
         color: TOPOLOGY_CONFIG.colors.lan,
         dashed: false,
-        label: 'Gigabit LAN (RTMP Engine)',
+        label: 'LAN / Media & Control',
         pathType: 'orthogonal',
         points: [[522, 740], [522, 595]]
     },

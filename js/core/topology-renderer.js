@@ -1,15 +1,6 @@
 /** SVG boundaries, connections, labels and particle-layer renderer. */
 (function (Simulator) {
     const SVG_NS = 'http://www.w3.org/2000/svg';
-    const ROOMS = [
-        { key: 'room_a', name: 'Classroom A (多功能集控讲台方案)', y: 40, height: 335 },
-        { key: 'room_b', name: 'Classroom B (标准多媒体教室 - NMP中控方案)', y: 390 },
-        { key: 'room_h', name: 'Lecture Hall (大型报告厅 - NDP200落地讲台方案)', y: 580 },
-        { key: 'room_sl', name: 'Classroom C (高端精品智慧教室 - SL100讲台方案)', y: 770 },
-        { key: 'room_c', name: 'Smart Meeting Room (智慧会议室 - NPS150)', y: 960 },
-        { key: 'room_l', name: 'Library (图书馆阅览大厅 - 视听与通知)', y: 1150 }
-    ];
-
     const svgElement = (tag, attributes = {}) => {
         const element = document.createElementNS(SVG_NS, tag);
         Object.entries(attributes).forEach(([name, value]) => element.setAttribute(name, value));
@@ -52,8 +43,8 @@
         group.appendChild(title);
     }
 
-    function renderCampusBoundary(group, translations) {
-        const bottom = TOPOLOGY_DATA.config.canvasHeight - 15;
+    function renderCampusBoundary(group, translations, canvasHeight) {
+        const bottom = canvasHeight - 15;
         const path = svgElement('path', {
             id: 'campus-lan-boundary',
             class: 'campus-lan-boundary',
@@ -65,8 +56,8 @@
         group.appendChild(title);
     }
 
-    function renderRooms(group, translations) {
-        ROOMS.forEach(room => {
+    function renderRooms(group, translations, rooms) {
+        rooms.forEach(room => {
             group.appendChild(svgElement('rect', {
                 x: 770, y: room.y, width: 625, height: room.height || 175, rx: 10, class: 'room-boundary'
             }));
@@ -74,9 +65,9 @@
                 x: 782, y: room.y + 6, width: 340, height: 18, rx: 4, class: 'room-title-bg'
             }));
             const title = svgElement('text', {
-                x: 790, y: room.y + 19, class: 'room-title'
+                x: 790, y: room.y + 19, class: 'room-title', 'data-room': room.key
             });
-            title.textContent = translations?.zones?.[room.key] || room.name;
+            title.textContent = translations?.zones?.[room.key] || room.key;
             group.appendChild(title);
         });
     }
@@ -94,6 +85,7 @@
             'marker-end': `url(#arrow-${markerType})`
         });
         if (connection.type === 'usb') path.removeAttribute('marker-end');
+        if (connection.bidirectional) path.setAttribute('marker-start', 'url(#arrow-lan)');
         if (connection.dashed) path.setAttribute('stroke-dasharray', '6 4');
         const title = svgElement('title');
         title.textContent = `${connection.label} (${connection.type.toUpperCase()})`;
@@ -103,7 +95,7 @@
 
     function createCableLabel(connection) {
         const switchBranch = connection.from === 'switch';
-        if (connection.type === 'hdmi' || switchBranch || connection.points?.length < 2) return null;
+        if (connection.hideLabel || connection.type === 'hdmi' || switchBranch || connection.points?.length < 2) return null;
 
         const endIndex = connection.type === 'audio' && connection.pathType === 'cubic' ? 3 : 1;
         const midX = connection.labelPosition?.[0] ?? (connection.points[0][0] + connection.points[endIndex][0]) / 2;
@@ -114,8 +106,9 @@
             class: `cable-label-group cable-label-${connection.type}`,
             transform: `translate(${midX}, ${midY})`
         });
+        const width = Math.max(76, connection.label.length * 5.3 + 12);
         group.appendChild(svgElement('rect', {
-            x: -38, y: -9, width: 76, height: 18, rx: 4, class: 'cable-label-bg'
+            x: -width / 2, y: -9, width, height: 18, rx: 4, class: 'cable-label-bg'
         }));
         const text = svgElement('text', {
             x: 0, y: 3.5, 'text-anchor': 'middle', class: 'cable-label-text'
@@ -130,8 +123,9 @@
             const svg = document.getElementById('topology-svg');
             const nodeContainer = document.getElementById('nodes-container');
             if (!svg || !nodeContainer) return;
-            const { canvasWidth, canvasHeight } = TOPOLOGY_DATA.config;
+            const { canvasWidth, canvasHeight } = this.getTopology().config;
             const board = document.getElementById('topology-board');
+            board.dataset.architectureView = this.view;
             board.style.width = `${canvasWidth}px`;
             board.style.height = `${canvasHeight}px`;
             svg.setAttribute('width', canvasWidth);
@@ -141,6 +135,7 @@
             nodeContainer.innerHTML = '';
             this.renderSvgTopology(svg);
             this.renderDeviceNodes(nodeContainer);
+            this.updateBroadcastGuide();
         },
 
         renderSvgTopology(svg) {
@@ -148,8 +143,8 @@
             const translations = this.getTranslations();
             const background = svgElement('g', { id: 'bg-group' });
             renderCloudBoundary(background, translations);
-            renderCampusBoundary(background, translations);
-            renderRooms(background, translations);
+            renderCampusBoundary(background, translations, this.getTopology().config.canvasHeight);
+            renderRooms(background, translations, this.getTopology().rooms);
             svg.appendChild(background);
             this.renderConnections(svg);
             svg.appendChild(svgElement('g', { id: 'particle-container' }));
@@ -157,7 +152,7 @@
 
         renderConnections(svg) {
             const group = svgElement('g', { id: 'lines-group' });
-            TOPOLOGY_DATA.connections.forEach(connection => {
+            this.getTopology().connections.forEach(connection => {
                 if (!this.isDeviceVisible(connection.from) || !this.isDeviceVisible(connection.to)) return;
                 group.appendChild(createConnectionPath(connection));
                 const label = createCableLabel(connection);

@@ -3,8 +3,8 @@ window.I18N_DATA.es = {
     media_server_option: 'Servidor multimedia (opcional)',
     export_png: 'Exportar PNG', export_busy: 'Exportando…', export_success: 'PNG guardado',
     export_error: 'No se pudo exportar el PNG. Inténtelo de nuevo o recargue la página.',
-    app_title: 'Simulador de arquitectura del sistema', app_tag: 'Formación en línea v3.1',
-    app_subtitle: 'Simulación interactiva del flujo de señales según las especificaciones de cableado de Q-NEX',
+    app_title: "Vista general de la arquitectura", app_tag: 'Formación en línea v3.1',
+    app_subtitle: "Control de equipos y distribución multimedia",
     theme_light: '☀️ Tema: claro', theme_dark: '🌙 Tema: oscuro', lang_btn: '🌐 Español',
     tour_btn: '🎓 Guía de inicio', sound_on: '🔊 Sonido: activado', sound_off: '🔇 Sonido: silenciado',
     pause: '⏸️ Pausar', play: '▶️ Reproducir',
@@ -19,24 +19,24 @@ window.I18N_DATA.es = {
     scenario_bar_title: 'Escenarios de formación:',
     scenarios: {
         standby: {
-            btn: '🌐 Espera y topología', badge: 'EN ESPERA', title: 'Topología IoT en espera y señales de actividad',
-            desc: 'Los terminales Q-NEX mantienen conexiones MQTT ligeras con la nube para comprobar su estado en línea. La distribución de audio y vídeo del campus se realiza en la red local.'
+            btn: "🌐 Vista de topología", badge: 'EN ESPERA', title: "Estado de equipos y topología",
+            desc: "Consulte las conexiones y el estado en línea de los terminales Q-NEX. Las órdenes de gestión y el contenido multimedia de la LAN se muestran por separado."
         },
         live_broadcast: {
-            btn: '📡 Emisión en directo (RTMP)', badge: 'EN DIRECTO', title: 'Distribución de vídeo en directo por el campus',
-            desc: "El Media Server opcional distribuye vídeo en directo por la LAN a NDP600, NMP311, NDP200 y MBX100 de la biblioteca. NPS150 y SL100 no reciben esta emisión."
+            btn: "📡 Vídeo en directo", badge: 'EN DIRECTO', title: "Vídeo en directo del campus",
+            desc: "Web Console o la aplicación envía una orden por la nube al Media Server del campus. El servidor distribuye contenido por la LAN a NDP600, NMP311, NDP200 y MBX100 para emitir imagen y sonido."
         },
         bell_music: {
-            btn: '🎵 Timbres y música programados', badge: 'AUDIO PROGRAMADO', title: 'Timbres escolares y música del almuerzo',
-            desc: "El Media Server opcional distribuye timbres y música programados a NDP600, NMP311, NDP200 y MBX100 de la biblioteca. NPS150 y SL100 no participan."
+            btn: "🎵 Timbres y música", badge: 'AUDIO PROGRAMADO', title: "Timbres y música del campus",
+            desc: "Configure una tarea en Web Console o la aplicación. La orden llega a Media Server mediante la nube y el servidor distribuye timbres y música. Las tareas programadas siguen el horario configurado."
         },
         cloud_control: {
-            btn: '⚡ Control desde la nube (MQTT)', badge: 'CONTROL REMOTO', title: 'Control centralizado y gestión IoT desde la nube',
-            desc: 'El administrador activa el encendido por lotes desde la consola web o la aplicación. Los comandos MQTT pasan por Q-NEX Cloud, la puerta de enlace y el conmutador hasta los terminales del aula.'
+            btn: "⚡ Control en la nube", badge: 'CONTROL REMOTO', title: "Control de equipos desde la nube",
+            desc: "El administrador envía órdenes desde Web Console o Q-NEX App por la nube, la puerta de enlace y el conmutador hasta los terminales. Las acciones dependen del equipo, la plataforma y los permisos."
         },
         emergency_alert: {
-            btn: '🚨 Aviso de emergencia por texto', badge: 'AVISO DE TEXTO', title: 'Aviso de evacuación del campus por texto',
-            desc: 'Q-NEX Cloud envía instrucciones de evacuación directamente por MQTT. No requiere servidor multimedia. Los terminales, incluido SL100, muestran el aviso en las pantallas conectadas. Este escenario representa un aviso de texto.'
+            btn: "📢 Avisos de texto", badge: "Avisos de texto", title: "Avisos del campus",
+            desc: "Web Console o la aplicación envía avisos cotidianos mediante la nube a los terminales y sus pantallas conectadas, sin Media Server."
         },
         local_teaching: {
             btn: "💻 Clases y reuniones (AV local)", badge: 'AV LOCAL', title: "Clases y reuniones locales",

@@ -77,7 +77,7 @@
             name: "Q-NEX Media Server",
             genericName_zh: "流媒体服务器 (Q-NEX 直播服务)",
             genericName_en: "Media Server (Streaming Engine)",
-            model: "Media Server (Optional)",
+            model: "Media Server",
             image: "assets/MediaServer-1.png",
             category: "core_service",
             zone_zh: "Campus Gigabit LAN (内网服务集群)",

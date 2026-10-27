@@ -3,9 +3,7 @@
     Object.assign(Simulator.prototype, {
         bindEvents() {
             this.bindScenarioControls();
-            document.getElementById('media-server-option')?.addEventListener('change', event => {
-                this.setMediaServerEnabled(event.target.checked);
-            });
+            this.bindViewControls();
             document.getElementById('btn-export-png')?.addEventListener('click', () => this.exportPng());
             this.bindPlaybackControls();
             this.bindDisplayControls();
@@ -18,6 +16,23 @@
             this.handleResize();
         },
 
+        bindViewControls() {
+            const tabs = [...document.querySelectorAll('[data-view]')];
+            tabs.forEach((tab, index) => {
+                tab.addEventListener('click', () => this.setView(tab.dataset.view));
+                tab.addEventListener('keydown', event => {
+                    if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+                    event.preventDefault();
+                    const rtl = document.documentElement.dir === 'rtl';
+                    const forward = event.key === (rtl ? 'ArrowLeft' : 'ArrowRight');
+                    const target = event.key === 'Home' ? 0 : event.key === 'End' ? tabs.length - 1
+                        : (index + (forward ? 1 : -1) + tabs.length) % tabs.length;
+                    this.setView(tabs[target].dataset.view);
+                    tabs[target].focus();
+                });
+            });
+        },
+
         bindScenarioControls() {
             document.querySelectorAll('.scenario-btn').forEach(button => {
                 button.addEventListener('click', () => this.setScenario(button.dataset.scenario));
@@ -27,10 +42,7 @@
         bindPlaybackControls() {
             const playButton = document.getElementById('btn-play-pause');
             playButton?.addEventListener('click', () => {
-                this.isPlaying = !this.isPlaying;
-                const translations = this.getTranslations();
-                playButton.innerHTML = this.isPlaying ? translations.pause : translations.play;
-                window.soundSys?.playClick();
+                this.setPlayback(!this.isPlaying);
             });
 
             document.getElementById('speed-select')?.addEventListener('change', event => {
@@ -47,7 +59,7 @@
                 window.soundSys.setMuted(isMuted);
                 const translations = this.getTranslations();
                 soundButton.innerHTML = isMuted ? translations.sound_off : translations.sound_on;
-                if (!isMuted) window.soundSys.playClick();
+                if (!isMuted && this.isPlaying) window.soundSys.playClick();
             });
         },
 

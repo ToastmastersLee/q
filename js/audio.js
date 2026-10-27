@@ -32,7 +32,7 @@ class SoundSynthesizer {
     }
 
     playClick() {
-        if (this.isMuted) return;
+        if (this.isMuted || window.simulator?.isPlaying === false) return;
         this.init();
         if (!this.ctx) return;
 
@@ -53,7 +53,7 @@ class SoundSynthesizer {
     }
 
     playBellChime() {
-        if (this.isMuted) return;
+        if (this.isMuted || window.simulator?.isPlaying === false) return;
         this.init();
         if (!this.ctx) return;
 
@@ -81,7 +81,7 @@ class SoundSynthesizer {
     }
 
     playMusicTune() {
-        if (this.isMuted) return;
+        if (this.isMuted || window.simulator?.isPlaying === false) return;
         this.init();
         if (!this.ctx) return;
 
@@ -116,7 +116,7 @@ class SoundSynthesizer {
     }
 
     playEmergencySiren() {
-        if (this.isMuted) return;
+        if (this.isMuted || window.simulator?.isPlaying === false) return;
         this.init();
         if (!this.ctx) return;
 
@@ -142,7 +142,7 @@ class SoundSynthesizer {
     }
 
     playLiveBroadcastTone() {
-        if (this.isMuted) return;
+        if (this.isMuted || window.simulator?.isPlaying === false) return;
         this.init();
         if (!this.ctx) return;
 

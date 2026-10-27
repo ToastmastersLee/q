@@ -89,8 +89,8 @@
             category: "peripheral",
             zone_zh: "Classroom C (高端精品智慧教室)",
             zone_en: "Classroom C (Premium Smart Classroom)",
-            role_zh: "呈现 SL100 本地输出的教学课件与书写画面。流媒体不往 SL100 走；接收到火警等云端文本广播时，可在屏幕上显示应急疏散文本通知（无需 Media Server 支持）。",
-            role_en: "Displays local lesson slides and annotations from SL100. Live streaming does not route to SL100; during fire alarms, it displays cloud-pushed emergency evacuation text notices without needing Media Server.",
+            role_zh: "Web Console 或 App 经云端向终端发送日常文字通知，内容显示在连接的屏幕上，无需 Media Server。",
+            role_en: "Web Console or App sends everyday text notices through the cloud to endpoints for display on connected screens. No Media Server is required.",
         },
         spk_sl: {
             id: "spk_sl",
@@ -141,8 +141,8 @@
             category: "peripheral",
             zone_zh: "Library (图书馆阅览大厅)",
             zone_en: "Library (Reading Hall)",
-            role_zh: "图书馆大厅电子屏，展示借阅须知、闭馆时间及好书推荐。支持云端即时文字紧急推送覆盖。",
-            role_en: "Library reading hall display showing opening hours, borrow notices, and recommendations. Supports instant cloud emergency text overlays.",
+            role_zh: "图书馆大厅电子屏，展示借阅须知、闭馆时间及好书推荐。支持云端日常文字通知。",
+            role_en: "Library reading hall display showing opening hours, borrow notices, and recommendations. Supports everyday cloud text notices.",
         },
         spk_l: {
             id: "spk_l",

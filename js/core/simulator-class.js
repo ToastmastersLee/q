@@ -10,10 +10,7 @@
             this.theme = 'light';
             try { this.theme = localStorage.getItem('qnex_theme') || 'light'; } catch (error) {}
             this.currentScenario = 'standby';
-            this.mediaServerEnabled = false;
-            try {
-                this.mediaServerEnabled = localStorage.getItem('qnex_media_server') === 'true';
-            } catch (error) {}
+            this.view = 'control';
             this.scenarioSoundTimer = null;
             this.isPlaying = true;
             this.speed = 1.0;
@@ -22,6 +19,8 @@
             this.particleGenerators = [];
             this.animationFrameId = null;
             this.lastTimestamp = 0;
+            this.animationTime = 0;
+            this.animationTasks = [];
             this.cableFilters = {
                 lan: true,
                 hdmi: true,
@@ -36,6 +35,8 @@
             this.screenStates_zh = app.data.screenStates.zh;
             this.screenStates_en = app.data.screenStates.en;
         }
+
+        get mediaServerEnabled() { return this.view === 'media'; }
 
         init() {
             this.renderCanvas();

@@ -14,7 +14,9 @@
             this.updateScenarioBanner(scenarioKey);
             this.playScenarioSound(scenarioKey);
             this.updateScreensAndSpeakers(scenarioKey);
-            this.setupScenarioParticles(scenarioKey);
+            if (this.mediaServerEnabled && scenarioKey !== 'standby') this.startBroadcastCycle();
+            else this.setupScenarioParticles(scenarioKey);
+            this.updateBroadcastGuide();
         },
 
         updateScenarioButtons(scenarioKey) {
@@ -46,25 +48,10 @@
         },
 
         playScenarioSound(scenarioKey) {
-            if (!window.soundSys) return;
-            const simpleSounds = {
-                live_broadcast: 'playLiveBroadcastTone',
-                cloud_control: 'playClick',
-                emergency_alert: 'playClick',
-                local_teaching: 'playClick'
-            };
-            if (scenarioKey === 'bell_music') {
-                window.soundSys.playBellChime();
-                this.scenarioSoundTimer = setTimeout(() => {
-                    this.scenarioSoundTimer = null;
-                    if (this.mediaServerEnabled && this.currentScenario === 'bell_music') {
-                        window.soundSys.playMusicTune();
-                    }
-                }, 1200);
-                return;
+            if (!window.soundSys || this.mediaServerEnabled) return;
+            if (['cloud_control', 'emergency_alert', 'local_teaching'].includes(scenarioKey)) {
+                window.soundSys.playClick();
             }
-            const method = simpleSounds[scenarioKey];
-            if (method) window.soundSys[method]();
         },
 
         updateScreensAndSpeakers(scenarioKey) {
@@ -75,7 +62,8 @@
         updateScreenPreviews(scenarioKey) {
             const localeStates = app.data.screenStates[this.lang] || app.data.screenStates.zh;
             const screens = localeStates[scenarioKey] || localeStates.standby;
-            Object.entries(screens).forEach(([screenId, data]) => {
+            Object.entries(screens).forEach(([screenId, state]) => {
+                const data = this.hasBroadcastReached(screenId) ? state : localeStates.standby[screenId];
                 const element = document.getElementById(`screen-${screenId}`);
                 if (!element) return;
                 element.style.backgroundColor = data.color;
@@ -96,7 +84,7 @@
                 emergency_alert: false,
                 local_teaching: ['spk_a', 'spk_b', 'spk_h', 'spk_sl', 'spk_c'].includes(speakerId)
             };
-            const active = Boolean(activeByScenario[scenarioKey]);
+            const active = Boolean(activeByScenario[scenarioKey]) && this.hasBroadcastReached(speakerId);
             const color = scenarioKey === 'live_broadcast' ? '#3b82f6' : '#2ECC40';
 
             waveElement.classList.toggle('active', active);

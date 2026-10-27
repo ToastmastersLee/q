@@ -47,6 +47,7 @@
             this.updateLegendLanguage(translations);
             this.updateTourLanguage(translations);
             this.updateScreensAndSpeakers(this.currentScenario);
+            this.updateBroadcastGuide();
         },
 
         updateHeaderLanguage(translations) {
@@ -109,10 +110,9 @@
             const campusTitle = document.querySelector('.campus-lan-title');
             if (campusTitle && translations.zones) campusTitle.textContent = translations.zones.campus_lan;
 
-            const roomKeys = ['room_a', 'room_b', 'room_h', 'room_sl', 'room_c', 'room_l'];
-            document.querySelectorAll('.room-title').forEach((element, index) => {
-                if (translations.zones?.[roomKeys[index]]) {
-                    element.textContent = translations.zones[roomKeys[index]];
+            document.querySelectorAll('.room-title').forEach(element => {
+                if (translations.zones?.[element.dataset.room]) {
+                    element.textContent = translations.zones[element.dataset.room];
                 }
             });
 
@@ -250,8 +250,8 @@
             const container = document.getElementById('board-container');
             if (!board || !container) return;
 
-            const width = TOPOLOGY_DATA.config.canvasWidth;
-            const height = TOPOLOGY_DATA.config.canvasHeight;
+            const width = this.getTopology().config.canvasWidth;
+            const height = this.getTopology().config.canvasHeight;
             // clientWidth excludes the native vertical scrollbar. Keep 12px on each side.
             const scale = Math.min(Math.max(0, container.clientWidth - 24) / width, 1.15);
             board.style.transform = `scale(${scale})`;

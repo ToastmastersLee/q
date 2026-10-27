@@ -19,7 +19,7 @@
 
     Object.assign(Simulator.prototype, {
         renderDeviceNodes(container) {
-            Object.entries(TOPOLOGY_DATA.positions).forEach(([deviceId, position]) => {
+            Object.entries(this.getTopology().positions).forEach(([deviceId, position]) => {
                 const device = TOPOLOGY_DATA.devices[deviceId];
                 if (!device || !this.isDeviceVisible(deviceId)) return;
                 container.appendChild(this.createDeviceNode(device, position));

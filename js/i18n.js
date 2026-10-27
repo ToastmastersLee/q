@@ -9,9 +9,9 @@ const I18N_DATA = {
         export_busy: '正在导出…',
         export_success: 'PNG 已导出',
         export_error: 'PNG 导出失败，请重试；如仍失败，请刷新页面。',
-        app_title: '系统架构全景仿真器 (System Architecture Simulator)',
+        app_title: "系统架构全景",
         app_tag: 'Online Training v3.0',
-        app_subtitle: '基于《Q-NEX 产品线拓扑图设计规范》的动态信号流仿真与新手教学系统',
+        app_subtitle: "设备控制与多媒体广播流程演示",
         
         // Header Controls
         theme_light: '<span>☀️</span> 皮肤：浅色明亮',
@@ -48,34 +48,34 @@ const I18N_DATA = {
         scenario_bar_title: '培训演练场景：',
         scenarios: {
             standby: {
-                btn: '<span>🌐</span> 待机心跳与拓扑',
+                btn: "🌐 拓扑总览",
                 badge: '待机总览',
-                title: '校园物联待机拓扑 (Normal Standby & IoT Heartbeat)',
-                desc: '全校所有 Q-NEX 终端（数字讲台、NMP处理器、SL100、NPS150、图书馆 MBX 媒体盒）与云端管理平台保持轻量 MQTT 心跳连接，用于实时检测在线/离线状态；校园局域网与流媒体引擎处于低功耗就绪状态。'
+                title: "设备在线状态与拓扑总览",
+                desc: "查看 Q-NEX 终端与云端平台之间的连接和在线状态。设备管理指令与校园内网的媒体分发分别展示。"
             },
             live_broadcast: {
-                btn: '<span>📡</span> 全校视讯直播 (RTMP推流)',
+                btn: "📡 视讯直播",
                 badge: '视讯直播',
-                title: '全校视讯直播 (Campus Live Streaming & RTMP Distribution)',
-                desc: "选配的 Media Server 通过校园内网向 NDP600、NMP311、NDP200 和图书馆 MBX100 分发直播。NPS150 和 SL100 不参与此广播。"
+                title: "校园视讯直播",
+                desc: "从 Web Console 或 App 发起广播指令，经云端到达校园 Media Server，再通过内网向 NDP600、NMP311、NDP200 和 MBX100 分发媒体，由终端输出画面与声音。"
             },
             bell_music: {
-                btn: '<span>🎵</span> 定时打铃与午间音乐 (内网音频)',
+                btn: "🎵 铃声与音乐",
                 badge: '定时广播',
-                title: '作息打铃与午间音乐 (Scheduled Bell & Lunch Break Music)',
-                desc: "选配的 Media Server 向 NDP600、NMP311、NDP200 和图书馆 MBX100 分发定时打铃与背景音乐。NPS150 和 SL100 不参与此广播。"
+                title: "校园铃声与音乐",
+                desc: "通过 Web Console 或 App 设置广播任务，指令经云端交给 Media Server，由服务器向支持的终端分发铃声与音乐。定时任务按已配置的排期执行。"
             },
             cloud_control: {
-                btn: '<span>⚡</span> 云端批量控制 (MQTT信令)',
+                btn: "⚡ 云端控制",
                 badge: '云端中控',
-                title: '云端批量统一控制 (Cloud Remote Control & IoT Management)',
-                desc: '管理员通过 Web 或移动端下发支持的远程控制，信令经过云端、网关和交换机到达终端；实际动作以设备接口、平台与权限配置为准。'
+                title: "云端设备控制",
+                desc: "管理员通过 Web Console 或 Q-NEX App 下发指令，经云端、网关和交换机到达终端。可用操作取决于设备、平台配置和账户权限。"
             },
             emergency_alert: {
-                btn: '<span>🚨</span> 突发火警文本广播',
-                badge: '云端文本广播',
-                title: '突发火警文本广播 (Emergency Evacuation Text Notice)',
-                desc: '本场景演示通过云端信令向连接的显示设备发送文字通知，无需经过流媒体服务器。可用的通知与控制功能以终端型号、固件和平台配置为准。'
+                btn: "📢 文本通知",
+                badge: "文本通知",
+                title: "校园文本通知",
+                desc: "Web Console 或 App 经云端向终端发送日常文字通知，内容显示在连接的屏幕上，无需 Media Server。"
             },
             local_teaching: {
                 btn: "💻 本地教学与会议（本地音视频）",
@@ -135,9 +135,9 @@ const I18N_DATA = {
         export_busy: 'Exporting…',
         export_success: 'PNG exported',
         export_error: 'PNG export failed. Please retry or reload the page.',
-        app_title: 'System Architecture Simulator',
+        app_title: "System Architecture Overview",
         app_tag: 'Online Training v3.0',
-        app_subtitle: 'Interactive Dynamic Signal Flow Simulator based on Q-NEX Topology Wiring Specifications',
+        app_subtitle: "Device control and multimedia broadcast flows",
 
         // Header Controls
         theme_light: '<span>☀️</span> Theme: Light',
@@ -174,34 +174,34 @@ const I18N_DATA = {
         scenario_bar_title: 'Training Scenarios:',
         scenarios: {
             standby: {
-                btn: '<span>🌐</span> Standby & Topology',
+                btn: "🌐 Topology Overview",
                 badge: 'STANDBY',
-                title: 'Campus IoT Standby Topology (Normal Standby & IoT Heartbeat)',
-                desc: 'All Q-NEX terminals across campus (Smart Podiums, NMP, SL100, and NPS150 and library MBX media boxes) maintain lightweight MQTT heartbeat connections with Q-NEX Cloud to determine real-time online/offline status.'
+                title: "Device Status & Topology",
+                desc: "View connections and online status between Q-NEX endpoints and the cloud platform. Management commands and campus LAN media distribution are shown separately."
             },
             live_broadcast: {
-                btn: '<span>📡</span> Live Broadcast (RTMP)',
+                btn: "📡 Live Video",
                 badge: 'LIVE ON AIR',
-                title: 'Campus Live Streaming & Video Distribution (RTMP Distribution)',
-                desc: "The optional Media Server distributes live video over the campus LAN to NDP600, NMP311, NDP200 and the library MBX100. NPS150 and SL100 do not receive this broadcast."
+                title: "Campus Live Video",
+                desc: "Web Console or App sends a broadcast command through the cloud to the campus Media Server. The server distributes media over the LAN to NDP600, NMP311, NDP200 and MBX100 for local display and audio output."
             },
             bell_music: {
-                btn: '<span>🎵</span> Bell & Lunch Music (Audio)',
+                btn: "🎵 Bells & Music",
                 badge: 'SCHEDULED AUDIO',
-                title: 'Scheduled Bell & Lunch Break Music (Internal LAN Broadcast)',
-                desc: "The optional Media Server sends scheduled bells and background music to NDP600, NMP311, NDP200 and the library MBX100. NPS150 and SL100 do not participate."
+                title: "Campus Bells & Music",
+                desc: "Set up a broadcast task in Web Console or App. The command reaches Media Server through the cloud; the server distributes bells and music to supported endpoints. Scheduled tasks follow the configured timetable."
             },
             cloud_control: {
-                btn: '<span>⚡</span> Cloud Control (MQTT)',
+                btn: "⚡ Cloud Control",
                 badge: 'CLOUD CONTROL',
-                title: 'Centralized Cloud Remote Control & IoT Management (MQTT Control)',
-                desc: '[Key Architecture Lesson]: Administrator clicks batch power-on from PC Web Console or Mobile App. Lightweight MQTT commands traverse Q-NEX Cloud -> Gateway -> Switch -> Endpoints according to the device and platform configuration.'
+                title: "Cloud Device Control",
+                desc: "An administrator sends a command from Web Console or Q-NEX App through the cloud, gateway and switch to endpoints. Available actions depend on the device, platform configuration and account permissions."
             },
             emergency_alert: {
-                btn: '<span>🚨</span> Emergency Text Broadcast',
-                badge: 'TEXT BROADCAST',
-                title: 'Campus Emergency Evacuation Text Broadcast',
-                desc: 'This example illustrates cloud text notices on connected displays without using the Media Server. Available actions and text display depend on the endpoint, firmware and platform configuration.'
+                btn: "📢 Text Notices",
+                badge: "Text Notices",
+                title: "Campus Text Notices",
+                desc: "Web Console or App sends everyday text notices through the cloud to endpoints for display on connected screens. No Media Server is required."
             },
             local_teaching: {
                 btn: "💻 Local Teaching & Meetings (Local AV)",

@@ -1,6 +1,7 @@
 /** Capture the complete layered board, independently of viewport scale/scroll. */
 (function (app, Simulator) {
-    function snapshotBoard() {
+    function snapshotBoard(simulator) {
+        const { canvasWidth, canvasHeight } = simulator.getTopology().config;
         const source = document.getElementById('topology-board');
         const clone = source.cloneNode(true);
         const originals = [source, ...source.querySelectorAll('*')];
@@ -32,7 +33,7 @@
         const background = getComputedStyle(document.getElementById('board-container'));
         Object.assign(clone.style, {
             position: 'relative', top: '0', left: '0', transform: 'none', margin: '0',
-            width: `${app.data.topology.config.canvasWidth}px`, height: `${app.data.topology.config.canvasHeight}px`, overflow: 'hidden',
+            width: `${canvasWidth}px`, height: `${canvasHeight}px`, overflow: 'hidden',
             backgroundColor: background.backgroundColor,
             backgroundImage: background.backgroundImage,
             backgroundSize: background.backgroundSize
@@ -66,7 +67,7 @@
             if (this.isExporting) return;
             this.isExporting = true;
             const playing = this.isPlaying;
-            this.isPlaying = false;
+            this.setPlayback(false);
             this.updateExportButton();
             const controls = [...document.querySelectorAll('button, input, select')];
             const disabled = controls.map(control => control.disabled);
@@ -76,11 +77,12 @@
             status.textContent = this.getTranslations().export_busy;
             try {
                 await document.fonts.ready;
-                snapshot = snapshotBoard();
+                snapshot = snapshotBoard(this);
+                const { canvasWidth, canvasHeight } = this.getTopology().config;
                 await Promise.all([...snapshot.clone.querySelectorAll('img')].map(img => img.decode()));
                 const blob = await window.htmlToImage.toBlob(snapshot.clone, {
-                    width: app.data.topology.config.canvasWidth,
-                    height: app.data.topology.config.canvasHeight, pixelRatio: 2, fontEmbedCSS: ''
+                    width: canvasWidth,
+                    height: canvasHeight, pixelRatio: 2, fontEmbedCSS: ''
                 });
                 if (!blob) throw new Error('PNG encoder returned no data');
                 const url = URL.createObjectURL(blob);
@@ -98,7 +100,7 @@
             } finally {
                 snapshot?.host.remove();
                 controls.forEach((control, index) => { control.disabled = disabled[index]; });
-                this.isPlaying = playing;
+                this.setPlayback(playing);
                 this.lastTimestamp = performance.now();
                 this.isExporting = false;
                 this.updateExportButton();

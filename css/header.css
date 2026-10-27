@@ -66,8 +66,6 @@ header.app-header {
 header.app-header { flex-wrap: wrap; gap: 12px; }
 .header-actions { flex: 0 0 auto; }
 .brand-section { flex: 1 1 480px; min-width: 0; }
-.media-server-option { white-space: nowrap; }
-.media-server-option input { accent-color: #0074D9; }
 .btn:disabled { cursor: wait; opacity: 0.65; }
 [hidden] { display: none !important; }
 .export-status { pointer-events: none; font-size: 12px; color: var(--text-muted); }
@@ -75,7 +73,7 @@ header.app-header { flex-wrap: wrap; gap: 12px; }
 .app-title-group { min-width: 0; }
 .tool-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding-bottom: 12px; border-bottom: 1px solid var(--border-color); }
 .tool-actions .btn { justify-content: center; }
-.tool-actions .media-server-option, #btn-scenarios-toggle { grid-column: 1 / -1; }
+#btn-scenarios-toggle { grid-column: 1 / -1; }
 .export-status:not(:empty) { position: fixed; right: 20px; bottom: 20px; padding: 12px 16px; border-radius: 8px; background: var(--bg-card); border: 1px solid var(--border-color); box-shadow: 0 4px 16px #0002; z-index: 200; }
 @media (max-width: 700px) {
     header.app-header { padding: 10px 12px; }

@@ -3,8 +3,8 @@ window.I18N_DATA.ja = {
     media_server_option: 'メディアサーバー（オプション）',
     export_png: 'PNGを書き出す', export_busy: '書き出し中…', export_success: 'PNGを保存しました',
     export_error: 'PNGの書き出しに失敗しました。再試行するかページを更新してください。',
-    app_title: 'システム構成シミュレーター', app_tag: 'オンライン研修 v3.1',
-    app_subtitle: 'Q-NEXの配線仕様に基づく、信号の流れとシステム構成を学ぶ対話型ツール',
+    app_title: "システム構成の全体像", app_tag: 'オンライン研修 v3.1',
+    app_subtitle: "機器制御とマルチメディア配信の流れ",
     theme_light: '☀️ テーマ：ライト', theme_dark: '🌙 テーマ：ダーク', lang_btn: '🌐 日本語',
     tour_btn: '🎓 はじめてのガイド', sound_on: '🔊 効果音：オン', sound_off: '🔇 効果音：ミュート',
     pause: '⏸️ 一時停止', play: '▶️ 再生',
@@ -19,24 +19,24 @@ window.I18N_DATA.ja = {
     scenario_bar_title: '研修シナリオ：',
     scenarios: {
         standby: {
-            btn: '🌐 待機とトポロジー', badge: '待機', title: 'キャンパスIoTの待機状態とハートビート',
-            desc: 'キャンパス内のQ-NEX端末は、軽量なMQTTハートビートでクラウドと接続し、オンライン状態を確認します。学内の映像・音声配信はローカルネットワークで処理します。'
+            btn: "🌐 構成図", badge: '待機', title: "機器の接続状態と構成図",
+            desc: "Q-NEX端末とクラウドの接続・オンライン状態を確認します。管理コマンドと学内LANのメディア配信を分けて表示します。"
         },
         live_broadcast: {
-            btn: '📡 学内ライブ配信（RTMP）', badge: 'ライブ配信', title: 'キャンパス全体へのライブ映像配信',
-            desc: "オプションのMedia Serverが学内LAN経由でNDP600、NMP311、NDP200と図書館のMBX100にライブ映像を配信します。NPS150とSL100は受信しません。"
+            btn: "📡 ライブ映像", badge: 'ライブ配信', title: "学内ライブ映像配信",
+            desc: "Web Consoleまたはアプリの配信指示がクラウド経由で学内Media Serverに届きます。サーバーがLANでNDP600、NMP311、NDP200、MBX100に配信し、端末が映像と音声を出力します。"
         },
         bell_music: {
-            btn: '🎵 定時チャイムと音楽', badge: '定時音声', title: '授業チャイムと昼休みの音楽',
-            desc: "オプションのMedia ServerがNDP600、NMP311、NDP200と図書館のMBX100に定時チャイムとBGMを配信します。NPS150とSL100は参加しません。"
+            btn: "🎵 チャイムと音楽", badge: '定時音声', title: "学内チャイムと音楽",
+            desc: "Web Consoleまたはアプリで配信タスクを設定します。指示がクラウド経由でMedia Serverに届き、チャイムや音楽を配信します。予約タスクは設定済みの時刻表に従います。"
         },
         cloud_control: {
-            btn: '⚡ クラウド一括制御（MQTT）', badge: 'クラウド制御', title: 'クラウドからの遠隔制御とIoT管理',
-            desc: '管理者がWebコンソールやアプリで一括電源操作を実行すると、MQTTコマンドがQ-NEXクラウド、ゲートウェイ、スイッチを経由して教室の端末に届きます。'
+            btn: "⚡ クラウド制御", badge: 'クラウド制御', title: "クラウドからの機器制御",
+            desc: "Web ConsoleまたはQ-NEX Appからのコマンドが、クラウド、ゲートウェイ、スイッチを経由して端末に届きます。操作範囲は機器、設定、アカウント権限によります。"
         },
         emergency_alert: {
-            btn: '🚨 緊急テキスト配信', badge: 'テキスト通知', title: 'キャンパスの緊急避難テキスト通知',
-            desc: 'Q-NEXクラウドがMQTTで避難案内を直接配信します。メディアサーバーは不要で、SL100を含む端末が接続先の画面に案内を表示します。このシナリオはテキスト通知です。'
+            btn: "📢 テキスト通知", badge: 'テキスト通知', title: "学内テキスト通知",
+            desc: "Web Consoleまたはアプリから日常のお知らせをクラウド経由で端末と接続画面に送信します。Media Serverは不要です。"
         },
         local_teaching: {
             btn: "💻 ローカル授業・会議 (AV)", badge: 'ローカルAV', title: "ローカル授業・会議",

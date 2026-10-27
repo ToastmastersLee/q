@@ -3,8 +3,8 @@ window.I18N_DATA.ko = {
     media_server_option: '미디어 서버 (선택 사항)',
     export_png: 'PNG 내보내기', export_busy: '내보내는 중…', export_success: 'PNG 저장 완료',
     export_error: 'PNG 내보내기에 실패했습니다. 다시 시도하거나 페이지를 새로 고치세요.',
-    app_title: '시스템 아키텍처 시뮬레이터', app_tag: '온라인 교육 v3.1',
-    app_subtitle: 'Q-NEX 배선 규격을 기반으로 신호 흐름과 시스템 구성을 확인하는 대화형 교육 도구',
+    app_title: "시스템 구성 전체 보기", app_tag: '온라인 교육 v3.1',
+    app_subtitle: "장비 제어와 멀티미디어 방송 흐름",
     theme_light: '<span>☀️</span> 테마: 밝게', theme_dark: '<span>🌙</span> 테마: 어둡게',
     lang_btn: '🌐 한국어', tour_btn: '<span>🎓</span> 초보자 가이드',
     sound_on: '<span>🔊</span> 효과음: 켜짐', sound_off: '<span>🔇</span> 효과음: 음소거',
@@ -20,24 +20,24 @@ window.I18N_DATA.ko = {
     scenario_bar_title: '교육 시나리오:',
     scenarios: {
         standby: {
-            btn: '🌐 대기 및 토폴로지', badge: '대기', title: '캠퍼스 IoT 대기 상태 및 하트비트',
-            desc: '캠퍼스의 Q-NEX 단말은 클라우드와 가벼운 MQTT 하트비트 연결을 유지하여 온라인 상태를 확인합니다. 교내 영상·음성 배포는 로컬 네트워크에서 처리합니다.'
+            btn: "🌐 구성도", badge: '대기', title: "장비 상태와 구성도",
+            desc: "Q-NEX 단말과 클라우드의 연결 및 온라인 상태를 확인합니다. 관리 명령과 교내 LAN 미디어 배포를 구분합니다."
         },
         live_broadcast: {
-            btn: '📡 교내 실시간 방송 (RTMP)', badge: '실시간 방송', title: '캠퍼스 실시간 영상 배포',
-            desc: "선택형 Media Server가 교내 LAN을 통해 NDP600, NMP311, NDP200 및 도서관 MBX100에 실시간 영상을 배포합니다. NPS150과 SL100은 수신하지 않습니다."
+            btn: "📡 실시간 영상", badge: '실시간 방송', title: "교내 실시간 영상 방송",
+            desc: "Web Console 또는 앱의 방송 명령이 클라우드를 통해 교내 Media Server에 도착합니다. 서버는 LAN으로 NDP600, NMP311, NDP200, MBX100에 미디어를 배포하고 단말은 영상과 음성을 출력합니다."
         },
         bell_music: {
-            btn: '🎵 예약 종소리 및 배경 음악', badge: '예약 오디오', title: '수업 종소리 및 점심시간 음악',
-            desc: "선택형 Media Server가 NDP600, NMP311, NDP200 및 도서관 MBX100에 예약 종소리와 배경 음악을 배포합니다. NPS150과 SL100은 참여하지 않습니다."
+            btn: "🎵 종소리와 음악", badge: '예약 오디오', title: "교내 종소리와 음악",
+            desc: "Web Console 또는 앱에서 방송 작업을 설정합니다. 명령이 클라우드를 통해 Media Server에 도착하면 서버가 종소리와 음악을 배포합니다. 예약 작업은 설정된 시간표를 따릅니다."
         },
         cloud_control: {
-            btn: '⚡ 클라우드 일괄 제어 (MQTT)', badge: '클라우드 제어', title: '클라우드 원격 제어 및 IoT 관리',
-            desc: '관리자가 웹 콘솔이나 모바일 앱에서 일괄 전원 켜기를 실행하면 MQTT 제어 명령이 Q-NEX 클라우드, 게이트웨이, 스위치를 거쳐 교실 단말에 전달됩니다.'
+            btn: "⚡ 클라우드 제어", badge: '클라우드 제어', title: "클라우드 장비 제어",
+            desc: "Web Console 또는 Q-NEX App의 명령이 클라우드, 게이트웨이, 스위치를 거쳐 단말에 도착합니다. 사용 가능한 제어는 장비, 플랫폼 설정 및 계정 권한에 따라 다릅니다."
         },
         emergency_alert: {
-            btn: '🚨 긴급 문자 방송', badge: '문자 알림', title: '교내 긴급 대피 문자 안내',
-            desc: 'Q-NEX 클라우드가 MQTT로 긴급 대피 문자를 전송합니다. 미디어 서버가 필요하지 않으며 SL100을 포함한 단말에서 연결된 화면에 안내를 표시합니다. 이 시나리오는 문자 알림입니다.'
+            btn: "📢 문자 공지", badge: "문자 공지", title: "교내 문자 공지",
+            desc: "Web Console 또는 앱이 일상 공지를 클라우드를 통해 단말과 연결 화면에 전달합니다. Media Server는 필요하지 않습니다."
         },
         local_teaching: {
             btn: "💻 로컬 수업 및 회의 (AV)", badge: '로컬 AV', title: "로컬 수업 및 회의",

@@ -19,9 +19,9 @@ class NewbieTour {
                 description: "<p class=\"tour-text\">可选的校园内网流媒体服务，用于直播与定时音频分发。内网分发可减少教室重复下载外部内容；外部节目源和云端管理仍可能需要互联网。服务器硬件按项目选型。</p>"
             },
             {
-                title: '第 3 站：物联终端核心家族：NDP vs NMP vs SL100 vs NPS150 vs MBX 选型全解',
+                title: '第 3 站：物联终端核心家族：NDP vs NMP vs SL100 vs NPS150 选型全解',
                 targetNodes: ['ndp600', 'nmp', 'ndp200', 'sl100', 'lcs810', 'nps150', 'mbx_library'],
-                description: "<p class=\"tour-text\">NDP600：桌面讲台，23.8 寸手写屏、内置 10.1 寸中控屏与 HDMI/USB 连接。NMP311：教室媒体处理器。NDP200：21.5 寸手写屏电动角度调节、两路外部 HDMI 输出。SL100：23.8 寸手写屏、8.8 寸串口中控屏、电动高度调节及 Type-C 65W PD；本方案不向其分发音视频广播流。MBX100：图书馆广播终端。NPS150: 面向会议室的 Dynamic BYOM 与设备集控中枢，连接自带笔记本与会议室外设，实现混合会议和统一控制。支持混合式教学（Hybrid Learning）：LCS810 通过 USB（UVC/UAC）接入 NDP600 内置 OPS，供 Teams、Zoom 等会议软件使用。S210 拾取教室声音，LCS810 完成录制，并将音视频送至 OPS，供远端师生互动。</p>"
+                description: "<p class=\"tour-text\">NDP600：桌面讲台，23.8 寸手写屏、内置 10.1 寸中控屏与 HDMI/USB 连接。NMP311：教室媒体处理器。NDP200：21.5 寸手写屏电动角度调节、两路外部 HDMI 输出。SL100：23.8 寸手写屏、8.8 寸串口中控屏、电动高度调节及 Type-C 65W PD；本方案不向其分发音视频广播流。NPS150: 面向会议室的 Dynamic BYOM 与设备集控中枢，连接自带笔记本与会议室外设，实现混合会议和统一控制。支持混合式教学（Hybrid Learning）：LCS810 通过 USB（UVC/UAC）接入 NDP600 内置 OPS，供 Teams、Zoom 等会议软件使用。S210 拾取教室声音，LCS810 完成录制，并将音视频送至 OPS，供远端师生互动。</p>"
             },
             {
                 title: '第 4 站：末端音视频呈现与功放一体化 (Displays & Amplification)',
@@ -47,9 +47,9 @@ class NewbieTour {
                 description: "<p class=\"tour-text\">Optional campus LAN streaming service for live broadcasts and scheduled audio. Local distribution can reduce repeated external downloads; external sources and cloud management may still require internet. Server hardware is selected for the project.</p>"
             },
             {
-                title: 'Step 3: Terminal Hardware Selection: NDP vs NMP vs SL100 vs NPS150 vs MBX',
+                title: 'Step 3: Terminal Hardware Selection: NDP vs NMP vs SL100 vs NPS150',
                 targetNodes: ['ndp600', 'nmp', 'ndp200', 'sl100', 'lcs810', 'nps150', 'mbx_library'],
-                description: "<p class=\"tour-text\">NDP600: desktop podium with 23.8-inch pen display, built-in 10.1-inch panel and HDMI/USB connections. NMP311: classroom media processor. NDP200: 21.5-inch pen display with electric tilt adjustment and two external HDMI outputs. SL100: 23.8-inch pen display, 8.8-inch serial panel, electric height adjustment and Type-C 65W PD; no AV broadcast route in this example. MBX100: library broadcast endpoint. NPS150: A meeting-room hub for Dynamic BYOM and centralized device control, connecting personal laptops with room peripherals for hybrid collaboration. Hybrid learning: LCS810 connects by USB (UVC/UAC) to the OPS installed in NDP600 for conferencing software such as Teams or Zoom. S210 microphones capture classroom voices; LCS810 records and sends the audio/video to the OPS for remote participants.</p>"
+                description: "<p class=\"tour-text\">NDP600: desktop podium with 23.8-inch pen display, built-in 10.1-inch panel and HDMI/USB connections. NMP311: classroom media processor. NDP200: 21.5-inch pen display with electric tilt adjustment and two external HDMI outputs. SL100: 23.8-inch pen display, 8.8-inch serial panel, electric height adjustment and Type-C 65W PD; no AV broadcast route in this example. NPS150: A meeting-room hub for Dynamic BYOM and centralized device control, connecting personal laptops with room peripherals for hybrid collaboration. Hybrid learning: LCS810 connects by USB (UVC/UAC) to the OPS installed in NDP600 for conferencing software such as Teams or Zoom. S210 microphones capture classroom voices; LCS810 records and sends the audio/video to the OPS for remote participants.</p>"
             },
             {
                 title: 'Step 4: Integrated Audio Amplification & 4K Display',
@@ -67,11 +67,19 @@ class NewbieTour {
     get steps() {
         const lang = window.simulator?.lang || 'en';
         const content = window.QnexApp.data.localeContent?.[lang];
+        if (window.simulator?.view === 'media') {
+            const targets = [
+                ['console', 'app', 'cloud'], ['router', 'switch', 'mediaserver'],
+                ['ndp600', 'nmp', 'ndp200', 'mbx_library'],
+                ['ifp_a', 'spk_a', 'ifp_b', 'spk_b', 'ifp_h', 'spk_h', 'disp_l', 'spk_l'], []
+            ];
+            return window.I18N_DATA[lang].mediaTour.map((step, index) => ({ ...step, targetNodes: targets[index] }));
+        }
         const steps = content
             ? this.steps_en.map((step, index) => ({ ...step, ...content.tour[index] }))
             : (lang === 'zh' ? this.steps_zh : this.steps_en);
-        return steps.filter(step => window.simulator?.mediaServerEnabled
-            || !step.targetNodes.includes('mediaserver'));
+        return steps.filter(step => !step.targetNodes.includes('mediaserver'))
+            .map(step => ({ ...step, targetNodes: step.targetNodes.filter(id => window.simulator?.isDeviceVisible(id)) }));
     }
 
     start() {

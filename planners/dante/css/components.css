@@ -1,0 +1,241 @@
+        /* Coverage Stats styling */
+        .stat-row {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            font-size: 0.85rem;
+        }
+        .stat-label-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .progress-container {
+            width: 100%;
+            height: 8px;
+            background: var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            border-radius: 4px;
+            transition: width 0.3s ease, background-color 0.3s ease;
+        }
+        .bg-success { background-color: #22c55e; }
+        .bg-warning { background-color: #f59e0b; }
+        .bg-danger { background-color: #ef4444; }
+
+        .height-note { font-size: 0.75rem; color: var(--text-muted); margin: 4px 0 0; }
+        .height-field { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 7px 0; font-size: 0.78rem; }
+        .height-field input, .height-field select { max-width: 110px; min-width: 0; padding: 4px; }
+        #rearHeightControls[hidden] { display: none; }
+        #rearHeightSlider { width: 100%; }
+        #heightEstimate[data-warning="true"] { color: #b45309; font-weight: 600; }
+        .recalculate-btn { width: 100%; margin-top: 10px; background: #f59e0b; }
+        .aux-display-summary { font-size: 0.8rem; color: var(--text-muted); line-height: 1.45; }
+        .visibility-label { display: flex; align-items: center; gap: 6px; cursor: pointer; font-weight: normal; }
+        .data-row-last { border-bottom: none; }
+        .color-m100-pickup { background: rgba(34, 197, 94, 0.2); border: 2px solid #22c55e; }
+        .color-m100-pa { background: transparent; border: 2px dashed #166534; }
+        .color-m40-pickup { background: rgba(168, 85, 247, 0.2); border: 2px solid #a855f7; }
+        .color-m40-pa { background: transparent; border: 2px dashed #7e22ce; }
+        .color-dc20 { background: rgba(147, 197, 253, 0.4); border: 2px solid #3b82f6; }
+        .add-m100 { background: #22c55e; }
+        .add-m40 { background: #a855f7; }
+        .add-dc20 { background: #3b82f6; }
+        .device-actions { display: flex; gap: 6px; margin-top: 4px; }
+        .device-actions button { flex: 1; }
+        .ref-specs-list { font-size: 0.75rem; line-height: 1.4; color: var(--text-muted); }
+        .spec-entry { margin-bottom: 4px; }
+        .spec-rule { margin-top: 6px; }
+        .accent-text { color: var(--primary); }
+        .bom-processor { border-top: 1px dashed var(--border); padding-top: 8px; margin-top: 8px; color: var(--primary); }
+        .bom-empty { color: var(--text-muted); text-align: center; font-size: 0.75rem; }
+        
+        /* Live data grid */
+        .data-panel { 
+            font-size: 0.85rem; 
+            line-height: 1.5; 
+        }
+        
+        .data-row { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            border-bottom: 1px dashed var(--border); 
+            padding: 6px 0; 
+        }
+        
+        .color-box { 
+            display: inline-block; 
+            width: 12px; 
+            height: 12px; 
+            margin-right: 6px; 
+            border-radius: 2px; 
+            vertical-align: middle;
+        }
+        
+        select.custom-select {
+            width: 100%;
+            padding: 8px;
+            border-radius: 6px;
+            background-color: var(--card-bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+            outline: none;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        /* Buttons */
+        .btn-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+        }
+
+        button { 
+            background: var(--primary); 
+            color: white; 
+            border: none; 
+            padding: 8px 12px; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            transition: background 0.2s; 
+            font-size: 0.85rem;
+        }
+        
+        button:hover { 
+            background: var(--primary-hover); 
+        }
+        
+        button.secondary { 
+            background: #64748b; 
+        }
+        
+        button.secondary:hover { 
+            background: #475569; 
+        }
+
+        button.danger {
+            background: #dc2626;
+        }
+        button.danger:hover {
+            background: #b91c1c;
+        }
+        
+
+        /* Floating BOM Panel */
+        .bom-panel {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: 0.8rem;
+            color: #f8fafc;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+            min-width: 210px;
+            z-index: 90;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            pointer-events: auto;
+        }
+        
+        .light-mode .bom-panel {
+            background: rgba(255, 255, 255, 0.95);
+            color: #0f172a;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Floating Specs Panel */
+        .specs-panel {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: 0.8rem;
+            color: #f8fafc;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+            min-width: 280px;
+            z-index: 90;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            pointer-events: auto;
+        }
+        
+        .light-mode .specs-panel {
+            background: rgba(255, 255, 255, 0.95);
+            color: #0f172a;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .bom-section {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .bom-section-title {
+            font-weight: bold;
+            color: var(--primary);
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 4px;
+            margin-bottom: 4px;
+            font-size: 0.85rem;
+        }
+
+        .model-toggle { display: flex; align-items: center; gap: 8px; }
+        #t_open3d { background: var(--primary); }
+        .instruction { top: 78px; bottom: auto; white-space: normal; max-width: calc(100% - 40px); width: max-content; }
+        .data-row { gap: 8px; }
+        .data-row > div { flex-shrink: 0; }
+        .visibility-label { min-width: 0; }
+        .visibility-label input, .visibility-label .color-box { flex-shrink: 0; }
+        .handoff-error { color: #f87171; font-size: .8rem; margin: 0; }
+        .slider-row-header span:first-child { min-width: 0; }
+        .bom-item span { overflow-wrap: anywhere; }
+        .bom-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 2px 0;
+        }
+
+        .bom-item span {
+            color: var(--text-muted);
+        }
+        
+        .bom-item strong {
+            color: var(--text);
+            font-family: monospace;
+            font-size: 0.85rem;
+        }
+
+        .ref-item {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+            display: flex;
+            justify-content: space-between;
+            padding: 1px 0;
+        }
+
+        .ref-item.highlight-ref {
+            color: #22c55e;
+            font-weight: bold;
+        }
+        
+        .light-mode .ref-item.highlight-ref {
+            color: #166534;
+        }

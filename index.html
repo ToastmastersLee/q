@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="assets/qnex-logo.png">
+    <title>Q-NEX System Architecture Simulator</title>
+    <link rel="stylesheet" href="css/theme.css?v=20261024-product-videos">
+    <link rel="stylesheet" href="css/base.css?v=20261024-product-videos">
+    <link rel="stylesheet" href="css/header.css?v=20261024-product-videos">
+    <link rel="stylesheet" href="css/localization.css?v=20261024-product-videos">
+    <link rel="stylesheet" href="css/scenarios.css?v=20261024-product-videos">
+    <link rel="stylesheet" href="css/workspace.css?v=20261024-product-videos">
+    <link rel="stylesheet" href="css/topology.css?v=20261024-product-videos">
+    <link rel="stylesheet" href="css/sidebar.css?v=20261024-product-videos">
+    <link rel="stylesheet" href="css/product-details.css?v=20261024-product-videos">
+    <link rel="stylesheet" href="css/tour.css?v=20261024-product-videos">
+</head>
+<body class="theme-light">
+    <!-- 顶部导航与全局控制栏 -->
+    <header class="app-header">
+        <div class="brand-section">
+            <div class="brand-badge"><img src="assets/qnex-logo.png" alt="Q-NEX" width="118" height="40"></div>
+            <div class="app-title-group">
+                <h1>System Architecture Simulator</h1>
+                <p>Interactive Dynamic Signal Flow Simulator based on Q-NEX Topology Wiring Specifications</p>
+            </div>
+        </div>
+        <div class="header-actions">
+            <label class="language-control btn">
+                <span aria-hidden="true">🌐</span>
+                <select id="language-select" aria-label="Language">
+                    <option value="en" lang="en">English</option>
+                    <option value="zh" lang="zh-CN">简体中文</option>
+                    <option value="ko" lang="ko">한국어</option>
+                    <option value="mn" lang="mn">Монгол</option>
+                    <option value="ja" lang="ja">日本語</option>
+                    <option value="es" lang="es">Español</option>
+                    <option value="fr" lang="fr">Français</option>
+                    <option value="ar" lang="ar">العربية</option>
+                </select>
+            </label>
+            <button id="btn-scenarios-toggle" class="btn btn-scenarios-toggle" type="button" aria-expanded="false" aria-controls="scenarios-collapse-wrapper">
+                <span>🧭</span> <span id="lbl-scenario-current">Scenario: STANDBY</span> <span class="scenario-arrow">▾</span>
+            </button>
+            <a id="lcs-demo-link" class="btn demo-shortcut" href="demos/lcs/index.html" target="_blank" rel="noopener">LCS 3D Demo ↗</a>
+            <a id="dante-demo-link" class="btn demo-shortcut" href="demos/dante/index.html" target="_blank" rel="noopener">Dante 3D Demo ↗</a>
+            <div class="settings-dropdown">
+                <button id="btn-settings-toggle" class="btn" title="Tools &amp; settings" type="button" aria-expanded="false" aria-controls="settings-panel">
+                    <span>⚙️</span> <span id="lbl-settings-toggle-text">More</span> <span class="arrow-indicator">▾</span>
+                </button>
+                <div id="settings-panel" class="settings-panel hidden" aria-labelledby="lbl-settings-heading">
+                    <div class="settings-panel-header">
+                        <span id="lbl-settings-heading">Tools &amp; Settings</span>
+                        <span id="app-version" class="tag">Online Training v3.0</span>
+                    </div>
+                    <div class="settings-panel-body">
+                        <div class="tool-actions">
+<a class="btn" id="lcs-2d-link" href="planners/lcs/index.html" target="_blank" rel="noopener">LCS-2D ↗</a>
+<a class="btn" id="dante-2d-link" href="planners/dante/index.html" target="_blank" rel="noopener">Dante-2D ↗</a>
+                            <label class="btn media-server-option">
+                                <input id="media-server-option" type="checkbox">
+                                <span id="lbl-media-server-option">Media Server (optional)</span>
+                            </label>
+                            <button id="btn-export-png" class="btn" type="button">Export PNG</button>
+                            <button id="btn-start-tour" class="btn btn-primary" type="button">🎓 Newbie Guide</button>
+                            <button id="btn-play-pause" class="btn" type="button">⏸️ Pause</button>
+                            <button id="btn-reset" class="btn" type="button">🔄 Reset Topology</button>
+                            <button id="btn-sidebar-toggle" class="btn" type="button">📋 Hide Inspector</button>
+                            <a id="terminal-architecture-link" class="btn" hidden>Terminal Architecture</a>
+                        </div>
+                        <div class="settings-item">
+                            <span class="settings-item-label" id="lbl-setting-speed">动画速度</span>
+                            <select id="speed-select" class="speed-select" title="动画播放速度">
+                                <option value="0.5">0.5x 慢速演示</option>
+                                <option value="1.0" selected>1.0x 正常速度</option>
+                                <option value="2.0">2.0x 快速流向</option>
+                            </select>
+                        </div>
+                        <div class="settings-item">
+                            <span class="settings-item-label" id="lbl-setting-sound">交互音效</span>
+                            <button id="btn-sound-toggle" class="btn settings-item-btn">
+                                <span>🔊</span> 音效：已开启
+                            </button>
+                        </div>
+                        <div class="settings-item">
+                            <span class="settings-item-label" id="lbl-setting-theme">界面皮肤</span>
+                            <button id="btn-theme-toggle" class="btn settings-item-btn" title="切换浅色明亮/深色极客皮肤">
+                                <span>☀️</span> 皮肤：浅色明亮
+                            </button>
+                        </div>
+                        <div class="settings-item">
+                            <span class="settings-item-label" id="lbl-setting-fullscreen">屏幕显示</span>
+                            <button id="btn-fullscreen" class="btn settings-item-btn" title="全屏显示 / Fullscreen">
+                                <span>⛶</span> 全屏显示
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <span id="export-status" class="export-status" role="status" aria-live="polite"></span>
+    <!-- 可折叠场景与说明面板 -->
+    <div id="scenarios-collapse-wrapper" class="scenarios-collapse-wrapper collapsed">
+        <nav class="scenario-bar">
+        <div class="scenario-bar-title">培训演练场景：</div>
+        <button class="scenario-btn active" data-scenario="standby">
+            <span>🌐</span> 待机心跳与拓扑
+        </button>
+        <button class="scenario-btn" data-scenario="live_broadcast" hidden>
+            <span>📡</span> 全校视讯直播 (RTMP推流)
+        </button>
+        <button class="scenario-btn" data-scenario="bell_music" hidden>
+            <span>🎵</span> 定时打铃与午间音乐 (内网音频)
+        </button>
+        <button class="scenario-btn" data-scenario="cloud_control">
+            <span>⚡</span> 云端批量控制 (MQTT信令)
+        </button>
+        <button class="scenario-btn" data-scenario="emergency_alert">
+            <span>🚨</span> 突发火警文本广播
+        </button>
+        <button class="scenario-btn" data-scenario="local_teaching">
+            <span>💻</span> 教室本地授课模式 (零网络开销)
+        </button>
+            <button id="btn-scenarios-close-bar" class="btn-scenarios-close-bar" title="收起场景面板">收起 ▴</button>
+        </nav>
+    <!-- 当前运行场景说明条 -->
+    <section class="scenario-banner" id="scenario-banner">
+        <div class="scenario-banner-left">
+            <span class="scenario-banner-badge" id="scenario-banner-badge">待机总览</span>
+            <div class="scenario-banner-text">
+                <h3 id="scenario-banner-title">校园物联待机拓扑 (Normal Standby & IoT Heartbeat)</h3>
+                <p id="scenario-banner-desc">全校所有 Q-NEX 终端（数字讲台、NMP处理器、SL100、公共区域 MBX 媒体盒）与云端保持轻量 MQTT 心跳连接，用于实时检测在线/离线状态；内网视讯处于低功耗就绪状态。</p>
+            </div>
+        </div>
+    </section>
+    </div>
+    <!-- 主工作区：拓扑画布 + 侧边深度学习面板 -->
+    <main class="workspace">
+        <!-- 核心交互拓扑画布 -->
+        <div class="board-container" id="board-container">
+            <div class="topology-board" id="topology-board">
+                <!-- SVG 连接线、虚线框与动画粒子层 -->
+                <svg id="topology-svg"></svg>
+
+                <!-- HTML 设备卡片层 (支持点击交互与状态呈现) -->
+                <div id="nodes-container"></div>
+                <!-- 接线颜色规范图例 (严格匹配 Q-NEX 规范) -->
+                <div class="legend-card" id="legend-card">
+                    <h3 id="legend-title">
+                        Wiring Legend
+                        <span id="legend-filter-hint">Filter cable layers</span>
+                    </h3>
+                    <div class="legend-items">
+                        <label class="legend-row">
+                            <div class="legend-left">
+                                <span class="color-bar lan"></span>
+                                <span id="legend-label-lan">🟦 LAN / Ethernet</span>
+                            </div>
+                            <input type="checkbox" class="legend-filter-chk" data-type="lan" checked>
+                        </label>
+
+                        <label class="legend-row">
+                            <div class="legend-left">
+                                <span class="color-bar hdmi"></span>
+                                <span id="legend-label-hdmi">🔴 HDMI / Video</span>
+                            </div>
+                            <input type="checkbox" class="legend-filter-chk" data-type="hdmi" checked>
+                        </label>
+
+                        <label class="legend-row">
+                            <div class="legend-left">
+                                <span class="color-bar audio"></span>
+                                <span id="legend-label-audio">🟢 Audio / 音频线 / 喇叭线</span>
+                            </div>
+                            <input type="checkbox" class="legend-filter-chk" data-type="audio" checked>
+                        </label>
+
+                        <label class="legend-row">
+                            <div class="legend-left">
+                                <span class="color-bar usb"></span>
+                                <span id="legend-label-usb">USB</span>
+                            </div>
+                            <input type="checkbox" class="legend-filter-chk" data-type="usb" checked>
+                        </label>
+
+                        <label class="legend-row">
+                            <div class="legend-left">
+                                <span class="color-bar wireless"></span>
+                                <span id="legend-label-wireless">📶 无线网络 / 4G / 麦克风 (虚线)</span>
+                            </div>
+                            <input type="checkbox" class="legend-filter-chk" data-type="wireless" checked>
+                        </label>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- 侧边栏：产品详情与应用场景 -->
+        <aside class="sidebar-panel" id="sidebar-panel">
+            <div class="sidebar-top-bar">
+                <span class="sidebar-top-title" id="lbl-sidebar-title">📋 Product details</span>
+                <button id="btn-sidebar-close" class="btn-sidebar-close" title="收起说明面板">
+                    <span id="lbl-sidebar-close-text">Hide ❯</span>
+                </button>
+            </div>
+            <!-- 设备检查卡片 -->
+            <div class="inspector-card" id="device-inspector">
+                <div class="inspector-header">
+                    <div class="inspector-title-wrap">
+                        <div class="inspector-heading-row">
+                            <h2 id="inspector-title">Core Gigabit Switch</h2>
+                            <a id="inspector-video" class="product-video-link" target="_blank" rel="noopener noreferrer" aria-describedby="inspector-video-tooltip" hidden>
+                                <svg viewBox="0 0 24 18" aria-hidden="true" focusable="false"><path fill="currentColor" d="M23.5 2.8A3 3 0 0 0 21.4.7C19.5.2 12 .2 12 .2S4.5.2 2.6.7A3 3 0 0 0 .5 2.8C0 4.6 0 9 0 9s0 4.4.5 6.2a3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1C24 13.4 24 9 24 9s0-4.4-.5-6.2Z"/><path fill="#fff" d="m9.5 12.8 6.5-3.8-6.5-3.8Z"/></svg>
+                                <span id="inspector-video-tooltip" class="product-video-tooltip" role="tooltip"></span>
+                            </a>
+                        </div>
+                        <span class="inspector-model-badge" id="inspector-model">Gigabit Network Switch</span>
+                    </div>
+                    <span class="inspector-zone-tag" id="inspector-zone">Campus Local Area Network</span>
+                </div>
+                <div class="inspector-preview-box">
+                    <img id="inspector-img" src="assets/Switch-2.png" alt="Device Preview" class="inspector-preview-img">
+                </div>
+                <div class="inspector-section">
+                    <h4 id="lbl-role">ROLE IN ARCHITECTURE</h4>
+                    <p class="inspector-role-text" id="inspector-role"></p>
+                </div>
+                <details class="inspector-section inspector-ports" id="inspector-ports-section">
+                    <summary id="lbl-ports">I/O PORTS &amp; CONNECTORS</summary>
+                    <ul class="inspector-ports-list" id="inspector-ports"></ul>
+                </details>
+                <div class="inspector-section">
+                    <h4 id="lbl-scenarios">APPLICATION &amp; USAGE SCENARIOS</h4>
+                    <div class="scenario-items" id="inspector-scenarios"></div>
+                </div>
+
+                <div class="inspector-actions" style="display: none;">
+                    <button class="inspector-btn" id="inspector-test-btn">
+                        🚀 发送设备自检诊断报文
+                    </button>
+                </div>
+            </div>
+
+        </aside>
+
+        <!-- 侧边栏折叠时的浮动展开按钮 -->
+        <button id="btn-sidebar-expand-tab" class="sidebar-expand-tab hidden" title="展开说明面板">
+            <span id="lbl-sidebar-expand-text">❮ 展开说明</span>
+        </button>
+    </main>
+
+    <!-- 新手培训向导模态弹窗 (Step-by-step Guided Tour) -->
+    <div class="tour-modal hidden" id="tour-modal">
+        <div class="tour-dialog">
+            <div class="tour-header">
+                <div>
+                    <span class="tour-step-badge" id="tour-step-counter">步骤 1 / 5</span>
+                    <h2 class="tour-title" id="tour-title">第 1 站：云端与远程管理层</h2>
+                </div>
+                <button class="btn" id="tour-close-btn">✕ 关闭</button>
+            </div>
+
+            <div class="tour-body" id="tour-body">
+                <!-- 内容由 tour.js 动态渲染 -->
+            </div>
+
+            <div class="tour-footer">
+                <button class="btn" id="tour-prev-btn" disabled>← 上一步</button>
+                <button class="btn btn-primary" id="tour-next-btn">下一步 →</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/namespace.js?v=20261024-product-videos"></script>
+    <script src="js/i18n.js?v=20261024-product-videos"></script>
+    <script src="js/i18n/locale-ko.js?v=20261024-product-videos"></script>
+    <script src="js/i18n/locale-ja.js?v=20261024-product-videos"></script>
+    <script src="js/i18n/locale-es.js?v=20261024-product-videos"></script>
+    <script src="js/i18n/locale-fr.js?v=20261024-product-videos"></script>
+    <script src="js/i18n/locale-ar.js?v=20261024-product-videos"></script>
+    <script src="js/i18n/locale-mn.js?v=20261024-product-videos"></script>
+    <script src="js/i18n/content-ko.js?v=20261024-product-videos"></script>
+    <script src="js/i18n/content-ja.js?v=20261024-product-videos"></script>
+    <script src="js/i18n/content-es.js?v=20261024-product-videos"></script>
+    <script src="js/i18n/content-fr.js?v=20261024-product-videos"></script>
+    <script src="js/i18n/content-ar.js?v=20261024-product-videos"></script>
+    <script src="js/i18n/content-mn.js?v=20261024-product-videos"></script>
+    <script src="js/data/screen-states.js?v=20261024-product-videos"></script>
+    <script src="js/data/topology-config.js?v=20261024-product-videos"></script>
+    <script src="js/data/devices-infrastructure.js?v=20261024-product-videos"></script>
+    <script src="js/data/devices-spaces.js?v=20261024-product-videos"></script>
+    <script src="js/data/devices-lcs.js?v=20261024-product-videos"></script>
+    <script src="js/data/connections.js?v=20261024-product-videos"></script>
+    <script src="js/data/product-videos.js?v=20261024-product-videos"></script>
+    <script src="js/data/topology-finalize.js?v=20261024-product-videos"></script>
+    <script src="js/i18n/prepare-content.js?v=20261024-product-videos"></script>
+    <script src="js/data/meeting-screen-states.js?v=20261024-product-videos"></script>
+    <script src="js/data/scenario-flows.js?v=20261024-product-videos"></script>
+
+    <script src="js/audio.js?v=20261024-product-videos"></script>
+    <script src="js/tour.js?v=20261024-product-videos"></script>
+    <script src="js/core/simulator-class.js?v=20261024-product-videos"></script>
+    <script src="js/core/media-server-option.js?v=20261024-product-videos"></script>
+    <script src="js/vendor/html-to-image-1.11.13.min.js?v=20261024-product-videos"></script>
+    <script src="js/data/export-images.js?v=20261024-product-videos"></script>
+    <script src="js/core/png-export.js?v=20261024-product-videos"></script>
+    <script src="js/core/ui-controller.js?v=20261024-product-videos"></script>
+    <script src="js/core/language-controller.js?v=20261024-product-videos"></script>
+    <script src="js/core/topology-renderer.js?v=20261024-product-videos"></script>
+    <script src="js/core/node-renderer.js?v=20261024-product-videos"></script>
+    <script src="js/core/particle-engine.js?v=20261024-product-videos"></script>
+    <script src="js/core/scenario-controller.js?v=20261024-product-videos"></script>
+    <script src="js/core/product-video.js?v=20261024-product-videos"></script>
+    <script src="js/core/device-inspector.js?v=20261024-product-videos"></script>
+    <script src="js/core/controls.js?v=20261024-product-videos"></script>
+    <script src="js/simulator.js?v=20261024-product-videos"></script>
+</body>
+</html>

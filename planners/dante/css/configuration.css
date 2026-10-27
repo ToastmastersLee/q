@@ -1,0 +1,17 @@
+.sidebar[hidden] { display: none; }
+.sidebar { overflow-x: hidden; }
+.instruction { pointer-events: auto; max-width: min(420px, calc(100% - 32px)); font-size: 13px; }
+.instruction summary, .specs-panel summary { cursor: pointer; font-weight: 700; }
+.instruction > div { margin-top: 10px; }
+.specs-panel { max-width: min(420px, calc(100% - 32px)); font-size: 12px; }
+.specs-panel:not([open]) { width: auto; }
+.sidebar #bomPanel { position: static; width: auto; min-width: 0; margin: 12px 0; max-height: none; box-shadow: none; padding: 12px; }
+.editable-bom-row { display: grid; grid-template-columns: minmax(0, 1fr) 65px; gap: 8px; align-items: center; margin: 9px 0; font-size: 12px; }
+.editable-bom-row select, .editable-bom-row input { box-sizing: border-box; width: 100%; min-width: 0; color: var(--text); background: var(--panel); border: 1px solid var(--border); padding: 6px; border-radius: 5px; }
+.editable-bom-row small { font-size: 10px; }
+#configuration-note, #processor-warning { font-size: 12px; line-height: 1.5; }
+#processor-warning { color: #d97706; }
+#bom-shortcut { position: absolute; bottom: 20px; right: 20px; z-index: 12; }
+.teaching-device { cursor: move; }
+.sidebar #export-quotation, .sidebar #restore-recommended { width: 100%; margin: 8px 0; }
+@media (max-width: 800px) { .sidebar { max-width: 85vw; } .instruction { top: 75px; } }

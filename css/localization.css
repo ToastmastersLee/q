@@ -1,0 +1,48 @@
+/* Language selector, brand asset and multilingual text layout. */
+.brand-badge {
+    background: #fff;
+    padding: 6px 10px;
+    border-radius: 6px;
+    box-shadow: none;
+    flex-shrink: 0;
+}
+.brand-badge img { display: block; width: 118px; height: auto; }
+.header-actions { flex-wrap: wrap; }
+.language-control { padding: 4px 8px; }
+.language-control select {
+    font: inherit;
+    background: var(--btn-bg);
+    color: var(--text-main);
+    border: 0;
+    padding: 3px 0;
+    cursor: pointer;
+    max-width: 140px;
+}
+.language-control:focus-within, .btn:focus-visible { outline: 2px solid #0074D9; outline-offset: 3px; }
+.demo-shortcut { text-decoration: none; white-space: nowrap; }
+.settings-item-label { width: auto; flex: 0 1 105px; white-space: normal; }
+.app-title-group h1 { display: block; }
+.btn-scenarios-toggle { max-width: 270px; }
+#lbl-scenario-current { overflow-wrap: anywhere; }
+.topology-board { direction: ltr; }
+.board-container { direction: ltr; }
+html[dir="rtl"] .node-caption,
+html[dir="rtl"] .screen-preview,
+html[dir="rtl"] .room-title,
+html[dir="rtl"] .cloud-title,
+html[dir="rtl"] .campus-lan-title { direction: rtl; }
+html[dir="rtl"] .room-title,
+html[dir="rtl"] .cloud-title,
+html[dir="rtl"] .campus-lan-title { text-anchor: end; }
+html[dir="rtl"] .settings-panel { right: auto; left: 0; }
+html[dir="rtl"] .inspector-card,
+html[dir="rtl"] .legend-card,
+html[dir="rtl"] .scenario-banner-text,
+html[dir="rtl"] .tour-dialog { text-align: start; }
+.scenario-banner-text p, .node-generic-name, .room-title { overflow-wrap: anywhere; }
+@media (max-width: 700px) {
+    .header-actions { width: 100%; justify-content: flex-start; }
+    .btn-scenarios-toggle { max-width: calc(100vw - 180px); }
+    .app-title-group h1 { font-size: 15px; }
+    .app-title-group p { font-size: 11px; }
+}

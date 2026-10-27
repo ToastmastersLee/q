@@ -1,0 +1,84 @@
+/* Product title, accessible video affordance and native port disclosure. */
+.inspector-title-wrap { min-width: 0; flex: 1; }
+.inspector-header { flex-direction: column; gap: 8px; }
+.inspector-title-wrap { width: 100%; }
+.inspector-zone-tag { align-self: flex-start; }
+.inspector-heading-row { display: flex; align-items: flex-start; gap: 8px; }
+.inspector-heading-row h2 { flex: 1; min-width: 0; }
+.product-video-link {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 30px;
+    width: 30px;
+    height: 28px;
+    margin-top: -4px;
+    border-radius: 5px;
+    color: #e62117;
+}
+.product-video-link[hidden] { display: none; }
+.product-video-link:hover { background: rgba(230, 33, 23, 0.1); }
+.product-video-link:focus-visible, .inspector-ports summary:focus-visible {
+    outline: 2px solid #0074D9;
+    outline-offset: 3px;
+}
+.product-video-link svg { width: 24px; height: 18px; }
+.product-video-tooltip {
+    display: none;
+    position: absolute;
+    inset-inline-end: 0;
+    top: calc(100% + 8px);
+    z-index: 50;
+    width: 245px;
+    padding: 8px 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: var(--bg-card);
+    color: var(--text-main);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+    font-size: 11px;
+    line-height: 1.45;
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+    text-align: start;
+}
+.product-video-link:hover .product-video-tooltip,
+.product-video-link:focus .product-video-tooltip { display: block; }
+.inspector-ports summary {
+    color: #0074D9;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    padding: 6px 0;
+}
+.inspector-ports[open] summary { margin-bottom: 4px; }
+
+/* Occupy the reserved left-hand canvas area, outside the campus boundary. */
+#topology-board > .legend-card {
+    position: absolute;
+    left: 50px;
+    top: 600px;
+    width: 280px;
+    z-index: 25;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+}
+.legend-card h3 { flex-wrap: wrap; gap: 4px 8px; font-size: 15px; }
+.legend-row { font-size: 14px; line-height: 1.4; gap: 10px; }
+.legend-left { min-width: 0; }
+.legend-left > span:last-child { overflow-wrap: anywhere; }
+.legend-filter-chk { flex-shrink: 0; width: 16px; height: 16px; }
+.legend-export-state {
+    flex: 0 0 16px;
+    width: 16px;
+    height: 16px;
+    border: 1px solid var(--text-muted);
+    border-radius: 3px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font: bold 12px Arial, sans-serif;
+    color: var(--text-main);
+}
+html[dir="rtl"] .legend-card { direction: rtl; }

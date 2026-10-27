@@ -1,0 +1,207 @@
+        /* Sidebar layout */
+        @media (max-width: 760px) {
+            body { display: flex; flex-direction: column; height: auto; overflow: auto; }
+            body .sidebar { width: 100%; overflow: visible; padding-top: 70px; }
+            body .main-area { flex: none; min-height: 60vh; flex-direction: column; gap: 14px; padding: 14px; overflow: visible; }
+            body .main-area svg { width: 100%; height: auto; max-height: none; }
+            body .instruction { position: static; transform: none; white-space: normal; border-radius: 10px; width: 100%; padding: 10px; }
+            body .specs-panel, body .bom-panel { position: static; min-width: 0; width: 100%; }
+            body .btn-grid { grid-template-columns: 1fr; }
+        }
+        .sidebar { 
+            width: 380px; 
+            background: var(--panel); 
+            border-right: 1px solid var(--border); 
+            padding: 20px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 16px; 
+            overflow-y: auto; 
+            box-shadow: 4px 0 15px rgba(0,0,0,0.15); 
+            z-index: 10; 
+        }
+        
+        .sidebar h1 { 
+            font-size: 1.25rem; 
+            margin: 0; 
+            color: var(--primary); 
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .sidebar .sub-desc {
+            font-size: 0.8rem; 
+            color: var(--text-muted); 
+            margin: -8px 0 10px 0;
+        }
+
+        .control-group { 
+            background: var(--card-bg); 
+            padding: 14px; 
+            border-radius: 8px; 
+            border: 1px solid var(--border); 
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .control-group label.group-title { 
+            font-weight: bold; 
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.95rem; 
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 6px;
+            margin-bottom: 4px;
+        }
+        
+        .slider-row {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .slider-row-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+        }
+
+        .slider-container { 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+        }
+        
+        input[type="range"] { 
+            flex: 1; 
+            height: 6px;
+            border-radius: 3px;
+            background: var(--border);
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            border: none;
+        }
+        
+        .value-display { 
+            font-family: monospace; 
+            font-size: 0.95rem; 
+            font-weight: bold; 
+            color: var(--primary); 
+            width: 50px; 
+            text-align: right; 
+        }
+
+
+        /* Top Navigation Area */
+        .top-nav {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 100;
+        }
+
+        .lang-selector, .theme-toggle { 
+            padding: 6px 10px; 
+            border-radius: 6px; 
+            border: 1px solid var(--border); 
+            font-weight: bold; 
+            background: var(--panel); 
+            color: var(--text); 
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+
+        /* Main canvas area */
+        .main-area { 
+            flex: 1; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            position: relative; 
+            overflow: auto; 
+            padding: 40px;
+            background-color: var(--bg);
+        }
+        
+        svg { 
+            background: var(--svg-bg); 
+            border-radius: 12px; 
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3); 
+            cursor: grab; 
+            max-width: 100%;
+            max-height: 85vh;
+            width: auto;
+            height: auto;
+            border: 1px solid var(--border);
+        }
+        
+        svg:active { 
+            cursor: grabbing; 
+        }
+        
+        .device { 
+            cursor: pointer; 
+        }
+        
+        .device:hover circle.core { 
+            stroke: var(--text); 
+            stroke-width: 2px; 
+        }
+        
+        .instruction { 
+            position: absolute; 
+            bottom: 20px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            background: rgba(15, 23, 42, 0.9); 
+            color: #f8fafc; 
+            padding: 10px 20px; 
+            border-radius: 20px; 
+            font-size: 0.85rem; 
+            pointer-events: none; 
+            white-space: nowrap; 
+            text-align: center; 
+            line-height: 1.5;
+            border: 1px solid #334155;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+        }
+        
+        .highlight { 
+            color: #fbbf24; 
+            font-weight: bold; 
+        }
+        
+        .radius-input { 
+            width: 55px; 
+            font-weight: bold; 
+            font-family: monospace; 
+            text-align: right; 
+            border: 1px solid var(--border); 
+            border-radius: 4px; 
+            padding: 2px 4px; 
+            margin-right: 2px; 
+            background: var(--bg); 
+            color: var(--text); 
+        }
+        
+        .radius-input:focus { 
+            outline: 2px solid var(--primary); 
+            border-color: transparent; 
+        }
+
+.sidebar[hidden]{display:none!important} .top-nav{flex-wrap:wrap;gap:8px} #export-quotation{padding:12px;background:#0072ce;color:white;border:0;border-radius:8px;cursor:pointer}

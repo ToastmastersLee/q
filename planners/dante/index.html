@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dante Classroom Coverage Simulator</title>
+    <link rel="stylesheet" href="css/base.css?v=20261026-quantities">
+    <link rel="stylesheet" href="css/layout.css?v=20261026-quantities">
+    <link rel="stylesheet" href="css/components.css?v=20261026-quantities">
+<script src="../shared-quotation/vendor/exceljs.min.js?v=20261026-quantities"></script>
+<script src="../shared-quotation/images.js?v=20261026-quantities"></script>
+<script src="../shared-quotation/quotation.js?v=20261026-quantities"></script>
+<link rel="stylesheet" href="css/configuration.css?v=20261026-quantities">
+<link rel="stylesheet" href="css/workspace.css?v=20261026-quantities">
+</head>
+<body>
+
+    <div class="top-nav">
+        <button class="theme-toggle" id="t_themeBtn">🌓 Theme</button>
+        <select class="lang-selector" id="langSelect">
+            <option value="en">English</option>
+            <option value="zh">简体中文</option>
+            <option value="es">Español</option>
+            <option value="ja">日本語</option>
+            <option value="ko">한국어</option>
+            <option value="it">Italiano</option>
+            <option value="hu">Magyar</option>
+            <option value="ar">العربية</option>
+        </select>
+    </div>
+
+    <div class="sidebar">
+        <div>
+            <h1 id="t_h1">⚙️ Classroom Acoustic Simulator</h1>
+            <p id="t_sub" class="sub-desc">Configurable Classroom coverage simulation</p>
+        </div>
+
+        <!-- Presets Card -->
+        <div class="control-group">
+            <label id="t_scenarioLabel" class="group-title">🏫 Preset Scenarios</label>
+            <select class="custom-select" id="presetSelect">
+                <option value="medium" id="t_presetMedium">Medium Classroom (10x8m)</option>
+                <option value="standard" id="t_presetStandard">Standard Classroom (10x10m)</option>
+                <option value="large" id="t_presetLarge">Large Lecture Hall (14x10m)</option>
+                <option value="step" id="t_presetStep">Large Stepped Classroom (10x20m)</option>
+                <option value="small" id="t_presetSmall">Small Meeting Room (6x5m)</option>
+                <option value="custom" id="t_presetCustom">Custom Configuration</option>
+            </select>
+        </div>
+
+        <!-- Room Config Card -->
+        <div class="control-group">
+            <label id="t_roomConfigLabel" class="group-title">📐 Room Dimensions</label>
+            
+            <div class="slider-row">
+                <div class="slider-row-header">
+                    <span id="t_lengthLabel">Room Length (X)</span>
+                    <span class="value-display" id="lengthVal">10.0m</span>
+                </div>
+                <div class="slider-container">
+                    <input type="range" id="lengthSlider" min="2.0" max="40.0" step="0.5" value="10.0">
+                </div>
+            </div>
+
+            <div class="slider-row">
+                <div class="slider-row-header">
+                    <span id="t_widthLabel">Room Width (Y)</span>
+                    <span class="value-display" id="widthVal">8.0m</span>
+                </div>
+                <div class="slider-container">
+                    <input type="range" id="widthSlider" min="2.0" max="20.0" step="0.5" value="8.0">
+                </div>
+            </div>
+
+            <div class="slider-row">
+                <div class="slider-row-header">
+                    <span id="t_heightLabel">Ceiling Height (Z)</span>
+                    <span class="value-display" id="heightVal">3.0m</span>
+                </div>
+                <div class="slider-container">
+                    <input type="range" id="heightSlider" min="2.0" max="4.0" step="0.01" value="3.0">
+                </div>
+                <label class="height-field"><span id="heightModeLabel">Ceiling profile</span><select id="heightMode"><option value="uniform">Uniform</option><option value="split">Front / rear</option></select></label>
+                <label class="height-field"><span id="frontHeightLabel">Front / uniform height</span><input id="frontHeight" type="number" min="2" max="4" step="0.01" value="3.00">m</label>
+                <div id="rearHeightControls" hidden>
+                    <label class="height-field"><span id="rearHeightLabel">Rear height</span><input id="rearHeight" type="number" min="2" max="4" step="0.01" value="3.00">m</label>
+                    <input id="rearHeightSlider" type="range" min="2" max="4" step="0.01" value="3">
+                    <label class="height-field"><span id="splitLabel">Front zone depth</span><input id="heightSplit" type="number" min="0.1" max="19.9" step="0.01" value="5.00">m</label>
+                </div>
+                <label class="height-field"><span id="dropLabel">M100 below ceiling</span><input id="micDrop" type="number" min="0" max="0.7" step="0.01" value="0">m</label>
+                <p id="heightEstimate" class="height-note" role="status"></p>
+                <button id="resetM100Radii" type="button">Use 73° estimate</button>
+                <p id="t_heightDesc" class="height-note">73° geometry is a planning estimate; verify pickup on site.</p>
+            </div>
+
+            <button id="t_recalculate" class="recalculate-btn">Recalculate</button>
+            <button id="t_open3d" class="recalculate-btn">View 3D</button>
+            <p id="handoff-error" class="handoff-error" role="alert" hidden></p>
+            <label class="model-toggle"><input type="checkbox" id="show-models"><span id="t_showModels">Show model numbers</span></label>
+            <p id="t_reference" class="height-note">Reference configuration. Adjust parameters for customer-owned equipment.</p>
+        </div>
+
+        <!-- Stats Card -->
+        <div class="control-group">
+            <label id="t_statsLabel" class="group-title">📈 Coverage Statistics</label>
+            <div class="stat-row">
+                <div class="stat-label-container">
+                    <span id="t_totalArea">Total Room Area</span>
+                    <strong id="totalAreaVal">80.0 m²</strong>
+                </div>
+            </div>
+            <div class="stat-row">
+                <div class="stat-label-container">
+                    <span id="t_micCoverage">Remote Mic Pickup Coverage</span>
+                    <strong id="micCoverageVal">0%</strong>
+                </div>
+                <div class="progress-container">
+                    <div class="progress-bar" id="micCoverageBar"></div>
+                </div>
+            </div>
+            <div class="stat-row">
+                <div class="stat-label-container">
+                    <span id="t_paCoverage">Local PA Pickup Coverage</span>
+                    <strong id="paCoverageVal">0%</strong>
+                </div>
+                <div class="progress-container">
+                    <div class="progress-bar" id="paCoverageBar"></div>
+                </div>
+            </div>
+            <div class="stat-row">
+                <div class="stat-label-container">
+                    <span id="t_spkCoverage">Speaker (DC20) Coverage</span>
+                    <strong id="speakerCoverageVal">0%</strong>
+                </div>
+                <div class="progress-container">
+                    <div class="progress-bar" id="speakerCoverageBar"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Auxiliary Display Recommendation Card -->
+        <div class="control-group data-panel">
+            <label id="t_auxDisplaysLabel" class="group-title">🖥️ Auxiliary Displays (AVIXA 6×)</label>
+            <div id="auxDisplaySummary" class="aux-display-summary"></div>
+        </div>
+
+        <!-- Live Radii Card -->
+        <div class="control-group data-panel">
+            <label id="t_dataLabel" class="group-title">📊 Live Radii (Editable)</label>
+            <div class="data-row">
+                <label class="visibility-label">
+                    <input type="checkbox" checked data-visibility="m100_pickup">
+                    <span class="color-box color-m100-pickup"></span><span id="t_m100Pickup">M100 Remote Pickup</span>
+                </label>
+                <div><input type="number" id="m100PickupInput" class="radius-input" step="0.1" value="8.00">m</div>
+            </div>
+            <div class="data-row">
+                <label class="visibility-label">
+                    <input type="checkbox" checked data-visibility="m100_pa">
+                    <span class="color-box color-m100-pa"></span><span id="t_m100PA">M100 Local PA Pickup</span>
+                </label>
+                <div><input type="number" id="m100PAInput" class="radius-input" step="0.1" value="5.00">m</div>
+            </div>
+            <div class="data-row">
+                <label class="visibility-label">
+                    <input type="checkbox" checked data-visibility="m40_pickup">
+                    <span class="color-box color-m40-pickup"></span><span id="t_m40Pickup">M40 Remote Pickup</span>
+                </label>
+                <div><input type="number" id="m40PickupInput" class="radius-input" step="0.1" value="5.00">m</div>
+            </div>
+            <div class="data-row">
+                <label class="visibility-label">
+                    <input type="checkbox" checked data-visibility="m40_pa">
+                    <span class="color-box color-m40-pa"></span><span id="t_m40PA">M40 Local PA Pickup</span>
+                </label>
+                <div><input type="number" id="m40PAInput" class="radius-input" step="0.1" value="3.00">m</div>
+            </div>
+            <div class="data-row data-row-last">
+                <label class="visibility-label">
+                    <input type="checkbox" checked data-visibility="dc20">
+                    <span class="color-box color-dc20"></span><span id="t_dc20Cover">DC20 Speaker Coverage</span>
+                </label>
+                <div><input type="number" id="dc20Input" class="radius-input" step="0.1" value="3.12">m</div>
+            </div>
+        </div>
+
+        <!-- Device Controls Card -->
+        <div class="control-group">
+            <label id="t_devicesLabel" class="group-title">🔧 Device Controls</label>
+            <div id="audio-count-controls"></div>
+            <div class="device-actions">
+                <button id="t_reset" class="secondary">↺ Reset</button>
+                <button id="t_clearAll" class="danger">🗑️ Clear</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-area">
+        <svg id="canvas" aria-label="Classroom plan">
+            <defs>
+                <pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse">
+                    <path d="M 50 0 L 0 0 0 50" fill="none" stroke="var(--grid-line)" stroke-width="1"/>
+                </pattern>
+                <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                    <path d="M 0 0 L 10 5 L 0 10 z" fill="#3b82f6" />
+                </marker>
+            </defs>
+            <!-- Background Grid -->
+            <rect id="gridRect" x="-100" y="-100" width="2000" height="2000" fill="url(#grid)" />
+
+            <!-- Room Bounds Rectangle -->
+            <rect id="roomBounds" x="0" y="0" width="500" height="400" fill="var(--room-fill)" stroke="var(--room-stroke)" stroke-width="3" />
+            <line id="heightSplitLine" x1="0" x2="500" y1="250" y2="250" stroke="#f59e0b" stroke-width="2" stroke-dasharray="8 5" hidden />
+
+            <!-- Dimension Lines -->
+            <!-- Top Length Dimension -->
+            <g id="lengthDimGroup">
+                <line id="lengthDimLine" x1="0" y1="-20" x2="500" y2="-20" stroke="#3b82f6" stroke-width="2" marker-start="url(#arrow)" marker-end="url(#arrow)" />
+                <text id="lengthDimText" x="250" y="-28" font-size="14" fill="#3b82f6" text-anchor="middle" font-weight="bold">10.0 m</text>
+            </g>
+            
+            <!-- Left Width Dimension -->
+            <g id="widthDimGroup">
+                <line id="widthDimLine" x1="-20" y1="0" x2="-20" y2="400" stroke="#3b82f6" stroke-width="2" marker-start="url(#arrow)" marker-end="url(#arrow)" />
+                <text id="widthDimText" x="-28" y="200" font-size="14" fill="#3b82f6" text-anchor="middle" font-weight="bold" transform="rotate(-90 -28 200)">8.0 m</text>
+            </g>
+
+            <!-- Door Group -->
+            <g id="doorGroup">
+                <!-- Drawn dynamically in JS -->
+                <path id="doorPath" d="" stroke="#ef4444" stroke-width="3" fill="none" stroke-dasharray="4,3" />
+                <text id="doorText" x="0" y="0" font-size="13" fill="#ef4444" font-weight="bold" text-anchor="middle">Door 🚪</text>
+            </g>
+
+            <!-- Auxiliary Display Layer -->
+            <g id="displayLayer"></g>
+
+            <!-- Device Layer -->
+            <g id="devicesLayer"></g>
+        </svg>
+
+        <details class="instruction"><summary data-config-copy="instructions">Instructions</summary><div>
+            <span class="highlight" id="t_warnTitle">⚠️ Microphones (M100, M40) do not output sound. PA requires DC20s.</span><br>
+            <span id="t_warnDesc">Tip: Drag devices to position them. Double-click to delete.</span></div>
+        </details>
+
+        <!-- Floating Specs Panel -->
+        <details class="specs-panel" id="specsPanel"><summary id="t_refTitle">Device reference</summary>
+            <div class="bom-section">
+
+                <div id="refSpecsList" class="ref-specs-list"></div>
+            </div>
+        </details>
+
+        <!-- Floating BOM Panel -->
+        <div class="bom-panel" id="bomPanel">
+            <div class="bom-section">
+                <div class="bom-section-title" id="t_bomTitle">📋 Active BOM (Equipment List)</div>
+                <div id="bomList"></div>
+            </div>
+        </div>
+    </div>
+
+    <script defer src="js/planning-core.js?v=20261026-quantities"></script>
+    <script defer src="js/core.js?v=20261026-quantities"></script>
+    <script defer src="js/presentation.js?v=20261026-quantities"></script>
+    <script defer src="js/configuration.js?v=20261026-quantities"></script>
+    <script defer src="js/configuration-copy.js?v=20261026-quantities"></script>
+    <script defer src="js/audio-layout.js?v=20261026-quantities"></script>
+    <script defer src="js/audio-controls.js?v=20261026-quantities"></script>
+    <script defer src="js/plan-snapshot.js?v=20261026-quantities"></script>
+    <script defer src="js/locales-en-zh.js?v=20261026-quantities"></script>
+    <script defer src="js/locales-hu-it.js?v=20261026-quantities"></script>
+    <script defer src="js/locales-es-ja.js?v=20261026-quantities"></script>
+    <script defer src="js/locales-ko-ar.js?v=20261026-quantities"></script>
+    <script defer src="js/i18n.js?v=20261026-quantities"></script>
+    <script defer src="js/displays.js?v=20261026-quantities"></script>
+    <script defer src="js/room.js?v=20261026-quantities"></script>
+    <script defer src="js/devices.js?v=20261026-quantities"></script>
+    <script defer src="js/coverage.js?v=20261026-quantities"></script>
+    <script defer src="js/recommend-mics.js?v=20261026-quantities"></script>
+    <script defer src="js/recommend-speakers.js?v=20261026-quantities"></script>
+    <script defer src="js/recommendation.js?v=20261026-quantities"></script>
+    <script defer src="js/presets.js?v=20261026-quantities"></script>
+    <script defer src="js/bom.js?v=20261026-quantities"></script>
+    <script defer src="js/interactions.js?v=20261026-quantities"></script>
+    <script defer src="js/main.js?v=20261026-quantities"></script>
+<script defer src="js/quotation.js?v=20261026-quantities"></script>
+<script defer src="js/workspace.js?v=20261026-quantities"></script>
+</body>
+</html>

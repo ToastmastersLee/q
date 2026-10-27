@@ -1,0 +1,70 @@
+/* Shared presentation tokens and controls; kept identical in both offline demos. */
+:root {
+  color-scheme: dark;
+  --bg:#0a1422; --panel:#101e30; --card:#15263a; --field:#17283a; --button:#20354b;
+  --hover:#304c66; --border:#2b4058; --divider:#2a3c4f; --text:#edf5fc; --muted:#9cb2c6;
+  --teal:#36d6b0; --blue:#74b6ff; --orange:#f4ad5e; --primary:#12ae91; --primary-text:#052622;
+  --accent-soft:#1a4449; --accent-text:#aaf4e2; --accent-border:#3c887f;
+  --overlay:#101e30ed; --label-bg:#16384cf0; --label-text:#effcff; --label-border:#62cfc4;
+  --label-selected:#277a7b; --detail-bg:#102239; --detail-text:#edf5fc; --detail-muted:#a9c1c8;
+  --error-bg:#4d1d2a; --error-text:#ffd9df; --error-border:#e98a9f;
+  --warning-bg:#3b301c; --warning-text:#f4d79a; --warning-border:#806333;
+  --shadow:0 8px 24px #0003; --glow:#22b89f2d;
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg:#eaf0f7; --panel:#f2f6f9; --card:#fff; --field:#f6f9fa; --button:#fff;
+  --hover:#e7f4f1; --border:#cfdfe6; --divider:#e3ecef; --text:#183146; --muted:#5b7484;
+  --teal:#168f88; --blue:#3478bc; --orange:#996018; --primary:#178f88; --primary-text:#fff;
+  --accent-soft:#e3f4ee; --accent-text:#146c61; --accent-border:#6bbbae;
+  --overlay:#ffffffed; --label-bg:#fffffff0; --label-text:#1b3b4c; --label-border:#8db7bb;
+  --label-selected:#dff3ed; --detail-bg:#eef5f6; --detail-text:#183146; --detail-muted:#587181;
+  --error-bg:#fff0f0; --error-text:#9b3434; --error-border:#dfabb0;
+  --warning-bg:#fff4db; --warning-text:#8f5b18; --warning-border:#efd7a0;
+  --shadow:0 8px 24px #24435718;
+}
+[hidden] { display:none!important }
+button,input,select { font-family:inherit }
+.scene-panel { container-type:inline-size; background:var(--bg) }
+.scene-tools {
+  position:absolute; z-index:3; top:16px; right:16px; display:flex; align-items:flex-start;
+  justify-content:flex-end; gap:7px; max-width:calc(100% - 32px);
+}
+.scene-tools .view-controls,.scene-tools .view-buttons,.scene-tool-actions {
+  position:static; transform:none; display:flex; gap:3px; flex-wrap:nowrap; max-width:none;
+  background:var(--overlay); border:1px solid var(--border); border-radius:11px;
+  padding:4px; box-shadow:var(--shadow); backdrop-filter:blur(10px);
+}
+.scene-tools button {
+  border:0; border-radius:7px; background:transparent; color:var(--muted); padding:7px 9px;
+  font-size:11px; line-height:1.25; font-weight:700; white-space:nowrap; box-shadow:none;
+}
+.scene-tools button:hover { background:var(--hover); color:var(--text) }
+.scene-tools button.active { background:var(--accent-soft); color:var(--accent-text) }
+.scene-tool-actions { flex:none }
+.scene-caption,.scene-topline { width:max-content; max-width:calc(100% - 32px); right:auto; text-shadow:none; color:var(--muted) }
+.scene-caption { padding:9px 11px; background:var(--overlay); border-color:var(--border) }
+.scene-caption [data-i18n="sceneCaption"] { display:none }
+.scene-caption strong { margin-left:0 }
+.device-label { background:var(--label-bg); color:var(--label-text); box-shadow:var(--shadow) }
+.device-label.selected { background:var(--label-selected) }
+.sidebar-collapsed .workspace { grid-template-columns:minmax(0,1fr) }
+.topbar { flex-wrap:wrap }
+.room-controls { flex-wrap:wrap }
+@container (max-width:760px) {
+  .scene-tools { top:50px; right:10px; flex-direction:column; align-items:flex-end; gap:5px; max-width:calc(100% - 20px) }
+  .scene-tools button { padding:6px 8px; font-size:10px }
+}
+@media(max-width:760px) {
+  .scene-caption,.scene-topline { top:14px; left:12px; font-size:10px }
+  .sidebar-collapsed .scene-panel { height:calc(100dvh - 175px); min-height:420px }
+}
+
+/* Language follows the main site; scene coordinates are never mirrored. */
+.language-select{background:var(--button,#20384b);color:inherit;border:1px solid #75899a66;border-radius:10px;padding:9px 12px;font:inherit;max-width:150px;cursor:pointer}
+.language-select option{background:#fff;color:#173044}
+html[dir="rtl"] .main-layout,html[dir="rtl"] .workspace{direction:ltr}
+html[dir="rtl"] .sidebar{direction:rtl;text-align:right}
+html[dir="rtl"] .scene-panel{direction:ltr}
+input[type="number"]{direction:ltr}
+.sidebar .model-toggle{display:flex;align-items:center;gap:9px;margin:16px 0;padding:12px;border:1px solid #75899a44;border-radius:8px;cursor:pointer}

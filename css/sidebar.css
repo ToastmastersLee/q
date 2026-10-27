@@ -1,0 +1,294 @@
+/* === SIDEBAR INSPECTOR & LEGEND === */
+aside.sidebar-panel {
+    width: 360px;
+    min-width: 360px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow-y: auto;
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                min-width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 0.25s ease,
+                margin 0.3s ease;
+}
+
+aside.sidebar-panel.collapsed {
+    width: 0;
+    min-width: 0;
+    margin-left: -16px;
+    opacity: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+/* Sidebar Top Bar with Collapse Button */
+.sidebar-top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+}
+
+.sidebar-top-title {
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--text-muted);
+}
+
+.btn-sidebar-close {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.btn-sidebar-close:hover {
+    background: var(--btn-hover);
+    color: var(--text-main);
+    border-color: var(--border-highlight);
+}
+
+/* Floating Expand Tab when sidebar is collapsed */
+.sidebar-expand-tab {
+    position: absolute;
+    top: 24px;
+    right: 12px;
+    z-index: 40;
+    background: var(--bg-card);
+    color: #0074D9;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+    padding: 8px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: slideInTab 0.25s ease-out;
+}
+
+.sidebar-expand-tab:hover {
+    background: #0074D9;
+    color: #ffffff;
+    box-shadow: 0 6px 18px rgba(0, 116, 217, 0.35);
+    transform: translateX(-2px);
+}
+
+.sidebar-expand-tab.hidden {
+    display: none !important;
+}
+
+@keyframes slideInTab {
+    from { opacity: 0; transform: translateX(12px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+/* Device Inspector Card */
+.inspector-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 16px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+}
+
+.inspector-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+}
+
+.inspector-title-wrap h2 {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.inspector-title-wrap span.inspector-model-badge {
+    background: #0074D9;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 3px;
+    margin-top: 3px;
+    display: inline-block;
+}
+
+.inspector-zone-tag {
+    font-size: 10.5px;
+    color: var(--inspector-zone-text);
+    background: var(--inspector-zone-bg);
+    padding: 2px 8px;
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+    font-weight: 600;
+}
+
+.inspector-preview-box {
+    background: var(--inspector-preview-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.inspector-preview-img {
+    max-height: 80px;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15));
+}
+
+.inspector-section { margin-bottom: 12px; }
+
+.inspector-section h4 {
+    font-size: 11px;
+    font-weight: 700;
+    color: #0074D9;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+}
+
+.inspector-role-text {
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--text-muted);
+}
+
+.inspector-ports-list {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 4px;
+}
+
+.inspector-ports-list li {
+    background: var(--ports-li-bg);
+    border: 1px solid var(--ports-li-border);
+    font-size: 10px;
+    font-family: var(--font-mono);
+    color: var(--ports-li-text);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+.scenario-items { display: flex; flex-direction: column; gap: 6px; }
+.scenario-item {
+    background: var(--scenario-item-bg);
+    border: 1px solid var(--scenario-item-border);
+    border-radius: 6px;
+    padding: 6px 8px;
+    font-size: 11px;
+    line-height: 1.4;
+}
+.scenario-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 4px;
+    margin-bottom: 2px;
+}
+.scenario-badge-teaching { background: var(--scenario-badge-teaching-bg); color: var(--scenario-badge-teaching-text); }
+.scenario-badge-control { background: var(--scenario-badge-control-bg); color: var(--scenario-badge-control-text); }
+.scenario-badge-cascading { background: var(--scenario-badge-cascading-bg); color: var(--scenario-badge-cascading-text); }
+.scenario-desc { color: var(--text-main); display: block; margin-top: 2px; }
+.inspector-actions {
+    display: none !important;
+}
+
+.inspector-btn {
+    width: 100%;
+    background: #0074D9;
+    color: #fff;
+    border: none;
+    padding: 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.inspector-btn:hover { background: #0284c7; }
+
+/* === WIRING SPECIFICATION LEGEND === */
+.legend-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 14px;
+}
+
+.legend-card h3 {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.legend-card h3 span {
+    font-size: 10px;
+    color: #0284c7;
+    font-weight: 600;
+}
+
+.legend-items {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.legend-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 11.5px;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.legend-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.color-bar {
+    width: 22px;
+    height: 4px;
+    flex-shrink: 0;
+    border-radius: 2px;
+}
+
+.color-bar.lan { background: #0074D9; }
+.color-bar.hdmi { background: #FF4136; }
+.color-bar.audio { background: #2ECC40; }
+.color-bar.wireless { background: repeating-linear-gradient(to right, #0284c7 0 5px, transparent 5px 8px); border-radius: 0; }
+.legend-filter-chk { cursor: pointer; accent-color: #0074D9; }
+
+.color-bar.usb { background: #FFDC00; }

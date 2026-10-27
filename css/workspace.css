@@ -1,0 +1,124 @@
+/* === MAIN WORKSPACE LAYOUT === */
+main.workspace {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+    min-width: 0;
+    overflow: hidden;
+    position: relative;
+    padding: 12px;
+    gap: 16px;
+}
+
+/* Topology Board Canvas Container */
+.board-container {
+    flex: 1;
+    background-color: var(--board-bg);
+    background-image:
+        radial-gradient(var(--board-dot) 1.2px, transparent 1.2px),
+        linear-gradient(to right, var(--board-grid) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--board-grid) 1px, transparent 1px);
+    background-size: 24px 24px, 120px 120px, 120px 120px;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    position: relative;
+    overflow-x: hidden;
+    overflow-y: auto;
+    min-height: 0;
+    min-width: 0;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.topology-board {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    /* Dimensions are set from topology.config by renderCanvas. */
+    transform-origin: top left;
+}
+
+#topology-svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    pointer-events: none;
+}
+
+#nodes-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 20;
+}
+
+/* SVG Elements Styling */
+.cloud-boundary {
+    fill: var(--cloud-boundary-fill);
+    stroke: var(--cloud-boundary-stroke);
+    stroke-width: 1.5;
+    stroke-dasharray: 6 4;
+}
+
+.cloud-title {
+    fill: var(--cloud-title-fill);
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+}
+
+.campus-lan-boundary {
+    fill: var(--campus-lan-fill);
+    stroke: var(--campus-lan-stroke);
+    stroke-width: 2;
+    stroke-dasharray: 8 6;
+}
+
+.campus-lan-title {
+    fill: var(--campus-lan-title-fill);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.room-boundary {
+    fill: var(--room-boundary-fill);
+    stroke: var(--room-boundary-stroke);
+    stroke-width: 1.5;
+}
+
+.room-title-bg {
+    fill: var(--room-title-bg-fill);
+    stroke: var(--room-title-stroke);
+    stroke-width: 1;
+}
+
+.room-title {
+    fill: var(--room-title-fill);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+}
+
+/* Cable Labels */
+.cable-label-hdmi {
+    display: none !important;
+}
+
+.cable-label-bg {
+    fill: var(--cable-label-bg);
+    stroke: var(--cable-label-stroke);
+    stroke-width: 1;
+}
+
+.cable-label-text {
+    fill: var(--cable-label-text);
+    font-size: 9px;
+    font-family: var(--font-mono);
+    font-weight: 600;
+}
+

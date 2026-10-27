@@ -1,0 +1,134 @@
+/* === SCENARIO QUICK SWITCH BAR === */
+.scenario-bar {
+    background: var(--bg-scenario-bar);
+    border-bottom: 1px solid var(--border-color);
+    padding: 8px 24px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    overflow-x: auto;
+    transition: background 0.25s ease;
+}
+
+.scenario-bar-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-right: 6px;
+    white-space: nowrap;
+}
+
+.scenario-btn {
+    background: var(--btn-bg);
+    border: 1px solid var(--btn-border);
+    color: var(--text-muted);
+    padding: 6px 13px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+}
+
+.scenario-btn:hover {
+    background: var(--btn-hover);
+    color: var(--text-main);
+}
+
+.scenario-btn.active {
+    background: rgba(0, 116, 217, 0.12);
+    color: #0074D9;
+    border-color: #0074D9;
+    font-weight: 700;
+    box-shadow: 0 0 10px rgba(0, 116, 217, 0.15);
+}
+
+/* === ACTIVE SCENARIO BANNER === */
+.scenario-banner {
+    background: var(--bg-scenario-banner);
+    border-bottom: 1px solid var(--border-color);
+    padding: 10px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.scenario-banner-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.scenario-banner-badge {
+    background: #0284c7;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+}
+
+.scenario-banner-text h3 {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.scenario-banner-text p {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+/* === COLLAPSIBLE SCENARIOS WRAPPER === */
+.scenarios-collapse-wrapper {
+    max-height: 200px;
+    opacity: 1;
+    overflow: hidden;
+    transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 0.25s ease;
+}
+
+.scenarios-collapse-wrapper.collapsed {
+    max-height: 0;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.btn-scenarios-close-bar {
+    margin-left: auto;
+    background: transparent;
+    border: 1px solid var(--btn-border);
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+}
+
+.btn-scenarios-close-bar:hover {
+    background: var(--btn-hover);
+    color: var(--text-main);
+    border-color: var(--border-highlight);
+}
+
+.scenario-arrow {
+    font-size: 10px;
+    margin-left: 2px;
+    display: inline-block;
+    transition: transform 0.2s ease;
+}
+
+.btn-scenarios-toggle.open .scenario-arrow {
+    transform: rotate(180deg);
+}

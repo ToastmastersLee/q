@@ -1,0 +1,112 @@
+/* === NEWBIE GUIDED TOUR MODAL === */
+.tour-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.65);
+    backdrop-filter: blur(8px);
+    z-index: 100;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 24px;
+}
+
+.tour-modal.hidden {
+    display: none;
+}
+
+.tour-dialog {
+    background: var(--modal-bg);
+    border: 2px solid var(--modal-border);
+    box-shadow: 0 10px 40px var(--modal-shadow);
+    border-radius: 14px;
+    width: 680px;
+    max-width: 90vw;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    animation: tour-slide-in 0.3s ease-out;
+}
+
+@keyframes tour-slide-in {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.tour-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
+}
+
+.tour-step-badge {
+    background: #0074D9;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+}
+
+.tour-title {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--text-main);
+    margin-top: 4px;
+}
+
+.tour-body {
+    font-size: 13.5px;
+    line-height: 1.6;
+    color: var(--text-muted);
+}
+
+.tour-text {
+    margin-bottom: 10px;
+    color: var(--text-main);
+}
+
+.tour-list {
+    list-style: disc;
+    margin-left: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.tour-color-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.color-item {
+    background: var(--modal-item-bg);
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-main);
+    border: 1px solid var(--border-color);
+}
+
+.color-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.tour-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid var(--border-color);
+    padding-top: 14px;
+}

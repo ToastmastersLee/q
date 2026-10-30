@@ -209,3 +209,5 @@ input,select {
   padding:17px;
   border-radius:10px
 }
+
+.room-controls #reset-plan{width:auto;flex:none;margin:0;align-self:end;padding:9px 12px;border:1px solid var(--border);border-radius:8px;background:var(--button);color:var(--text);cursor:pointer;font:inherit;font-size:12px;font-weight:700;white-space:nowrap}#s210-count-status{font-size:11px;color:var(--muted)}

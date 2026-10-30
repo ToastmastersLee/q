@@ -23,3 +23,5 @@
 @media(max-width:1250px){.room-toolbar.room-controls{order:3;flex-basis:100%}.topbar{gap:10px}}
 @media(max-width:980px){.app-shell{height:auto;min-height:100dvh}.main-layout{flex-direction:column}.sidebar{width:auto;border-left:0;border-top:1px solid var(--border)}.scene-panel{height:65dvh;min-height:430px;flex:none}}
 @media(max-width:600px){.topbar{padding:10px 12px}.topbar-actions{width:auto}.brand-lockup h1{font-size:14px;max-width:200px}.room-controls label:first-child select{width:136px}.room-controls input{width:60px}.room-toolbar label{font-size:9px}.room-toolbar input,.room-toolbar select{padding:7px}.room-toolbar .primary-button{padding:8px}.scene-panel{height:59dvh;min-height:390px}.sidebar{padding:12px}}
+
+.room-controls #reset-plan{width:auto;flex:none;margin:0;align-self:end;padding:9px 12px;border:1px solid var(--border);border-radius:8px;background:var(--button);color:var(--text);cursor:pointer;font:inherit;font-size:12px;font-weight:700;white-space:nowrap}#s210-count-status{font-size:11px;color:var(--muted)}

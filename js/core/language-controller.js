@@ -20,6 +20,10 @@
             document.getElementById('lcs-demo-link').textContent = lcs;
             document.getElementById('dante-demo-link').textContent = dante;
             for (const name of ['lcs','dante']) document.getElementById(`${name}-demo-link`).setAttribute('href', `demos/${name}/index.html?lang=${this.lang}`);
+            for (const [id,path] of [['meeting-2d-link','planners/meeting/index.html'],['meeting-3d-link','planners/meeting/three-demo/index.html']]) {
+                const link=document.getElementById(id); link.href=`${path}?lang=${this.lang}`;
+                link.textContent=(this.lang==='zh'?'会议室 ': 'Meeting ')+(id==='meeting-2d-link'?'2D':'3D')+' ↗';
+            }
             for (const name of ['lcs','dante']) {
  const link=document.getElementById(`${name}-2d-link`);
  link.onclick=()=>{link.href=`planners/${name}/index.html?lang=${this.lang}&theme=${this.theme}&home=../../index.html`;};

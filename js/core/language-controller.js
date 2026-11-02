@@ -21,7 +21,7 @@
             document.getElementById('dante-demo-link').textContent = dante;
             for (const name of ['lcs','dante']) document.getElementById(`${name}-demo-link`).setAttribute('href', `demos/${name}/index.html?lang=${this.lang}`);
             for (const [id,path] of [['meeting-2d-link','planners/meeting/index.html'],['meeting-3d-link','planners/meeting/three-demo/index.html']]) {
-                const link=document.getElementById(id); link.href=`${path}?lang=${this.lang}`;
+                const link=document.getElementById(id); link.href=`${path}?lang=${this.lang}&v=20261102-devices`;
                 link.textContent=(this.lang==='zh'?'会议室 ': 'Meeting ')+(id==='meeting-2d-link'?'2D':'3D')+' ↗';
             }
             for (const name of ['lcs','dante']) {

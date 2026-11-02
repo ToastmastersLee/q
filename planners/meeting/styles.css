@@ -4,3 +4,5 @@
 button:disabled,input:disabled,select:disabled{opacity:.55;cursor:not-allowed}
 
 .meeting-3d .header-spacer{flex:1}.meeting-3d .tools{background:var(--panel);padding:5px;border:1px solid var(--border);border-radius:10px;box-shadow:var(--shadow)}.meeting-3d .tools button{border:0;background:transparent}.meeting-3d .tools button.active{background:var(--accent);color:white}.meeting-3d main.sidebar-collapsed{grid-template-columns:minmax(0,1fr)}.meeting-3d main.sidebar-collapsed .side{display:none}.meeting-3d .side select{width:100%}@media(max-width:700px){.meeting-3d .header-spacer{display:none}.meeting-3d .tools{top:48px}.meeting-3d main.sidebar-collapsed .side{display:none}}
+
+.device-list{display:grid;gap:6px;margin:8px 0 16px}.device-list button{text-align:left;display:flex;justify-content:space-between;gap:8px;padding:8px;font-size:12px}.device-list button.selected{border-color:var(--accent);background:var(--surface);box-shadow:inset 3px 0 var(--accent)}.device-list small{color:var(--muted);white-space:nowrap}.meeting-3d .side h3{font-size:13px;margin:18px 0 2px}

@@ -1,5 +1,21 @@
 /** DOM event binding for application controls. */
 (function (Simulator) {
+    function bindHorizontalTabs(tabs, activate) {
+        tabs.forEach((tab, index) => {
+            tab.addEventListener('click', () => activate(tab));
+            tab.addEventListener('keydown', event => {
+                if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+                event.preventDefault();
+                const rtl = document.documentElement.dir === 'rtl';
+                const forward = event.key === (rtl ? 'ArrowLeft' : 'ArrowRight');
+                const target = event.key === 'Home' ? 0 : event.key === 'End' ? tabs.length - 1
+                    : (index + (forward ? 1 : -1) + tabs.length) % tabs.length;
+                activate(tabs[target]);
+                tabs[target].focus();
+            });
+        });
+    }
+
     Object.assign(Simulator.prototype, {
         bindEvents() {
             this.bindScenarioControls();
@@ -18,18 +34,18 @@
 
         bindViewControls() {
             const tabs = [...document.querySelectorAll('[data-view]')];
-            tabs.forEach((tab, index) => {
-                tab.addEventListener('click', () => this.setView(tab.dataset.view));
-                tab.addEventListener('keydown', event => {
-                    if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
-                    event.preventDefault();
-                    const rtl = document.documentElement.dir === 'rtl';
-                    const forward = event.key === (rtl ? 'ArrowLeft' : 'ArrowRight');
-                    const target = event.key === 'Home' ? 0 : event.key === 'End' ? tabs.length - 1
-                        : (index + (forward ? 1 : -1) + tabs.length) % tabs.length;
-                    this.setView(tabs[target].dataset.view);
-                    tabs[target].focus();
-                });
+            bindHorizontalTabs(tabs, tab => this.setView(tab.dataset.view));
+        },
+
+        bindSettingsTabs() {
+            const tabs = [...document.querySelectorAll('.settings-tabs [role="tab"]')];
+            bindHorizontalTabs(tabs, activeTab => {
+                for (const tab of tabs) {
+                    const selected = tab === activeTab;
+                    tab.setAttribute('aria-selected', String(selected));
+                    tab.tabIndex = selected ? 0 : -1;
+                    document.getElementById(tab.getAttribute('aria-controls')).hidden = !selected;
+                }
             });
         },
 
@@ -106,13 +122,22 @@
         bindCollapsiblePanels() {
             const settingsToggle = document.getElementById('btn-settings-toggle');
             const settingsPanel = document.getElementById('settings-panel');
+            this.bindSettingsTabs();
 
             settingsToggle?.addEventListener('click', (event) => {
                 event.stopPropagation();
                 this.toggleSettingsPanel();
+                if (!settingsPanel.classList.contains('hidden')) {
+                    settingsPanel.querySelector('[role="tab"][aria-selected="true"]').focus();
+                }
             });
             settingsPanel?.addEventListener('click', event => {
-                if (event.target.closest('.tool-actions button')) this.closeSettingsPanel();
+                const button = event.target.closest('.tool-actions button');
+                if (!button) return;
+                this.closeSettingsPanel();
+                const nextFocus = button.id === 'btn-start-tour'
+                    ? document.getElementById('tour-close-btn') : settingsToggle;
+                nextFocus?.focus();
             });
 
             document.addEventListener('click', (event) => {

@@ -7,8 +7,9 @@
     <title>Q-NEX System Architecture Overview</title>
     <link rel="stylesheet" href="css/theme.css?v=20261028-compact-control">
     <link rel="stylesheet" href="css/base.css?v=20261028-compact-control">
-    <link rel="stylesheet" href="css/header.css?v=20261028-compact-control">
-    <link rel="stylesheet" href="css/localization.css?v=20261028-compact-control">
+    <link rel="stylesheet" href="css/header.css?v=20261110-tools">
+    <link rel="stylesheet" href="css/localization.css?v=20261110-tools">
+    <link rel="stylesheet" href="css/tools-panel.css?v=20261110-tools">
     <link rel="stylesheet" href="css/scenarios.css?v=20261028-compact-control">
     <link rel="stylesheet" href="css/workspace.css?v=20261028-compact-control">
     <link rel="stylesheet" href="css/topology.css?v=20261028-compact-control">
@@ -61,24 +62,41 @@
                         <span id="lbl-settings-heading">Tools &amp; Settings</span>
                         <span id="app-version" class="tag">Online Training v3.0</span>
                     </div>
-                    <div class="settings-panel-body">
+                    <div class="settings-tabs" role="tablist" aria-labelledby="lbl-settings-heading">
+                        <button id="settings-tab-planners" type="button" role="tab" aria-selected="true" aria-controls="settings-planners">Planners</button>
+                        <button id="settings-tab-tools" type="button" role="tab" aria-selected="false" aria-controls="settings-tools" tabindex="-1">Tools</button>
+                        <button id="settings-tab-display" type="button" role="tab" aria-selected="false" aria-controls="settings-display" tabindex="-1">Display</button>
+                    </div>
+                    <div id="settings-planners" role="tabpanel" aria-labelledby="settings-tab-planners">
+                        <ul class="planner-list" role="list" dir="ltr">
+                            <li class="planner-row">
+                                <bdi id="planner-name-lcs">LCS</bdi>
+                                <a id="lcs-2d-link" class="planner-link" href="planners/lcs/index.html" target="_blank" rel="noopener" aria-labelledby="planner-name-lcs lcs-2d-link">2D <span aria-hidden="true">↗</span></a>
+                                <a id="lcs-demo-link" class="planner-link planner-link-3d" href="demos/lcs/index.html" target="_blank" rel="noopener" aria-labelledby="planner-name-lcs lcs-demo-link">3D <span aria-hidden="true">↗</span></a>
+                            </li>
+                            <li class="planner-row">
+                                <bdi id="planner-name-dante">Dante</bdi>
+                                <a id="dante-2d-link" class="planner-link" href="planners/dante/index.html" target="_blank" rel="noopener" aria-labelledby="planner-name-dante dante-2d-link">2D <span aria-hidden="true">↗</span></a>
+                                <a id="dante-demo-link" class="planner-link planner-link-3d" href="demos/dante/index.html" target="_blank" rel="noopener" aria-labelledby="planner-name-dante dante-demo-link">3D <span aria-hidden="true">↗</span></a>
+                            </li>
+                            <li class="planner-row">
+                                <bdi id="planner-name-meeting">Meeting Room</bdi>
+                                <a id="meeting-2d-link" class="planner-link" href="planners/meeting/index.html?v=20261102-devices" target="_blank" rel="noopener" aria-labelledby="planner-name-meeting meeting-2d-link">2D <span aria-hidden="true">↗</span></a>
+                                <a id="meeting-3d-link" class="planner-link planner-link-3d" href="planners/meeting/three-demo/index.html?v=20261102-devices" target="_blank" rel="noopener" aria-labelledby="planner-name-meeting meeting-3d-link">3D <span aria-hidden="true">↗</span></a>
+                            </li>
+                        </ul>
+                        <p id="lbl-planner-tab-note">Each planner opens in a new tab.</p>
+                    </div>
+                    <div id="settings-tools" class="settings-panel-body" role="tabpanel" aria-labelledby="settings-tab-tools" hidden>
                         <div class="tool-actions">
-            <a id="lcs-demo-link" class="btn demo-shortcut" href="demos/lcs/index.html" target="_blank" rel="noopener">LCS 3D Demo ↗</a>
-            <a id="dante-demo-link" class="btn demo-shortcut" href="demos/dante/index.html" target="_blank" rel="noopener">Dante 3D Demo ↗</a>
-
-<a class="btn" id="lcs-2d-link" href="planners/lcs/index.html" target="_blank" rel="noopener">LCS-2D ↗</a>
-<a class="btn" id="dante-2d-link" href="planners/dante/index.html" target="_blank" rel="noopener">Dante-2D ↗</a>
-<a class="btn" id="meeting-2d-link" href="planners/meeting/index.html?v=20261102-devices" target="_blank" rel="noopener">Meeting 2D ↗</a>
-<a class="btn" id="meeting-3d-link" href="planners/meeting/three-demo/index.html?v=20261102-devices" target="_blank" rel="noopener">Meeting 3D ↗</a>
                             <button id="btn-export-png" class="btn" type="button">Export PNG</button>
                             <button id="btn-start-tour" class="btn btn-primary" type="button">🎓 Newbie Guide</button>
                             <button id="btn-play-pause" class="btn" type="button">⏸️ Pause</button>
                             <button id="btn-reset" class="btn" type="button">🔄 Reset Topology</button>
-                            <button id="btn-sidebar-toggle" class="btn" type="button">📋 Hide Inspector</button>
                             <a id="terminal-architecture-link" class="btn" hidden>Terminal Architecture</a>
                         </div>
                         <div class="settings-item">
-                            <span class="settings-item-label" id="lbl-setting-speed">动画速度</span>
+                            <label class="settings-item-label" id="lbl-setting-speed" for="speed-select">Animation Speed</label>
                             <select id="speed-select" class="speed-select" title="动画播放速度">
                                 <option value="0.5">0.5x 慢速演示</option>
                                 <option value="1.0" selected>1.0x 正常速度</option>
@@ -91,6 +109,8 @@
                                 <span>🔊</span> 音效：已开启
                             </button>
                         </div>
+                    </div>
+                    <div id="settings-display" class="settings-panel-body" role="tabpanel" aria-labelledby="settings-tab-display" hidden>
                         <div class="settings-item">
                             <span class="settings-item-label" id="lbl-setting-theme">界面皮肤</span>
                             <button id="btn-theme-toggle" class="btn settings-item-btn" title="切换浅色明亮/深色极客皮肤">
@@ -102,6 +122,9 @@
                             <button id="btn-fullscreen" class="btn settings-item-btn" title="全屏显示 / Fullscreen">
                                 <span>⛶</span> 全屏显示
                             </button>
+                        </div>
+                        <div class="tool-actions">
+                            <button id="btn-sidebar-toggle" class="btn" type="button">📋 Hide Inspector</button>
                         </div>
                     </div>
                 </div>
@@ -333,8 +356,8 @@
     <script src="js/vendor/html-to-image-1.11.13.min.js?v=20261028-compact-control"></script>
     <script src="js/data/export-images.js?v=20261028-compact-control"></script>
     <script src="js/core/png-export.js?v=20261028-compact-control"></script>
-    <script src="js/core/ui-controller.js?v=20261028-compact-control"></script>
-    <script src="js/core/language-controller.js?v=20261028-compact-control"></script>
+    <script src="js/core/ui-controller.js?v=20261110-tools"></script>
+    <script src="js/core/language-controller.js?v=20261110-tools"></script>
     <script src="js/core/topology-renderer.js?v=20261028-compact-control"></script>
     <script src="js/core/node-renderer.js?v=20261028-compact-control"></script>
     <script src="js/core/particle-engine.js?v=20261028-compact-control"></script>
@@ -342,7 +365,7 @@
     <script src="js/core/scenario-controller.js?v=20261028-compact-control"></script>
     <script src="js/core/product-video.js?v=20261028-compact-control"></script>
     <script src="js/core/device-inspector.js?v=20261028-compact-control"></script>
-    <script src="js/core/controls.js?v=20261028-compact-control"></script>
+    <script src="js/core/controls.js?v=20261110-tools"></script>
     <script src="js/simulator.js?v=20261028-compact-control"></script>
 </body>
 </html>

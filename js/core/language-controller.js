@@ -1,14 +1,14 @@
 /** Locale content adapters; geometry and product model identifiers stay stable. */
 (function (app, Simulator) {
-    const DEMO_TEXT = {
-        en: ['LCS 3D Demo ↗', 'Dante 3D Demo ↗'],
-        zh: ['LCS 3D 演示 ↗', 'Dante 3D 演示 ↗'],
-        ko: ['LCS 3D 데모 ↗', 'Dante 3D 데모 ↗'],
-        mn: ['LCS 3D үзүүлэн ↗', 'Dante 3D үзүүлэн ↗'],
-        ja: ['LCS 3D デモ ↗', 'Dante 3D デモ ↗'],
-        es: ['Demo 3D LCS ↗', 'Demo 3D Dante ↗'],
-        fr: ['Démo LCS 3D ↗', 'Démo Dante 3D ↗'],
-        ar: ['عرض LCS ثلاثي الأبعاد ↗', 'عرض Dante ثلاثي الأبعاد ↗']
+    const SETTINGS_COPY = {
+        en: ['Planners', 'Tools', 'Display', 'Meeting Room', 'Each planner opens in a new tab.'],
+        zh: ['方案设计', '工具', '显示', '会议室', '方案工具会在新标签页打开。'],
+        ko: ['설계 도구', '도구', '화면', '회의실', '설계 도구는 새 탭에서 열립니다.'],
+        mn: ['Төлөвлөлт', 'Хэрэгсэл', 'Дэлгэц', 'Хурлын өрөө', 'Төлөвлөх хэрэгсэл шинэ табд нээгдэнэ.'],
+        ja: ['プランナー', 'ツール', '表示', '会議室', 'プランナーは新しいタブで開きます。'],
+        es: ['Planificación', 'Herramientas', 'Pantalla', 'Sala de reuniones', 'Cada planificador se abre en una pestaña nueva.'],
+        fr: ['Planification', 'Outils', 'Affichage', 'Salle de réunion', 'Chaque outil de planification s’ouvre dans un nouvel onglet.'],
+        ar: ['أدوات التخطيط', 'الأدوات', 'العرض', 'غرفة الاجتماعات', 'تُفتح أدوات التخطيط في علامات تبويب جديدة.']
     };
     Object.assign(Simulator.prototype, {
         updateLanguageControls(t) {
@@ -16,19 +16,13 @@
             const select = document.getElementById('language-select');
             select.value = this.lang;
             select.setAttribute('aria-label', t.setting_lang_label);
-            const [lcs, dante] = DEMO_TEXT[this.lang];
-            document.getElementById('lcs-demo-link').textContent = lcs;
-            document.getElementById('dante-demo-link').textContent = dante;
-            for (const name of ['lcs','dante']) document.getElementById(`${name}-demo-link`).setAttribute('href', `demos/${name}/index.html?lang=${this.lang}`);
-            for (const [id,path] of [['meeting-2d-link','planners/meeting/index.html'],['meeting-3d-link','planners/meeting/three-demo/index.html']]) {
-                const link=document.getElementById(id); link.href=`${path}?lang=${this.lang}&v=20261102-devices`;
-                link.textContent=(this.lang==='zh'?'会议室 ': 'Meeting ')+(id==='meeting-2d-link'?'2D':'3D')+' ↗';
-            }
-            for (const name of ['lcs','dante']) {
- const link=document.getElementById(`${name}-2d-link`);
- link.onclick=()=>{link.href=`planners/${name}/index.html?lang=${this.lang}&theme=${this.theme}&home=../../index.html`;};
- }
- const titles = {
+            const labelIds = ['settings-tab-planners', 'settings-tab-tools', 'settings-tab-display',
+                'planner-name-meeting', 'lbl-planner-tab-note'];
+            SETTINGS_COPY[this.lang].forEach((label, index) => {
+                document.getElementById(labelIds[index]).textContent = label;
+            });
+            this.updatePlannerLinks();
+            const titles = {
                 'btn-settings-toggle': t.settings_heading,
                 'btn-scenarios-toggle': t.scenario_bar_title,
                 'btn-scenarios-close-bar': t.scenarios_collapse_btn,
@@ -41,6 +35,20 @@
             Object.entries(titles).forEach(([id, title]) => {
                 document.getElementById(id)?.setAttribute('title', title);
             });
+        },
+        updatePlannerLinks() {
+            const language = `lang=${this.lang}`;
+            for (const name of ['lcs', 'dante']) {
+                document.getElementById(`${name}-2d-link`).setAttribute('href',
+                    `planners/${name}/index.html?${language}&theme=${this.theme}&home=../../index.html`);
+                document.getElementById(`${name}-demo-link`).setAttribute('href',
+                    `demos/${name}/index.html?${language}`);
+            }
+            const meetingQuery = `?${language}&v=20261102-devices`;
+            document.getElementById('meeting-2d-link').setAttribute('href',
+                `planners/meeting/index.html${meetingQuery}`);
+            document.getElementById('meeting-3d-link').setAttribute('href',
+                `planners/meeting/three-demo/index.html${meetingQuery}`);
         },
         getDeviceTranslation(device, property) {
             const data = app.data.localeContent?.[this.lang];

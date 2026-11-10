@@ -14,6 +14,7 @@
             this.theme = theme;
             document.body.classList.remove('theme-light', 'theme-dark');
             document.body.classList.add(theme === 'dark' ? 'theme-dark' : 'theme-light');
+            this.updatePlannerLinks();
             try {
                 localStorage.setItem('qnex_theme', theme);
             } catch (error) {}

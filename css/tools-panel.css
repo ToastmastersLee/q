@@ -1,0 +1,179 @@
+/* More popover and its three content panels. */
+.settings-dropdown { position: relative; }
+
+.settings-panel {
+    position: absolute;
+    inset-block-start: calc(100% + 8px);
+    inset-inline-end: 0;
+    width: min(368px, calc(100vw - 24px));
+    max-height: calc(100dvh - 110px);
+    overflow: auto;
+    overscroll-behavior: contain;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    box-shadow: 0 16px 40px #0f172a30, 0 3px 8px #0f172a12;
+    z-index: 100;
+    padding: 14px;
+    display: grid;
+    gap: 12px;
+}
+
+.settings-panel.hidden { display: none; }
+
+.settings-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.settings-panel-header .tag {
+    color: var(--text-muted);
+    text-align: end;
+    font-size: 10px;
+}
+
+.settings-tabs {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 3px;
+    padding: 3px;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+}
+
+.settings-tabs button {
+    min-height: 34px;
+    border: 1px solid transparent;
+    border-radius: 7px;
+    padding: 4px 5px;
+    background: transparent;
+    color: var(--text-muted);
+    font: 650 12px var(--font-sans);
+    overflow-wrap: anywhere;
+    cursor: pointer;
+}
+
+.settings-tabs button:hover { color: var(--text-main); }
+
+.settings-tabs [aria-selected="true"] {
+    background: var(--bg-secondary);
+    border-color: var(--border-color);
+    color: var(--inspector-zone-text);
+    box-shadow: 0 1px 3px #0f172a14;
+}
+
+.planner-list {
+    list-style: none;
+    display: grid;
+    gap: 7px;
+}
+
+.planner-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) repeat(2, minmax(58px, 72px));
+    align-items: center;
+    gap: 7px;
+    padding: 6px 7px 6px 10px;
+    background: var(--btn-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 650;
+}
+
+.planner-row bdi { overflow-wrap: anywhere; }
+
+.planner-link {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    min-height: 36px;
+    border: 1px solid var(--border-color);
+    border-radius: 7px;
+    background: var(--bg-secondary);
+    color: var(--text-main);
+    font-size: 12px;
+    text-decoration: none;
+}
+
+.planner-link-3d {
+    background: var(--inspector-zone-bg);
+    color: var(--inspector-zone-text);
+    border-color: transparent;
+}
+
+.planner-link span { font-size: 11px; }
+.planner-link:hover { border-color: var(--border-highlight); }
+
+.settings-tabs button:focus-visible,
+.settings-panel :is(a, select):focus-visible {
+    outline: 2px solid var(--border-highlight);
+    outline-offset: 1px;
+}
+
+#lbl-planner-tab-note {
+    margin-block-start: 8px;
+    color: var(--text-muted);
+    font-size: 11px;
+}
+
+.settings-panel-body {
+    display: grid;
+    gap: 8px;
+}
+
+.tool-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+}
+
+#settings-tools .tool-actions {
+    padding-block-end: 10px;
+    border-block-end: 1px solid var(--border-color);
+}
+
+.tool-actions .btn {
+    justify-content: center;
+    text-align: center;
+    min-height: 36px;
+}
+
+#settings-display .tool-actions { grid-template-columns: 1fr; }
+
+.settings-item {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.65fr);
+    align-items: center;
+    gap: 8px;
+}
+
+.settings-item-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    overflow-wrap: anywhere;
+}
+
+.settings-item :is(.btn, .speed-select) {
+    min-height: 34px;
+    width: 100%;
+    padding: 6px 8px;
+    justify-content: center;
+    text-align: center;
+    font-size: 12px;
+}
+
+@media (max-width: 760px) {
+    .settings-dropdown { position: static; }
+    .settings-panel {
+        inset-inline-end: 12px;
+        max-height: calc(100dvh - 170px);
+    }
+}

@@ -19,8 +19,6 @@
     max-width: 140px;
 }
 .language-control:focus-within, .btn:focus-visible { outline: 2px solid #0074D9; outline-offset: 3px; }
-.demo-shortcut { text-decoration: none; white-space: nowrap; }
-.settings-item-label { width: auto; flex: 0 1 105px; white-space: normal; }
 .app-title-group h1 { display: block; }
 .btn-scenarios-toggle { max-width: 270px; }
 #lbl-scenario-current { overflow-wrap: anywhere; }
@@ -34,7 +32,6 @@ html[dir="rtl"] .campus-lan-title { direction: rtl; }
 html[dir="rtl"] .room-title,
 html[dir="rtl"] .cloud-title,
 html[dir="rtl"] .campus-lan-title { text-anchor: end; }
-html[dir="rtl"] .settings-panel { right: auto; left: 0; }
 html[dir="rtl"] .inspector-card,
 html[dir="rtl"] .legend-card,
 html[dir="rtl"] .scenario-banner-text,

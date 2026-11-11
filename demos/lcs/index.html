@@ -7,9 +7,9 @@
   <meta name="theme-color" content="#eaf0f7">
   <title>LCS 810 · 3D Room Demo</title>
   <link rel="stylesheet" href="styles.css?v=20261030-planning-reset">
-  <link rel="stylesheet" href="styles-presentation.css">
+  <link rel="stylesheet" href="styles-presentation.css?v=sidebar-tabs">
   <link rel="stylesheet" href="styles-camera-field.css">
-  <script defer src="dist/app.js?v=20261030-planning-reset"></script>
+  <script defer src="dist/app.js?v=s210-shallow-rooms"></script>
 </head>
 <body>
   <div id="app" class="app-shell">
@@ -53,64 +53,82 @@
         <div id="scene-error" class="scene-error" role="alert" hidden></div>
       </section>
 
-      <aside id="scene-sidebar" class="sidebar">
-        <div class="sidebar-intro"><span class="section-kicker" data-i18n="study">PRESALES SPATIAL STUDY</span><h2 data-i18n="layoutTitle">System layout</h2><p data-i18n="layoutDesc">A clear view of where the core LCS devices would be installed.</p></div>
-        <div class="metric-row"><div><span data-i18n="width">WIDTH</span><strong id="width-metric">8.0 <small>m</small></strong></div><div><span data-i18n="depth">DEPTH</span><strong id="depth-metric">10.0 <small>m</small></strong></div><div><span data-i18n="height">HEIGHT</span><strong id="height-metric">3.0 <small>m</small></strong></div></div>
-        <section id="s210-controls" class="sidebar-section selected-section"><label class="select-row"><span id="s210-count-label">S210 quantities</span><select id="s210-count"></select></label><p id="s210-count-status" aria-live="polite"></p></section>
-        <section class="sidebar-section selected-section" aria-live="polite"><div class="section-heading"><h3 data-i18n="selected">Selected device</h3></div><div id="device-detail" class="device-detail"></div></section>
-        <section id="camera-field-panel" class="sidebar-section camera-field-panel" data-enabled="false">
-          <h3 data-field-i18n="heading">Camera field of view</h3>
-          <label class="check-row"><input id="camera-field-enabled" type="checkbox"><span data-field-i18n="enabled">Show 3D camera field</span></label>
-          <p id="camera-field-empty" data-field-i18n="empty" hidden>No camera is available.</p>
-          <div id="camera-field-settings" hidden>
-            <label class="select-row"><span data-field-i18n="camera">Camera</span><select id="camera-field-select"></select></label>
-            <label class="check-row"><input id="camera-field-only" type="checkbox"><span data-field-i18n="onlyCurrent">Only current camera</span></label>
-            <div class="field-angle-row"><label for="camera-field-pan" data-field-i18n="pan">Pan</label><div><input id="camera-field-pan" type="range" min="-90" max="90" step="1" value="0"><input id="camera-field-pan-number" type="number" min="-90" max="90" step="1" value="0"><span>°</span></div></div>
-            <div class="field-angle-row"><label for="camera-field-tilt" data-field-i18n="tilt">Tilt</label><div><input id="camera-field-tilt" type="range" min="-60" max="60" step="1" value="0"><input id="camera-field-tilt-number" type="number" min="-60" max="60" step="1" value="0"><span>°</span></div></div>
-            <p class="settings-note" data-field-i18n="tiltHint">Positive tilt points down; negative tilt points up.</p>
-            <label id="camera-field-custom-row" class="check-row"><input id="camera-field-custom" type="checkbox"><span data-field-i18n="custom">Custom demonstration</span></label>
-            <div class="field-angle-row"><label for="camera-field-hfov" data-field-i18n="hfov">Horizontal field of view</label><div><input id="camera-field-hfov" type="range" min="2" max="140" step="0.1" value="43"><input id="camera-field-hfov-number" type="number" min="2" max="140" step="0.1" value="43"><span>°</span></div></div>
-            <p id="camera-field-vfov" class="settings-note"></p>
-            <p id="camera-field-hint" class="settings-note"></p>
-            <button id="camera-field-reset" type="button" class="reset-button" data-field-i18n="reset">Reset this camera</button>
-            <p class="settings-note" data-field-i18n="note">16:9 field-of-view illustration.</p>
-          </div>
-        </section>
-        <details id="settings-panel" class="settings-panel"><summary><span data-i18n="settings">Scene settings</span><span class="summary-chevron" aria-hidden="true">⌄</span></summary>
-          <div class="settings-content">
-
+      <aside id="scene-sidebar" class="sidebar sidebar-lcs">
+        <div class="sidebar-tabs" role="tablist" aria-label="Scene settings">
+          <button type="button" id="sidebar-tab-config" role="tab" aria-controls="sidebar-config" aria-selected="true" tabindex="0" data-sidebar-copy="config">Setup</button>
+          <button type="button" id="sidebar-tab-devices" role="tab" aria-controls="sidebar-devices" aria-selected="false" tabindex="-1" data-sidebar-copy="devices">Devices</button>
+          <button type="button" id="sidebar-tab-coverage" role="tab" aria-controls="sidebar-coverage" aria-selected="false" tabindex="-1" data-sidebar-copy="coverage">Coverage</button>
+          <button type="button" id="sidebar-tab-display" role="tab" aria-controls="sidebar-display" aria-selected="false" tabindex="-1" data-sidebar-copy="display">Display</button>
+        </div>
+        <div id="height-warning" class="height-warning" role="status" hidden></div>
+        <div class="sidebar-pane" id="sidebar-config" role="tabpanel" aria-labelledby="sidebar-tab-config" tabindex="0">
+          <div class="sidebar-intro"><h2 data-i18n="layoutTitle">System layout</h2><p data-i18n="layoutDesc">A clear view of where the core LCS devices would be installed.</p></div>
+          <div class="metric-row"><div><span data-i18n="width">WIDTH</span><strong id="width-metric">8.0 <small>m</small></strong></div><div><span data-i18n="depth">DEPTH</span><strong id="depth-metric">10.0 <small>m</small></strong></div><div><span data-i18n="height">HEIGHT</span><strong id="height-metric">3.0 <small>m</small></strong></div></div>
+          <section id="s210-controls" class="sidebar-section selected-section"><label class="select-row"><span id="s210-count-label">S210 quantities</span><select id="s210-count"></select></label><p id="s210-count-status" aria-live="polite"></p></section>
+          <section class="sidebar-section selected-section">
             <div id="equipment-controls">
-            <div class="subheading" data-i18n="equipment">Equipment configuration</div>
-            <label class="select-row"><span data-i18n="ifpSize">IFP size</span><select id="ifp-size"><option value="65">65&quot;</option><option value="75">75&quot;</option><option value="86" selected>86&quot;</option></select></label>
-            <label class="select-row"><span data-i18n="ifpCount">IFP panels</span><select id="ifp-count"><option value="1">1</option><option value="2" selected>2</option></select></label>
-            <label class="select-row"><span data-i18n="displaySize">Auxiliary Display size</span><select id="display-size"><option value="55" selected>55&quot;</option><option value="65">65&quot;</option><option value="75">75&quot;</option></select></label>
-            <label class="select-row"><span data-i18n="cameraPackage">Camera package</span><select id="camera-package"><option value="CV870">CV870 Pro</option><option value="CV210">CV210</option></select></label>
-            <div id="long-camera-settings" hidden>
-              <label class="select-row"><span data-i18n="teacherModel">Teacher camera</span><select id="teacher-model"><option value="CV870">CV870 Pro</option><option value="PVC-G530P">PVC-G530P</option><option value="PVC-G520P">PVC-G520P</option><option value="PVC-G512P">PVC-G512P</option></select></label>
-              <label class="select-row"><span data-i18n="studentModel">Student camera</span><select id="student-model"><option value="CV870">CV870 Pro</option><option value="PVC-G530P">PVC-G530P</option><option value="PVC-G520P">PVC-G520P</option><option value="PVC-G512P">PVC-G512P</option></select></label>
-              <label class="select-row"><span data-i18n="studentQty">Student cameras</span><select id="student-qty"><option>1</option><option>2</option><option>3</option></select></label>
-              <button id="apply-recommendation" type="button" class="reset-button" data-i18n="applyRecommendation">Apply recommended cameras</button>
-              <p id="recommendation-note" class="settings-note"></p>
-            </div>
-            <button id="apply-equipment" type="button" class="reset-button" data-i18n="applyEquipment">Apply equipment</button>
+              <div class="subheading" data-i18n="equipment">Equipment configuration</div>
+              <label class="select-row"><span data-i18n="ifpSize">IFP size</span><select id="ifp-size"><option value="65">65&quot;</option><option value="75">75&quot;</option><option value="86" selected>86&quot;</option></select></label>
+              <label class="select-row"><span data-i18n="ifpCount">IFP panels</span><select id="ifp-count"><option value="1">1</option><option value="2" selected>2</option></select></label>
+              <label class="select-row"><span data-i18n="displaySize">Auxiliary Display size</span><select id="display-size"><option value="55" selected>55&quot;</option><option value="65">65&quot;</option><option value="75">75&quot;</option></select></label>
+              <label class="select-row"><span data-i18n="cameraPackage">Camera package</span><select id="camera-package"><option value="CV870">CV870 Pro</option><option value="CV210">CV210</option></select></label>
+              <div id="long-camera-settings" hidden>
+                <label class="select-row"><span data-i18n="teacherModel">Teacher camera</span><select id="teacher-model"><option value="CV870">CV870 Pro</option><option value="PVC-G530P">PVC-G530P</option><option value="PVC-G520P">PVC-G520P</option><option value="PVC-G512P">PVC-G512P</option></select></label>
+                <label class="select-row"><span data-i18n="studentModel">Student camera</span><select id="student-model"><option value="CV870">CV870 Pro</option><option value="PVC-G530P">PVC-G530P</option><option value="PVC-G520P">PVC-G520P</option><option value="PVC-G512P">PVC-G512P</option></select></label>
+                <label class="select-row"><span data-i18n="studentQty">Student cameras</span><select id="student-qty"><option>1</option><option>2</option><option>3</option></select></label>
+                <button id="apply-recommendation" type="button" class="reset-button" data-i18n="applyRecommendation">Apply recommended cameras</button>
+                <p id="recommendation-note" class="settings-note"></p>
+              </div>
+              <button id="apply-equipment" type="button" class="reset-button" data-i18n="applyEquipment">Apply equipment</button>
             </div>
             <label class="select-row"><span data-i18n="doorSide">Door side</span><select id="door-side"><option value="right" selected data-i18n="doorRight">Right wall</option><option value="left" data-i18n="doorLeft">Left wall</option></select></label>
-            <div class="settings-divider"></div>
+          </section>
+        </div>
+        <div class="sidebar-pane" id="sidebar-devices" role="tabpanel" aria-labelledby="sidebar-tab-devices" tabindex="0" hidden>
+          <section class="sidebar-section selected-section" aria-live="polite"><div class="section-heading"><h3 data-i18n="selected">Selected device</h3></div><div id="device-detail" class="device-detail"></div><button id="adjust-camera-field" class="reset-button" type="button" data-sidebar-copy="adjustCamera" hidden>Adjust field of view</button></section>
+          <details class="settings-panel">
+            <summary data-i18n="mountingHeights">Illustrative mounting heights</summary>
+            <div class="settings-content"><div id="height-controls"></div>
+            <p class="assumption-note" data-i18n="assumption">Mounting heights are presentation assumptions. Confirm the final equipment positions on site.</p></div>
+          </details>
+        </div>
+        <div class="sidebar-pane" id="sidebar-coverage" role="tabpanel" aria-labelledby="sidebar-tab-coverage" tabindex="0" hidden>
+          <section id="camera-field-panel" class="sidebar-section camera-field-panel" data-enabled="false">
+            <h3 data-field-i18n="heading">Camera field of view</h3>
+            <label class="check-row"><input id="camera-field-enabled" type="checkbox"><span data-field-i18n="enabled">Show 3D camera field</span></label>
+            <p id="camera-field-empty" data-field-i18n="empty" hidden>No camera is available.</p>
+            <div id="camera-field-settings" hidden>
+              <label class="select-row"><span data-field-i18n="camera">Camera</span><select id="camera-field-select"></select></label>
+              <label class="check-row"><input id="camera-field-only" type="checkbox"><span data-field-i18n="onlyCurrent">Only current camera</span></label>
+              <div class="field-angle-row"><label for="camera-field-pan" data-field-i18n="pan">Pan</label><div><input id="camera-field-pan" type="range" min="-90" max="90" step="1" value="0"><input id="camera-field-pan-number" type="number" min="-90" max="90" step="1" value="0"><span>°</span></div></div>
+              <div class="field-angle-row"><label for="camera-field-tilt" data-field-i18n="tilt">Tilt</label><div><input id="camera-field-tilt" type="range" min="-60" max="60" step="1" value="0"><input id="camera-field-tilt-number" type="number" min="-60" max="60" step="1" value="0"><span>°</span></div></div>
+              <p class="settings-note" data-field-i18n="tiltHint">Positive tilt points down; negative tilt points up.</p>
+              <label id="camera-field-custom-row" class="check-row"><input id="camera-field-custom" type="checkbox"><span data-field-i18n="custom">Custom demonstration</span></label>
+              <div class="field-angle-row"><label for="camera-field-hfov" data-field-i18n="hfov">Horizontal field of view</label><div><input id="camera-field-hfov" type="range" min="2" max="140" step="0.1" value="43"><input id="camera-field-hfov-number" type="number" min="2" max="140" step="0.1" value="43"><span>°</span></div></div>
+              <p id="camera-field-vfov" class="settings-note"></p>
+              <p id="camera-field-hint" class="settings-note"></p>
+              <button id="camera-field-reset" type="button" class="reset-button" data-field-i18n="reset">Reset this camera</button>
+              <p class="settings-note" data-field-i18n="note">16:9 field-of-view illustration.</p>
+            </div>
+          </section>
+          <section class="sidebar-section selected-section">
+            <label class="check-row"><input id="s210-ripples" type="checkbox"><span data-i18n="s210Ripples">S210 3D pickup ripples</span></label>
+            <label class="check-row"><input id="animate-s210-ripples" type="checkbox" disabled><span data-i18n="animateS210Ripples">Animate pickup ripples</span></label>
+            <p class="settings-note" data-i18n="s210RipplesNote">Cardioid illustration using the 6 m and 8 m planning ranges. Verify pickup on site.</p>
+          </section>
+          <section class="sidebar-section selected-section"><label class="check-row"><input id="show-coverage" type="checkbox"><span data-i18n="showCoverage">Floor coverage projection</span></label><p class="settings-note" data-i18n="coverageNote">Coverage marks project the existing 2D rules onto the floor. They are not a validated 3D acoustic or image model.</p></section>
+        </div>
+        <div class="sidebar-pane" id="sidebar-display" role="tabpanel" aria-labelledby="sidebar-tab-display" tabindex="0" hidden>
+          <section class="sidebar-section selected-section">
             <div id="visibility-heading" class="subheading" data-i18n="visibility">Visibility</div>
             <div class="check-grid">
               <label class="check-row"><input id="show-labels" type="checkbox" checked><span data-i18n="showLabels">Device names</span></label>
               <div id="visibility-controls" class="visibility-kinds"></div>
               <label class="check-row"><input id="show-furniture" type="checkbox" checked><span data-i18n="showFurniture">Reference furniture</span></label>
-              <label class="check-row"><input id="show-coverage" type="checkbox"><span data-i18n="showCoverage">Floor coverage projection</span></label>
             </div>
-            <p class="settings-note" data-i18n="coverageNote">Coverage marks project the existing 2D rules onto the floor. They are not a validated 3D acoustic or image model.</p>
-            <div class="settings-divider"></div><div class="subheading" data-i18n="mountingHeights">Illustrative mounting heights</div>
-            <div id="height-controls"></div>
-            <button id="reset-button" type="button" class="reset-button" data-i18n="reset">Restore demo defaults</button>
-          </div>
-        </details>
-        <div id="height-warning" class="height-warning" hidden></div>
-        <p class="assumption-note" data-i18n="assumption">Mounting heights are presentation assumptions. Confirm the final equipment positions on site.</p>
+          </section>
+        </div>
+        <div class="sidebar-footer"><button id="reset-button" type="button" class="reset-button" data-i18n="reset">Restore demo defaults</button></div>
       </aside>
     </main>
   </div>

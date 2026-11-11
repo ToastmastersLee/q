@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="styles-base.css?v=20261030-planning-reset">
   <link rel="stylesheet" href="styles-sidebar.css">
   <link rel="stylesheet" href="styles-responsive.css">
-  <link rel="stylesheet" href="styles-presentation.css">
+  <link rel="stylesheet" href="styles-presentation.css?v=sidebar-tabs">
   <link rel="stylesheet" href="styles-camera-field.css?v=20261026-camera-field">
 </head>
 <body>
@@ -37,77 +37,107 @@
       <div id="scene-error" class="scene-error" hidden></div>
       <div class="scene-hint" data-i18n="sceneHint">Drag to rotate · wheel to zoom · right drag to pan</div>
     </section>
-    <aside id="scene-sidebar" class="sidebar">
-      <section class="card intro"><p class="eyebrow" data-i18n="planLabel">CURRENT PLAN</p><h1 data-i18n="title">Classroom coverage in 3D</h1><p id="plan-origin" class="microcopy" hidden></p><p id="reference-note" class="microcopy"></p><p data-i18n="intro">Devices and floor positions follow the 2D Recalculate rules.</p></section>
-      <section class="card" id="audio-count-controls"></section>
-      <section class="card height-profile-card">
-        <h2 id="profile-heading">Ceiling height &amp; microphone reach</h2>
-        <label class="height-profile-field" hidden><span data-i18n="height">Height</span><input id="room-height" type="number" min="2" max="4" step="0.01" value="3"></label>
-        <label class="height-profile-field"><span id="profile-mode-label">Ceiling profile</span><select id="profile-mode"><option value="uniform">Uniform</option><option value="split">Front / rear</option></select></label>
-        <label class="height-profile-field"><span id="front-height-label">Front / uniform height</span><input id="front-height" type="number" min="2" max="4" step="0.01" value="3"></label>
-        <input id="front-height-slider" type="range" min="2" max="4" step="0.01" value="3" aria-label="Front ceiling height">
-        <div id="rear-height-controls" hidden>
-          <label class="height-profile-field"><span id="rear-height-label">Rear height</span><input id="rear-height" type="number" min="2" max="4" step="0.01" value="3"></label>
-          <input id="rear-height-slider" type="range" min="2" max="4" step="0.01" value="3" aria-label="Rear ceiling height">
-          <label class="height-profile-field"><span id="split-depth-label">Front zone depth</span><input id="split-depth" type="number" min="0.1" max="39.9" step="0.01" value="5"></label>
-        </div>
-        <p id="profile-estimate" class="microcopy" role="status"></p>
-        <button id="reset-m100-radii" type="button" hidden>Use 73° estimate</button>
-      </section>
-      <section class="card" id="volume-controls">
-        <h2 id="volume-title">3D coverage</h2>
-        <div class="check-grid">
-          <label><input type="checkbox" id="volume-remote" checked><span id="volume-remote-label">Remote pickup</span></label>
-          <label><input type="checkbox" id="volume-pa"><span id="volume-pa-label">Local PA pickup</span></label>
-          <label><input type="checkbox" id="volume-speaker"><span id="volume-speaker-label">Speaker</span></label>
-          <label><input type="checkbox" id="volume-selected"><span id="volume-selected-label">Selected device only</span></label>
-          <label><input type="checkbox" id="volume-animation"><span id="volume-animation-label">Animate waves</span></label>
-        </div><p class="microcopy" id="volume-note"></p>
-      </section>
-      <section class="card metrics"><div class="section-heading"><h2 data-i18n="coverage">Ground projection</h2><label class="model-toggle"><input id="floor-projection" type="checkbox"><span data-i18n="projection">2D rule</span></label></div><div id="coverage-stats"></div><p class="microcopy" data-i18n="coverageNote">Projection of the 2D rules, not a validated 3D acoustic simulation.</p></section>
-      <section class="card"><div class="section-heading"><h2 data-i18n="selection">Selected device</h2><span class="tag" data-i18n="demo">Demo</span></div><div id="device-detail" class="detail" data-i18n="selectPrompt">Click a device or choose one below.</div><button id="focus-device" class="focus-device" data-i18n="focusDevice" hidden>View device close up</button></section>
-        <section id="camera-field-panel" class="card camera-field-panel" data-enabled="false">
-          <h3 data-field-i18n="heading">Camera field of view</h3>
-          <label class="check-row"><input id="camera-field-enabled" type="checkbox"><span data-field-i18n="enabled">Show 3D camera field</span></label>
-          <p id="camera-field-empty" data-field-i18n="empty" hidden>No camera is available.</p>
-          <div id="camera-field-settings" hidden>
-            <label class="select-row"><span data-field-i18n="camera">Camera</span><select id="camera-field-select"></select></label>
-            <label class="check-row"><input id="camera-field-only" type="checkbox"><span data-field-i18n="onlyCurrent">Only current camera</span></label>
-            <div class="field-angle-row"><label for="camera-field-pan" data-field-i18n="pan">Pan</label><div><input id="camera-field-pan" type="range" min="-90" max="90" step="1" value="0"><input id="camera-field-pan-number" type="number" min="-90" max="90" step="1" value="0"><span>°</span></div></div>
-            <div class="field-angle-row"><label for="camera-field-tilt" data-field-i18n="tilt">Tilt</label><div><input id="camera-field-tilt" type="range" min="-60" max="60" step="1" value="0"><input id="camera-field-tilt-number" type="number" min="-60" max="60" step="1" value="0"><span>°</span></div></div>
-            <p class="settings-note" data-field-i18n="tiltHint">Positive tilt points down; negative tilt points up.</p>
-            <label id="camera-field-custom-row" class="check-row"><input id="camera-field-custom" type="checkbox"><span data-field-i18n="custom">Custom demonstration</span></label>
-            <div class="field-angle-row"><label for="camera-field-hfov" data-field-i18n="hfov">Horizontal field of view</label><div><input id="camera-field-hfov" type="range" min="2" max="140" step="0.1" value="43"><input id="camera-field-hfov-number" type="number" min="2" max="140" step="0.1" value="43"><span>°</span></div></div>
-            <p id="camera-field-vfov" class="settings-note"></p>
-            <p id="camera-field-hint" class="settings-note"></p>
-            <button id="camera-field-reset" type="button" class="reset-button" data-field-i18n="reset">Reset this camera</button>
-            <p class="settings-note" data-field-i18n="note">16:9 field-of-view illustration.</p>
+    <aside id="scene-sidebar" class="sidebar sidebar-dante">
+      <div class="sidebar-tabs" role="tablist" aria-label="Scene settings">
+        <button type="button" id="sidebar-tab-config" role="tab" aria-controls="sidebar-config" aria-selected="true" tabindex="0" data-sidebar-copy="config">Setup</button>
+        <button type="button" id="sidebar-tab-devices" role="tab" aria-controls="sidebar-devices" aria-selected="false" tabindex="-1" data-sidebar-copy="devices">Devices</button>
+        <button type="button" id="sidebar-tab-coverage" role="tab" aria-controls="sidebar-coverage" aria-selected="false" tabindex="-1" data-sidebar-copy="coverage">Coverage</button>
+        <button type="button" id="sidebar-tab-display" role="tab" aria-controls="sidebar-display" aria-selected="false" tabindex="-1" data-sidebar-copy="display">Display</button>
+      </div>
+      <div class="sidebar-pane" id="sidebar-config" role="tabpanel" aria-labelledby="sidebar-tab-config" tabindex="0">
+        <section class="card intro"><h1 data-i18n="title">Classroom coverage in 3D</h1><p id="plan-origin" class="microcopy" hidden></p><p id="reference-note" class="microcopy"></p><p data-i18n="intro">Devices and floor positions follow the 2D Recalculate rules.</p></section>
+        <section class="card" id="audio-count-controls"></section>
+        <section class="card height-profile-card">
+          <h2 id="profile-heading">Ceiling height &amp; microphone reach</h2>
+          <label class="height-profile-field" hidden><span data-i18n="height">Height</span><input id="room-height" type="number" min="2" max="4" step="0.01" value="3"></label>
+          <label class="height-profile-field"><span id="profile-mode-label">Ceiling profile</span><select id="profile-mode"><option value="uniform">Uniform</option><option value="split">Front / rear</option></select></label>
+          <label class="height-profile-field"><span id="front-height-label">Front / uniform height</span><input id="front-height" type="number" min="2" max="4" step="0.01" value="3"></label>
+          <input id="front-height-slider" type="range" min="2" max="4" step="0.01" value="3" aria-label="Front ceiling height">
+          <div id="rear-height-controls" hidden>
+            <label class="height-profile-field"><span id="rear-height-label">Rear height</span><input id="rear-height" type="number" min="2" max="4" step="0.01" value="3"></label>
+            <input id="rear-height-slider" type="range" min="2" max="4" step="0.01" value="3" aria-label="Rear ceiling height">
+            <label class="height-profile-field"><span id="split-depth-label">Front zone depth</span><input id="split-depth" type="number" min="0.1" max="39.9" step="0.01" value="5"></label>
           </div>
+          <p id="profile-estimate" class="microcopy" role="status"></p>
+          <button id="reset-m100-radii" type="button" hidden>Use 73° estimate</button>
         </section>
-      <details id="settings-panel" class="card settings"><summary data-i18n="settings">Settings & devices</summary>
-        <label class="model-toggle"><input id="show-models" type="checkbox"><span id="model-caption">Show model numbers</span></label>
-        <label class="select-field"><span data-i18n="doorSide">Door side</span><select id="door-side"><option value="right" selected data-i18n="doorRight">Right wall</option><option value="left" data-i18n="doorLeft">Left wall</option></select></label>
-        <h3 data-i18n="visualConfig">Teaching equipment · 3D demonstration</h3>
-        <label class="select-field"><span data-i18n="ifpCount">IFP panels</span><select id="ifp-count"><option value="1">1</option><option value="2" selected>2</option></select></label>
-        <label class="select-field"><span data-i18n="ifpSize">IFP size</span><select id="ifp-size"><option value="65">65″</option><option value="75" selected>75″</option><option value="86">86″</option></select></label>
-        <label class="select-field"><span data-i18n="podiumModel">Podium model</span><select id="podium-model"><option value="NDP600">NDP600</option><option value="SL100">SL100</option></select></label>
-        <div class="check-grid"><label><input type="checkbox" data-kind="ifp" checked><span data-i18n="main">IFP</span></label><label><input type="checkbox" data-kind="podium" checked><span data-i18n="podium">Podium</span></label><label><input type="checkbox" data-kind="station" checked><span data-i18n="station">Recording Station</span></label></div>
-        <label class="model-toggle"><input type="checkbox" id="show-recording-cameras" data-kind="camera" checked><span id="recording-camera-label">Recording cameras</span></label>
-        <h3 data-i18n="visibility">Visibility</h3><div id="visibility-controls" class="check-grid">
+        <section class="card">
+          <label class="select-field"><span data-i18n="doorSide">Door side</span><select id="door-side"><option value="right" selected data-i18n="doorRight">Right wall</option><option value="left" data-i18n="doorLeft">Left wall</option></select></label>
+          <h3 data-i18n="visualConfig">Teaching equipment · 3D demonstration</h3>
+          <label class="select-field"><span data-i18n="ifpCount">IFP panels</span><select id="ifp-count"><option value="1">1</option><option value="2" selected>2</option></select></label>
+          <label class="select-field"><span data-i18n="ifpSize">IFP size</span><select id="ifp-size"><option value="65">65″</option><option value="75" selected>75″</option><option value="86">86″</option></select></label>
+          <label class="select-field"><span data-i18n="podiumModel">Podium model</span><select id="podium-model"><option value="NDP600">NDP600</option><option value="SL100">SL100</option></select></label>
+        </section>
+      </div>
+      <div class="sidebar-pane" id="sidebar-devices" role="tabpanel" aria-labelledby="sidebar-tab-devices" tabindex="0" hidden>
+        <section class="card"><div class="section-heading"><h2 data-i18n="selection">Selected device</h2><span class="tag" data-i18n="demo">Demo</span></div><div id="device-detail" class="detail" data-i18n="selectPrompt">Click a device or choose one below.</div><button id="focus-device" class="focus-device" data-i18n="focusDevice" hidden>View device close up</button><button id="adjust-camera-field" class="focus-device" type="button" data-sidebar-copy="adjustCamera" hidden>Adjust field of view</button></section>
+        <details class="card settings">
+          <summary data-i18n="devices">Devices</summary>
+          <div id="device-list" class="device-list"></div>
+        </details>
+        <details class="card settings">
+          <summary data-i18n="install">Demo mounting heights</summary>
+          <label class="inline-field"><span data-i18n="audioDrop">M100/M40 below ceiling</span><input id="audio-drop" type="number" min="0" max="0.7" step="0.01" value="0">m</label><p class="microcopy" data-i18n="dc20MountNote">DC20 face is fixed 12 mm below the ceiling; its enclosure sits above it.</p><label class="inline-field"><span data-i18n="mainHeight">Main display center</span><input id="main-height" type="number" min="0.5" max="3.5" step="0.1" value="1.5">m</label><label class="inline-field"><span data-i18n="auxDrop">Auxiliary below ceiling</span><input id="aux-drop" type="number" min="0.3" max="1.5" step="0.1" value="0.7">m</label>
+        </details>
+        <details class="card bom settings"><summary><span data-i18n="demoEquipment">3D teaching equipment</span><span class="tag" data-i18n="demo">Demo</span></summary><div id="demo-list"></div></details>
+        <details class="card bom settings"><summary><span data-i18n="bom">Recommended equipment</span><span id="equipment-total" class="tag"></span></summary><div id="bom-list"></div><p class="microcopy" data-i18n="bomNote">DU11 and DSP belong to the BOM; no room mounting location is specified.</p></details>
+      </div>
+      <div class="sidebar-pane" id="sidebar-coverage" role="tabpanel" aria-labelledby="sidebar-tab-coverage" tabindex="0" hidden>
+        <details class="card settings" open>
+          <summary data-sidebar-copy="acoustic">Acoustic coverage</summary>
+          <section class="coverage-section" id="volume-controls">
+            <h2 id="volume-title">3D coverage</h2>
+            <div class="check-grid">
+              <label><input type="checkbox" id="volume-remote" checked><span id="volume-remote-label">Remote pickup</span></label>
+              <label><input type="checkbox" id="volume-pa"><span id="volume-pa-label">Local PA pickup</span></label>
+              <label><input type="checkbox" id="volume-speaker"><span id="volume-speaker-label">Speaker</span></label>
+              <label><input type="checkbox" id="volume-selected"><span id="volume-selected-label">Selected device only</span></label>
+              <label><input type="checkbox" id="volume-animation"><span id="volume-animation-label">Animate waves</span></label>
+            </div><p class="microcopy" id="volume-note"></p>
+          </section>
+          <section class="coverage-section metrics"><div class="section-heading"><h2 data-i18n="coverage">Ground projection</h2><label class="model-toggle"><input id="floor-projection" type="checkbox"><span data-i18n="projection">2D rule</span></label></div><div id="coverage-stats"></div><p class="microcopy" data-i18n="coverageNote">Projection of the 2D rules, not a validated 3D acoustic simulation.</p></section>
+          <div class="check-grid"><label data-i18n-label="remote"><input type="checkbox" data-kind="remote">Remote pickup</label><label data-i18n-label="pa"><input type="checkbox" data-kind="pa">Local PA pickup</label><label data-i18n-label="speaker"><input type="checkbox" data-kind="speaker">Speaker projection</label></div>
+          <p class="microcopy" data-i18n="paNote">M100/M40 do not produce sound. Local PA requires DC20.</p>
+          <details class="settings">
+            <summary data-i18n="radii">2D coverage radii · m</summary>
+            <div id="radii-list" class="radii-list"></div>
+          </details>
+        </details>
+        <details class="card settings">
+          <summary data-field-i18n="heading">Camera field of view</summary>
+          <section id="camera-field-panel" class="camera-field-panel" data-enabled="false">
+            <label class="check-row"><input id="camera-field-enabled" type="checkbox"><span data-field-i18n="enabled">Show 3D camera field</span></label>
+            <p id="camera-field-empty" data-field-i18n="empty" hidden>No camera is available.</p>
+            <div id="camera-field-settings" hidden>
+              <label class="select-row"><span data-field-i18n="camera">Camera</span><select id="camera-field-select"></select></label>
+              <label class="check-row"><input id="camera-field-only" type="checkbox"><span data-field-i18n="onlyCurrent">Only current camera</span></label>
+              <div class="field-angle-row"><label for="camera-field-pan" data-field-i18n="pan">Pan</label><div><input id="camera-field-pan" type="range" min="-90" max="90" step="1" value="0"><input id="camera-field-pan-number" type="number" min="-90" max="90" step="1" value="0"><span>°</span></div></div>
+              <div class="field-angle-row"><label for="camera-field-tilt" data-field-i18n="tilt">Tilt</label><div><input id="camera-field-tilt" type="range" min="-60" max="60" step="1" value="0"><input id="camera-field-tilt-number" type="number" min="-60" max="60" step="1" value="0"><span>°</span></div></div>
+              <p class="settings-note" data-field-i18n="tiltHint">Positive tilt points down; negative tilt points up.</p>
+              <label id="camera-field-custom-row" class="check-row"><input id="camera-field-custom" type="checkbox"><span data-field-i18n="custom">Custom demonstration</span></label>
+              <div class="field-angle-row"><label for="camera-field-hfov" data-field-i18n="hfov">Horizontal field of view</label><div><input id="camera-field-hfov" type="range" min="2" max="140" step="0.1" value="43"><input id="camera-field-hfov-number" type="number" min="2" max="140" step="0.1" value="43"><span>°</span></div></div>
+              <p id="camera-field-vfov" class="settings-note"></p>
+              <p id="camera-field-hint" class="settings-note"></p>
+              <button id="camera-field-reset" type="button" class="reset-button" data-field-i18n="reset">Reset this camera</button>
+              <p class="settings-note" data-field-i18n="note">16:9 field-of-view illustration.</p>
+            </div>
+          </section>
+        </details>
+      </div>
+      <div class="sidebar-pane" id="sidebar-display" role="tabpanel" aria-labelledby="sidebar-tab-display" tabindex="0" hidden>
+        <section class="card">
+          <label class="model-toggle"><input id="show-models" type="checkbox"><span id="model-caption">Show model numbers</span></label>
+          <div class="check-grid"><label><input type="checkbox" data-kind="ifp" checked><span data-i18n="main">IFP</span></label><label><input type="checkbox" data-kind="podium" checked><span data-i18n="podium">Podium</span></label><label><input type="checkbox" data-kind="station" checked><span data-i18n="station">Recording Station</span></label></div>
+          <label class="model-toggle"><input type="checkbox" id="show-recording-cameras" data-kind="camera" checked><span id="recording-camera-label">Recording cameras</span></label>
+          <h3 data-i18n="visibility">Visibility</h3><div id="visibility-controls" class="check-grid">
           <label><input type="checkbox" id="show-labels" checked><span data-i18n="showLabels">Device names</span></label>
           <label><input type="checkbox" data-kind="m100" checked><span data-audio-name="m100"></span></label><label><input type="checkbox" data-kind="m40" checked><span data-audio-name="m40"></span></label><label><input type="checkbox" data-kind="dc20" checked><span data-audio-name="dc20"></span></label><label data-i18n-label="aux"><input type="checkbox" data-kind="display" checked>Auxiliary Displays</label>
-          <label data-i18n-label="remote"><input type="checkbox" data-kind="remote">Remote pickup</label><label data-i18n-label="pa"><input type="checkbox" data-kind="pa">Local PA pickup</label><label data-i18n-label="speaker"><input type="checkbox" data-kind="speaker">Speaker projection</label>
         </div>
-        <p class="microcopy" data-i18n="paNote">M100/M40 do not produce sound. Local PA requires DC20.</p>
-        <h3 data-i18n="install">Demo mounting heights</h3><label class="inline-field"><span data-i18n="audioDrop">M100/M40 below ceiling</span><input id="audio-drop" type="number" min="0" max="0.7" step="0.01" value="0">m</label><p class="microcopy" data-i18n="dc20MountNote">DC20 face is fixed 12 mm below the ceiling; its enclosure sits above it.</p><label class="inline-field"><span data-i18n="mainHeight">Main display center</span><input id="main-height" type="number" min="0.5" max="3.5" step="0.1" value="1.5">m</label><label class="inline-field"><span data-i18n="auxDrop">Auxiliary below ceiling</span><input id="aux-drop" type="number" min="0.3" max="1.5" step="0.1" value="0.7">m</label>
-        <button id="reset-demo" class="reset-demo" type="button" data-i18n="reset">Restore demo defaults</button>
-        <h3 data-i18n="radii">2D coverage radii · m</h3><div id="radii-list" class="radii-list"></div>
-        <h3 data-i18n="devices">Devices</h3><div id="device-list" class="device-list"></div>
-      </details>
-      <section class="card bom"><div class="section-heading"><h2 data-i18n="demoEquipment">3D teaching equipment</h2><span class="tag" data-i18n="demo">Demo</span></div><div id="demo-list"></div></section>
-      <section class="card bom"><div class="section-heading"><h2 data-i18n="bom">Recommended equipment</h2><span id="equipment-total" class="tag"></span></div><div id="bom-list"></div><p class="microcopy" data-i18n="bomNote">DU11 and DSP belong to the BOM; no room mounting location is specified.</p></section>
+      </section>
+      </div>
+      <div class="sidebar-footer"><button id="reset-demo" class="reset-demo" type="button" data-i18n="reset">Restore demo defaults</button></div>
     </aside>
   </main>
-  <script defer src="dist/aispeech-three.js?v=20261030-planning-reset"></script>
+  <script defer src="dist/aispeech-three.js?v=sidebar-tabs"></script>
 </body>
 </html>

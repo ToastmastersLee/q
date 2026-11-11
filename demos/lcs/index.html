@@ -7,9 +7,9 @@
   <meta name="theme-color" content="#eaf0f7">
   <title>LCS 810 · 3D Room Demo</title>
   <link rel="stylesheet" href="styles.css?v=20261030-planning-reset">
-  <link rel="stylesheet" href="styles-presentation.css?v=sidebar-tabs">
+  <link rel="stylesheet" href="styles-presentation.css?v=classroom-controls">
   <link rel="stylesheet" href="styles-camera-field.css">
-  <script defer src="dist/app.js?v=s210-shallow-rooms"></script>
+  <script defer src="dist/app.js?v=rear-curtains-projection"></script>
 </head>
 <body>
   <div id="app" class="app-shell">
@@ -28,6 +28,10 @@
         <span id="input-error" role="alert" hidden></span>
       </div>
       <div class="topbar-actions">
+        <div id="classroom-mode" class="classroom-mode" role="group" aria-label="Classroom mode" hidden>
+          <button type="button" data-classroom-mode="planning" aria-pressed="true">Planning</button>
+          <button type="button" data-classroom-mode="simulation" aria-pressed="false">Simulation</button>
+        </div>
         <select id="language-button" class="language-select" aria-label="Language"><option value="en">English</option></select>
         <button id="export-button" class="primary-button" type="button" data-i18n="export">Export PNG</button>
       </div>
@@ -61,6 +65,7 @@
           <button type="button" id="sidebar-tab-display" role="tab" aria-controls="sidebar-display" aria-selected="false" tabindex="-1" data-sidebar-copy="display">Display</button>
         </div>
         <div id="height-warning" class="height-warning" role="status" hidden></div>
+        <div id="quality-warning" class="height-warning" role="status" hidden></div>
         <div class="sidebar-pane" id="sidebar-config" role="tabpanel" aria-labelledby="sidebar-tab-config" tabindex="0">
           <div class="sidebar-intro"><h2 data-i18n="layoutTitle">System layout</h2><p data-i18n="layoutDesc">A clear view of where the core LCS devices would be installed.</p></div>
           <div class="metric-row"><div><span data-i18n="width">WIDTH</span><strong id="width-metric">8.0 <small>m</small></strong></div><div><span data-i18n="depth">DEPTH</span><strong id="depth-metric">10.0 <small>m</small></strong></div><div><span data-i18n="height">HEIGHT</span><strong id="height-metric">3.0 <small>m</small></strong></div></div>
@@ -85,7 +90,7 @@
           </section>
         </div>
         <div class="sidebar-pane" id="sidebar-devices" role="tabpanel" aria-labelledby="sidebar-tab-devices" tabindex="0" hidden>
-          <section class="sidebar-section selected-section" aria-live="polite"><div class="section-heading"><h3 data-i18n="selected">Selected device</h3></div><div id="device-detail" class="device-detail"></div><button id="adjust-camera-field" class="reset-button" type="button" data-sidebar-copy="adjustCamera" hidden>Adjust field of view</button></section>
+          <section class="sidebar-section selected-section" aria-live="polite"><div class="section-heading"><h3 data-i18n="selected">Selected device</h3></div><div id="device-detail" class="device-detail"></div><button id="adjust-camera-field" class="reset-button" type="button" data-sidebar-copy="adjustCamera" hidden>Adjust field of view</button><button id="open-av-matrix" class="reset-button" type="button" hidden>Open AV Matrix</button></section>
           <details class="settings-panel">
             <summary data-i18n="mountingHeights">Illustrative mounting heights</summary>
             <div class="settings-content"><div id="height-controls"></div>
@@ -119,6 +124,11 @@
           <section class="sidebar-section selected-section"><label class="check-row"><input id="show-coverage" type="checkbox"><span data-i18n="showCoverage">Floor coverage projection</span></label><p class="settings-note" data-i18n="coverageNote">Coverage marks project the existing 2D rules onto the floor. They are not a validated 3D acoustic or image model.</p></section>
         </div>
         <div class="sidebar-pane" id="sidebar-display" role="tabpanel" aria-labelledby="sidebar-tab-display" tabindex="0" hidden>
+          <section class="sidebar-section">
+            <label class="select-row" for="render-quality"><span id="quality-label">Render quality</span>
+              <select id="render-quality" disabled><option value="standard">Standard</option><option value="high">High fidelity</option></select>
+            </label>
+          </section>
           <section class="sidebar-section selected-section">
             <div id="visibility-heading" class="subheading" data-i18n="visibility">Visibility</div>
             <div class="check-grid">
@@ -129,6 +139,7 @@
           </section>
         </div>
         <div class="sidebar-footer"><button id="reset-button" type="button" class="reset-button" data-i18n="reset">Restore demo defaults</button></div>
+        <div id="simulation-controls"></div>
       </aside>
     </main>
   </div>

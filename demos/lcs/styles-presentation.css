@@ -143,6 +143,41 @@ input[type="number"]{direction:ltr}
 .sidebar details.bom summary .tag { margin-inline-start:6px }
 .sidebar .coverage-section + .coverage-section { border-top:1px solid var(--divider); padding-top:10px }
 
+.classroom-mode { display:flex; padding:3px; border:1px solid var(--border); border-radius:10px; background:var(--card); gap:2px }
+.topbar-actions:has(.classroom-mode:not([hidden])) { max-width:100%; min-width:0 }
+.classroom-mode button { border:1px solid transparent; border-radius:7px; padding:7px 10px; background:transparent; color:var(--muted); font-weight:750; font-size:12px; white-space:nowrap }
+.classroom-mode button[aria-pressed="true"] { background:var(--accent-soft); color:var(--accent-text); border-color:var(--accent-border) }
+#open-av-matrix { margin-top:10px }
+#scene-sidebar:not([data-mode="simulation"]) > #simulation-controls,
+#scene-sidebar[data-mode="simulation"] > :not(#simulation-controls, #quality-warning) { display:none }
+#simulation-controls { display:flex; flex-direction:column; flex:1; min-height:0 }
+.simulation-actions { flex:none; padding:12px 14px; background:var(--panel); border-bottom:1px solid var(--divider) }
+.simulation-actions p { margin:0 0 8px; font-size:12px; font-weight:750; color:var(--muted) }
+.simulation-actions > div { display:flex; gap:7px; flex-wrap:wrap }
+.simulation-actions button { flex:1; min-height:36px }
+.simulation-actions .primary-button { color:var(--primary-text) }
+.simulation-card { margin:0 0 9px; border:1px solid var(--border); border-radius:10px; padding:12px; background:var(--card) }
+.simulation-card.simulation-selected { border-color:var(--accent-border) }
+.simulation-card h3 { margin:0 0 8px; font-size:14px }
+.simulation-device-name { border:0; background:transparent; color:var(--text); font-weight:800; padding:0; text-align:start }
+.simulation-device-name:hover { color:var(--teal) }
+.simulation-route { display:grid; grid-template-columns:minmax(0,1fr); gap:4px; margin:8px 0; padding:7px 9px; background:var(--panel); border-radius:7px; font-size:12px; font-weight:700 }
+.simulation-route-status { font-size:11px; color:var(--muted) }
+.simulation-route select, .simulation-footer select { min-width:0; max-width:100%; color:var(--text); background:var(--field); border:1px solid var(--border); border-radius:6px; padding:6px }
+.simulation-device-controls, .simulation-footer { display:flex; align-items:center; justify-content:space-between; gap:8px }
+.simulation-device-controls { flex-wrap:wrap; font-size:12px }
+.simulation-device-controls output { color:var(--accent-text); font-weight:700 }
+.simulation-blind-controls { display:flex; gap:4px; flex-wrap:wrap }
+.simulation-blind-controls button { padding-inline:8px }
+.simulation-blind-controls button:disabled { opacity:.48; cursor:default }
+.simulation-footer { padding:8px 12px; flex:none; border-top:1px solid var(--divider); font-size:12px; background:var(--panel) }
+@media(max-width:980px) {
+  #simulation-controls .sidebar-tabs { position:static }
+}
+@media(max-width:600px) {
+  .topbar-actions:has(.classroom-mode:not([hidden])) { width:100%; justify-content:flex-start }
+}
+
 @media(max-width:980px) {
   .sidebar.sidebar-lcs { overflow:visible }
   .sidebar-lcs .sidebar-tabs { position:sticky; top:0 }

@@ -131,6 +131,7 @@ input[type="number"]{direction:ltr}
 .sidebar-footer button { width:100%; margin:0 }
 .sidebar #height-warning { flex:none; margin:8px 12px 0 }
 .sidebar #adjust-camera-field { margin-top:10px }
+.sidebar #adjust-s210-aim, .sidebar #s210-aim-reset { margin-top:10px }
 .sidebar .sidebar-intro, .sidebar .intro { padding:12px }
 .sidebar .sidebar-intro h2, .sidebar .intro h1 { font-size:16px }
 .sidebar .intro p { margin:4px 0; font-size:12px }

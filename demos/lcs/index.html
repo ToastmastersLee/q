@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="styles.css?v=20261030-planning-reset">
   <link rel="stylesheet" href="styles-presentation.css?v=classroom-controls">
   <link rel="stylesheet" href="styles-camera-field.css">
-  <script defer src="dist/app.js?v=rear-curtains-projection"></script>
+  <script defer src="dist/app.js?v=s210-aim"></script>
 </head>
 <body>
   <div id="app" class="app-shell">
@@ -90,7 +90,7 @@
           </section>
         </div>
         <div class="sidebar-pane" id="sidebar-devices" role="tabpanel" aria-labelledby="sidebar-tab-devices" tabindex="0" hidden>
-          <section class="sidebar-section selected-section" aria-live="polite"><div class="section-heading"><h3 data-i18n="selected">Selected device</h3></div><div id="device-detail" class="device-detail"></div><button id="adjust-camera-field" class="reset-button" type="button" data-sidebar-copy="adjustCamera" hidden>Adjust field of view</button><button id="open-av-matrix" class="reset-button" type="button" hidden>Open AV Matrix</button></section>
+          <section class="sidebar-section selected-section" aria-live="polite"><div class="section-heading"><h3 data-i18n="selected">Selected device</h3></div><div id="device-detail" class="device-detail"></div><button id="adjust-camera-field" class="reset-button" type="button" data-sidebar-copy="adjustCamera" hidden>Adjust field of view</button><button id="adjust-s210-aim" class="reset-button" type="button" hidden>Aim S210</button><button id="open-av-matrix" class="reset-button" type="button" hidden>Open AV Matrix</button></section>
           <details class="settings-panel">
             <summary data-i18n="mountingHeights">Illustrative mounting heights</summary>
             <div class="settings-content"><div id="height-controls"></div>
@@ -119,6 +119,13 @@
           <section class="sidebar-section selected-section">
             <label class="check-row"><input id="s210-ripples" type="checkbox"><span data-i18n="s210Ripples">S210 3D pickup ripples</span></label>
             <label class="check-row"><input id="animate-s210-ripples" type="checkbox" disabled><span data-i18n="animateS210Ripples">Animate pickup ripples</span></label>
+            <div id="s210-aim" hidden>
+              <label class="select-row"><span data-aim-copy="mic">Microphone</span><select id="s210-aim-select"></select></label>
+              <div class="field-angle-row" data-aim-axis="pan"><label for="s210-pan">Azimuth</label><div><input id="s210-pan" type="range" step="1"><input id="s210-pan-number" type="number" step="1"><span>°</span></div></div>
+              <div class="field-angle-row" data-aim-axis="tilt"><label for="s210-tilt">Tilt from vertical</label><div><input id="s210-tilt" type="range" step="1"><input id="s210-tilt-number" type="number" step="1"><span>°</span></div></div>
+              <button id="s210-aim-reset" class="reset-button" type="button">Reset angle</button>
+              <p class="settings-note" data-aim-copy="note"></p>
+            </div>
             <p class="settings-note" data-i18n="s210RipplesNote">Cardioid illustration using the 6 m and 8 m planning ranges. Verify pickup on site.</p>
           </section>
           <section class="sidebar-section selected-section"><label class="check-row"><input id="show-coverage" type="checkbox"><span data-i18n="showCoverage">Floor coverage projection</span></label><p class="settings-note" data-i18n="coverageNote">Coverage marks project the existing 2D rules onto the floor. They are not a validated 3D acoustic or image model.</p></section>

@@ -73,13 +73,13 @@ class NewbieTour {
                 ['ndp600', 'nmp', 'ndp200', 'mbx_library'],
                 ['ifp_a', 'spk_a', 'ifp_b', 'spk_b', 'ifp_h', 'spk_h', 'disp_l', 'spk_l'], []
             ];
-            return window.I18N_DATA[lang].mediaTour.map((step, index) => ({ ...step, targetNodes: targets[index] }));
+            return window.simulator.getTranslations().mediaTour.map((step, index) => ({ ...step, targetNodes: targets[index] }));
         }
         const steps = content
             ? this.steps_en.map((step, index) => ({ ...step, ...content.tour[index] }))
             : (lang === 'zh' ? this.steps_zh : this.steps_en);
-        return steps.filter(step => !step.targetNodes.includes('mediaserver'))
-            .map(step => ({ ...step, targetNodes: step.targetNodes.filter(id => window.simulator?.isDeviceVisible(id)) }));
+        return window.simulator.resolveDeploymentTour(steps.filter(step => !step.targetNodes.includes('mediaserver'))
+            .map(step => ({ ...step, targetNodes: step.targetNodes.filter(id => window.simulator?.isDeviceVisible(id)) })));
     }
 
     start() {

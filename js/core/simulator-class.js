@@ -11,6 +11,8 @@
             try { this.theme = localStorage.getItem('qnex_theme') || 'light'; } catch (error) {}
             this.currentScenario = 'standby';
             this.view = 'control';
+            this.deployment = 'public';
+            this.privateDeployment = 'regional';
             this.scenarioSoundTimer = null;
             this.isPlaying = true;
             this.speed = 1.0;

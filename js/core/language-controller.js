@@ -62,10 +62,10 @@
         },
         localizedScenarioValue(device, property) {
             const content = app.data.localeContent?.[this.lang];
-            if (content && property.startsWith('badge')) return content.deviceScenarios?.[device.id]?.[property];
-            return content?.deviceScenarios?.[device.id]?.[property]
+            if (content && property.startsWith('badge')) return this.resolveDeploymentText(content.deviceScenarios?.[device.id]?.[property]);
+            return this.resolveDeploymentText(content?.deviceScenarios?.[device.id]?.[property]
                 || device.scenarios?.[`${property}_${this.lang}`]
-                || device.scenarios?.[`${property}_en`];
+                || device.scenarios?.[`${property}_en`]);
         }
     });
 })(window.QnexApp, window.QnexApp.services.QnexSimulator);

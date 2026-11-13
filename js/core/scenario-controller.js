@@ -26,7 +26,7 @@
         },
 
         updateScenarioBanner(scenarioKey) {
-            const translations = window.I18N_DATA?.[this.lang] || window.I18N_DATA?.zh;
+            const translations = this.getTranslations();
             const scenario = translations?.scenarios?.[scenarioKey];
             if (!scenario) return;
 
@@ -63,7 +63,8 @@
             const localeStates = app.data.screenStates[this.lang] || app.data.screenStates.zh;
             const screens = localeStates[scenarioKey] || localeStates.standby;
             Object.entries(screens).forEach(([screenId, state]) => {
-                const data = this.hasBroadcastReached(screenId) ? state : localeStates.standby[screenId];
+                const reached = this.hasBroadcastReached(screenId);
+                const data = this.resolveDeploymentScreen(reached ? state : localeStates.standby[screenId], reached ? scenarioKey : 'standby');
                 const element = document.getElementById(`screen-${screenId}`);
                 if (!element) return;
                 element.style.backgroundColor = data.color;

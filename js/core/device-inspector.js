@@ -24,9 +24,10 @@
         const zoneText = this.localizedDeviceValue(dev, 'zone');
         const roleText = this.localizedDeviceValue(dev, 'role');
 
-        document.getElementById('inspector-title').textContent = this.getDeviceTranslation(dev, 'name') || dev.name;
-        document.getElementById('inspector-model').textContent = dev.model;
+        document.getElementById('inspector-title').textContent = this.localizedDeviceValue(dev, 'name');
+        document.getElementById('inspector-model').textContent = this.localizedDeviceValue(dev, 'model');
         document.getElementById('inspector-img').src = dev.image;
+        document.getElementById('inspector-img').alt = this.localizedDeviceValue(dev, 'name');
         document.getElementById('inspector-zone').textContent = zoneText;
         document.getElementById('inspector-role').textContent = roleText;
 
@@ -40,7 +41,7 @@
         const portsList = document.getElementById('inspector-ports');
         const portsSection = portsList?.closest('.inspector-section');
         if (portsSection) {
-            const ports = this.getDeviceTranslation(dev, 'ports') || dev.ports;
+            const ports = dev.ports ? this.localizedDeviceValue(dev, 'ports') : null;
             if (ports && ports.length > 0) {
                 portsSection.style.display = '';
                 portsList.innerHTML = ports.map(p => `<li>${p}</li>`).join('');
@@ -56,7 +57,7 @@
             if (dev.scenarios) {
                 scenariosSection.style.display = '';
                 const isEn = this.lang === 'en';
-                const t = (window.I18N_DATA && window.I18N_DATA[this.lang]) || window.I18N_DATA?.zh;
+                const t = this.getTranslations();
                 const labels = {
                     teaching: t?.inspector?.scenario_teaching || (isEn ? 'Teaching' : '教学场景'),
                     control: t?.inspector?.scenario_control || (isEn ? 'Control' : '设备集控'),
@@ -81,10 +82,10 @@
         }
 
         // Test action button title
-        const t = (window.I18N_DATA && window.I18N_DATA[this.lang]) || window.I18N_DATA?.zh;
+        const t = this.getTranslations();
         const testBtn = document.getElementById('inspector-test-btn');
         if (testBtn && t) {
-            testBtn.textContent = `${t.inspector.test_btn_prefix} ${dev.model} ${t.inspector.test_btn_suffix}`;
+            testBtn.textContent = `${t.inspector.test_btn_prefix} ${this.localizedDeviceValue(dev, 'model')} ${t.inspector.test_btn_suffix}`;
         }
     },
     triggerDeviceSelfTest() {
@@ -102,10 +103,9 @@
 
         const bannerDesc = document.getElementById('scenario-banner-desc');
         if (bannerDesc) {
-            const orig = bannerDesc.textContent;
-            const msg = `${dev.model}: ${this.getTranslations().inspector.ping_success}`;
+            const msg = `${this.localizedDeviceValue(dev, 'model')}: ${this.getTranslations().inspector.ping_success}`;
             bannerDesc.innerHTML = `<span style="color:#38bdf8;">${msg}</span>`;
-            setTimeout(() => { bannerDesc.textContent = orig; }, 3000);
+            setTimeout(() => { this.updateScenarioBanner(this.currentScenario); }, 3000);
         }
     },
     toggleCableFilter(type, isVisible) {

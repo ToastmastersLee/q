@@ -17,6 +17,7 @@
     <link rel="stylesheet" href="css/product-details.css?v=20261028-compact-control">
     <link rel="stylesheet" href="css/architecture-views.css?v=20261028-compact-control">
     <link rel="stylesheet" href="css/tour.css?v=20261028-compact-control">
+    <link rel="stylesheet" href="css/deployment.css?v=20261113-deployment">
 </head>
 <body class="theme-light">
     <!-- 顶部导航与全局控制栏 -->
@@ -62,6 +63,19 @@
                         <span id="lbl-settings-heading">Tools &amp; Settings</span>
                         <span id="app-version" class="tag">Online Training v3.0</span>
                     </div>
+                    <fieldset class="deployment-settings">
+                        <legend id="deployment-heading">Deployment</legend>
+                        <div class="deployment-toggle-row">
+                            <label><input id="deployment-private" type="checkbox" role="switch" aria-describedby="deployment-note"><span id="deployment-toggle-label">Private deployment</span></label>
+                            <span id="deployment-current" aria-live="polite">Public Cloud</span>
+                        </div>
+                        <div id="deployment-location-field" hidden>
+                            <label id="deployment-location-label" for="deployment-location">Hosting location</label>
+                            <select id="deployment-location" disabled><option value="regional">Regional hosting</option><option value="campus">Campus LAN</option></select>
+                        </div>
+                        <p id="deployment-note"></p>
+                        <p id="deployment-diagram-help" hidden></p>
+                    </fieldset>
                     <div class="settings-tabs" role="tablist" aria-labelledby="lbl-settings-heading">
                         <button id="settings-tab-planners" type="button" role="tab" aria-selected="true" aria-controls="settings-planners">Planners</button>
                         <button id="settings-tab-tools" type="button" role="tab" aria-selected="false" aria-controls="settings-tools" tabindex="-1">Tools</button>
@@ -348,24 +362,27 @@
     <script src="js/data/meeting-screen-states.js?v=20261028-compact-control"></script>
     <script src="js/i18n/architecture-copy.js?v=20261028-compact-control"></script>
     <script src="js/data/scenario-flows.js?v=20261028-compact-control"></script>
+    <script src="js/i18n/deployment-copy.js?v=20261113-deployment"></script>
+    <script src="js/i18n/deployment-copy-asia.js?v=20261113-deployment"></script>
 
     <script src="js/audio.js?v=20261028-compact-control"></script>
-    <script src="js/tour.js?v=20261028-compact-control"></script>
-    <script src="js/core/simulator-class.js?v=20261028-compact-control"></script>
+    <script src="js/tour.js?v=20261113-deployment"></script>
+    <script src="js/core/simulator-class.js?v=20261113-deployment"></script>
     <script src="js/core/media-server-option.js?v=20261028-compact-control"></script>
     <script src="js/vendor/html-to-image-1.11.13.min.js?v=20261028-compact-control"></script>
     <script src="js/data/export-images.js?v=20261028-compact-control"></script>
     <script src="js/core/png-export.js?v=20261028-compact-control"></script>
-    <script src="js/core/ui-controller.js?v=20261110-tools"></script>
-    <script src="js/core/language-controller.js?v=20261110-tools"></script>
-    <script src="js/core/topology-renderer.js?v=20261028-compact-control"></script>
-    <script src="js/core/node-renderer.js?v=20261028-compact-control"></script>
+    <script src="js/core/ui-controller.js?v=20261113-deployment"></script>
+    <script src="js/core/language-controller.js?v=20261113-deployment"></script>
+    <script src="js/core/topology-renderer.js?v=20261113-deployment"></script>
+    <script src="js/core/node-renderer.js?v=20261113-deployment"></script>
     <script src="js/core/particle-engine.js?v=20261028-compact-control"></script>
     <script src="js/core/broadcast-controller.js?v=20261028-compact-control"></script>
-    <script src="js/core/scenario-controller.js?v=20261028-compact-control"></script>
+    <script src="js/core/scenario-controller.js?v=20261113-deployment"></script>
     <script src="js/core/product-video.js?v=20261028-compact-control"></script>
-    <script src="js/core/device-inspector.js?v=20261028-compact-control"></script>
-    <script src="js/core/controls.js?v=20261110-tools"></script>
+    <script src="js/core/device-inspector.js?v=20261113-deployment"></script>
+    <script src="js/core/controls.js?v=20261113-deployment"></script>
+    <script src="js/core/deployment-controller.js?v=20261113-deployment"></script>
     <script src="js/simulator.js?v=20261028-compact-control"></script>
 </body>
 </html>

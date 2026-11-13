@@ -7,7 +7,7 @@
 
     Object.assign(Simulator.prototype, {
         getTranslations() {
-            return window.I18N_DATA?.[this.lang] || window.I18N_DATA?.en;
+            return this.resolveDeploymentTranslations(window.I18N_DATA?.[this.lang] || window.I18N_DATA?.en);
         },
 
         applyTheme(theme) {
@@ -40,6 +40,7 @@
             if (!translations) return;
             this.updateHeaderLanguage(translations);
             this.updateLanguageControls(translations);
+            this.updateDeploymentControls();
             this.updateMediaServerControls();
             this.updateExportButton();
             this.updateScenarioLanguage(translations);
@@ -121,6 +122,7 @@
                 const name = document.querySelector(`#node-${device.id} .node-generic-name`);
                 if (name) name.textContent = this.localizedDeviceValue(device, 'genericName');
             });
+            this.updateDeploymentCanvas();
         },
 
         updateInspectorLanguage(translations) {
@@ -157,11 +159,12 @@
         },
 
         localizedDeviceValue(device, property) {
-            return this.getDeviceTranslation(device, property)
+            const value = this.getDeviceTranslation(device, property)
                 || device[`${property}_${this.lang}`]
                 || device[`${property}_en`]
                 || device[property]
                 || device.name;
+            return this.resolveDeploymentDeviceValue(device, property, value);
         },
 
         toggleLanguage() {

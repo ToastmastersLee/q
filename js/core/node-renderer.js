@@ -40,11 +40,11 @@
             const genericName = this.localizedDeviceValue(device, 'genericName');
             node.innerHTML = `
                 <div class="node-badge-container">
-                    <span class="node-model-badge">${device.model}</span>
+                    <span class="node-model-badge">${this.localizedDeviceValue(device, 'model')}</span>
                     <span class="node-status-dot online"></span>
                 </div>
                 <div class="node-img-wrapper">
-                    <img src="${device.image}" alt="${device.name}" class="node-product-img">
+                    <img src="${device.image}" alt="${this.localizedDeviceValue(device, 'name')}" class="node-product-img">
                     ${createExtraVisual(device)}
                 </div>
                 <div class="node-caption">

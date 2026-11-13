@@ -104,6 +104,7 @@
             : (connection.points[0][1] + connection.points[1][1]) / 2);
         const group = svgElement('g', {
             class: `cable-label-group cable-label-${connection.type}`,
+            'data-connection-label': connection.id,
             transform: `translate(${midX}, ${midY})`
         });
         const width = Math.max(76, connection.label.length * 5.3 + 12);
@@ -135,6 +136,7 @@
             nodeContainer.innerHTML = '';
             this.renderSvgTopology(svg);
             this.renderDeviceNodes(nodeContainer);
+            this.updateDeploymentCanvas();
             this.updateBroadcastGuide();
         },
 
@@ -154,8 +156,9 @@
             const group = svgElement('g', { id: 'lines-group' });
             this.getTopology().connections.forEach(connection => {
                 if (!this.isDeviceVisible(connection.from) || !this.isDeviceVisible(connection.to)) return;
-                group.appendChild(createConnectionPath(connection));
-                const label = createCableLabel(connection);
+                const resolved = this.getDeploymentConnection(connection);
+                group.appendChild(createConnectionPath(resolved));
+                const label = createCableLabel(resolved);
                 if (label) group.appendChild(label);
             });
             svg.appendChild(group);

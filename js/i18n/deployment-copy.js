@@ -1,0 +1,77 @@
+/** Deployment presentation only; no sizing or service-combination claims. */
+(function (app) {
+    app.data.deploymentCopy = {
+        en: {
+            heading: 'Deployment', toggle: 'Private deployment', public: 'Public Cloud', location: 'Hosting location',
+            regional: 'Regional hosting', campus: 'Campus LAN',
+            regionalZone: 'Regional Private Hosting', campusZone: 'Campus Private Management',
+            regionalServer: 'Q-NEX Private Server', campusServer: 'Q-NEX On-Premise Server',
+            publicNote: 'Q-NEX public cloud management with campus LAN media distribution.',
+            regionalNote: 'One management server hosted in the SI-designated country or region, accessible over the internet.',
+            campusNote: 'One management server inside the school. Supports restricted or no public internet. Off-campus access and external content require suitable network connectivity.',
+            diagramNote: 'Logical flow diagram; zone outlines do not indicate physical server placement.',
+            logical: 'Logical management zone', control: 'Server Device Control',
+            command: 'Web Console or Q-NEX App sends commands through the private management server, gateway and switch to endpoints. Available actions depend on device, platform configuration and permissions.',
+            notice: 'Web Console or App sends text notices through the private management server to connected screens. No Media Server is required.',
+            management: 'Device registration, online status and authorized control on one private management server.',
+            gateway: 'Project-configured routing and firewall between management services and campus endpoints; public internet is not required for local server access.',
+            media: 'Campus Media Server distributes live video and scheduled audio over the LAN after receiving the command. External content requires suitable network connectivity.',
+            links: ['Internet / HTTPS', 'Internet / Mobile Network', 'Private Server Control / WAN', 'Campus LAN / HTTPS', 'Campus Wi-Fi', 'Local Server Control / LAN'],
+            cloudPattern: '\\b(?:public cloud|cloud)(?:-based)?\\b', serverWord: 'server'
+        },
+        zh: {
+            heading: '部署方式', toggle: '私有化部署', public: '公有云', location: '服务器位置',
+            regional: '区域托管', campus: '校园局域网',
+            regionalZone: '区域私有化托管', campusZone: '校园私有化管理',
+            regionalServer: 'Q-NEX 私有服务器', campusServer: 'Q-NEX 校内服务器',
+            publicNote: 'Q-NEX 公有云管理，校园局域网分发媒体。',
+            regionalNote: '单台管理服务器部署在 SI 指定的国家或地区，保留互联网访问能力。',
+            campusNote: '单台管理服务器部署在校内，支持限制或不接入公网。校外访问及外部内容需要相应的网络连接。',
+            diagramNote: '本图表示逻辑流程，区域边框不代表服务器的实际物理位置。',
+            logical: '逻辑管理区域', control: '服务器设备控制',
+            command: 'Web Console 或 Q-NEX App 通过私有管理服务器、网关和交换机向终端下发指令。可用操作取决于设备、平台配置和权限。',
+            notice: 'Web Console 或 App 经私有管理服务器发送文字通知，由终端连接的屏幕显示，无需 Media Server。',
+            management: '由单台私有管理服务器提供设备注册、在线状态及授权控制。',
+            gateway: '按项目配置管理服务与校园终端之间的路由和防火墙；访问校内服务器无需公网。',
+            media: '校园 Media Server 接收指令后，通过局域网分发直播和定时音频。外部内容需要相应的网络连接。',
+            links: ['互联网 / HTTPS', '互联网 / 移动网络', '私有服务器控制 / WAN', '校园局域网 / HTTPS', '校园 Wi-Fi', '本地服务器控制 / LAN'],
+            cloudPattern: '官方公有云|公有云|云端|云控|云平台', serverWord: '服务器'
+        },
+        fr: {
+            heading: 'Déploiement', toggle: 'Déploiement privé', public: 'Cloud public', location: 'Hébergement',
+            regional: 'Hébergement régional', campus: 'LAN du campus',
+            regionalZone: 'Hébergement privé régional', campusZone: 'Gestion privée du campus',
+            regionalServer: 'Serveur privé Q-NEX', campusServer: 'Serveur local Q-NEX',
+            publicNote: 'Gestion cloud public Q-NEX et distribution multimédia sur le LAN du campus.',
+            regionalNote: 'Un serveur de gestion hébergé dans le pays ou la région désigné par le SI, accessible par Internet.',
+            campusNote: 'Un serveur de gestion dans l’école, avec accès Internet limité ou absent. L’accès hors campus et les contenus externes nécessitent une connectivité adaptée.',
+            diagramNote: 'Schéma logique : les zones ne représentent pas l’emplacement physique des serveurs.',
+            logical: 'Zone logique de gestion', control: 'Commande par serveur',
+            command: 'Web Console ou Q-NEX App envoie les commandes via le serveur privé, la passerelle et le commutateur. Les actions dépendent du matériel, de la configuration et des autorisations.',
+            notice: 'Web Console ou App envoie les annonces via le serveur privé aux écrans connectés. Aucun Media Server requis.',
+            management: 'Enregistrement, état en ligne et commandes autorisées sur un serveur de gestion privé.',
+            gateway: 'Routage et pare-feu configurés entre la gestion et les terminaux ; l’accès au serveur local ne nécessite pas Internet.',
+            media: 'Après réception de la commande, Media Server distribue vidéo en direct et audio programmé sur le LAN. Les contenus externes nécessitent une connectivité adaptée.',
+            links: ['Internet / HTTPS', 'Internet / Réseau mobile', 'Commande privée / WAN', 'LAN du campus / HTTPS', 'Wi-Fi du campus', 'Commande locale / LAN'],
+            cloudPattern: 'cloud public|cloud|nuage', serverWord: 'serveur'
+        },
+        es: {
+            heading: 'Despliegue', toggle: 'Despliegue privado', public: 'Nube pública', location: 'Alojamiento',
+            regional: 'Alojamiento regional', campus: 'LAN del campus',
+            regionalZone: 'Alojamiento privado regional', campusZone: 'Gestión privada del campus',
+            regionalServer: 'Servidor privado Q-NEX', campusServer: 'Servidor local Q-NEX',
+            publicNote: 'Gestión en la nube pública Q-NEX y distribución multimedia por la LAN del campus.',
+            regionalNote: 'Un servidor de gestión en el país o región designado por el SI, accesible por Internet.',
+            campusNote: 'Un servidor de gestión dentro del centro, con Internet restringido o sin Internet. El acceso externo y los contenidos externos requieren conectividad adecuada.',
+            diagramNote: 'Diagrama lógico: las zonas no indican la ubicación física de los servidores.',
+            logical: 'Zona lógica de gestión', control: 'Control por servidor',
+            command: 'Web Console o Q-NEX App envía órdenes por el servidor privado, la puerta de enlace y el conmutador. Las acciones dependen del equipo, configuración y permisos.',
+            notice: 'Web Console o App envía avisos por el servidor privado a las pantallas conectadas. No requiere Media Server.',
+            management: 'Registro, estado en línea y control autorizado en un servidor de gestión privado.',
+            gateway: 'Enrutamiento y cortafuegos configurados entre gestión y terminales; el acceso al servidor local no requiere Internet.',
+            media: 'Tras recibir la orden, Media Server distribuye vídeo en directo y audio programado por la LAN. Los contenidos externos requieren conectividad adecuada.',
+            links: ['Internet / HTTPS', 'Internet / Red móvil', 'Control privado / WAN', 'LAN del campus / HTTPS', 'Wi-Fi del campus', 'Control local / LAN'],
+            cloudPattern: 'la nube pública|nube pública|la nube|nube|cloud', serverWord: 'servidor'
+        }
+    };
+})(window.QnexApp);

@@ -20,6 +20,7 @@
         bindEvents() {
             this.bindScenarioControls();
             this.bindViewControls();
+            this.bindDeploymentControls();
             document.getElementById('btn-export-png')?.addEventListener('click', () => this.exportPng());
             this.bindPlaybackControls();
             this.bindDisplayControls();

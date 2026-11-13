@@ -985,10 +985,9 @@
       { id: 1, x: width / 2, y: rearY, label: "S2", facing: "up" }
     ], width, length);
   };
-  var isDirectHostPairQualified = (mics, width, length) => {
-    if (mics.length !== 2) return false;
-    const pairCoverage = calculateS210Coverage(mics, width, length);
-    return pairCoverage.best >= s210DirectHostTarget.best && pairCoverage.limit >= s210DirectHostTarget.limit;
+  var meetsDirectHostTarget = (mics, width, length) => {
+    const coverage = calculateS210Coverage(mics, width, length);
+    return coverage.best >= s210DirectHostTarget.best && coverage.limit >= s210DirectHostTarget.limit;
   };
   var buildFixedS210Layout = (width, length, count) => {
     if (!Number.isInteger(count) || count < 0 || count > S210_MAX_COUNT) throw new RangeError("Invalid S210 count");
@@ -998,6 +997,11 @@
   };
   var buildS210Layout = (width, length, s210s, fixedCount = null) => {
     if (fixedCount !== null) return buildFixedS210Layout(width, length, fixedCount);
+    const shallowRoom = length <= 6;
+    if (shallowRoom) {
+      const single = buildS210CandidateLayout(width, length, 1, 1);
+      if (meetsDirectHostTarget(single, width, length)) return single;
+    }
     const existingPair = s210s.length === 2 ? placeS210FrontRow(s210s.map((mic, index) => ({
       ...mic,
       id: index,
@@ -1005,12 +1009,16 @@
       y: clamp(mic.y, 0.3, length - 0.3),
       label: mic.label || `S${index + 1}`
     })), width, length) : null;
-    if (existingPair && isDirectHostPairQualified(existingPair, width, length)) {
+    if (existingPair && meetsDirectHostTarget(existingPair, width, length)) {
       return existingPair;
     }
     const proposedPair = buildDirectHostPairLayout(width, length);
-    if (isDirectHostPairQualified(proposedPair, width, length)) {
+    if (meetsDirectHostTarget(proposedPair, width, length)) {
       return proposedPair;
+    }
+    if (shallowRoom) {
+      const optimizedPair = buildFixedS210Layout(width, length, 2);
+      if (meetsDirectHostTarget(optimizedPair, width, length)) return optimizedPair;
     }
     return buildCoverageOptimizedS210Layout(width, length);
   };

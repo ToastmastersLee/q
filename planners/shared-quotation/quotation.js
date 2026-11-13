@@ -98,8 +98,8 @@
         }
         const total=10+lines.length; ws.mergeCells(total,1,total,6); ws.getCell(total,1).value='Amount:';
         ws.getCell(total,7).value={formula:lines.length?`SUM(G10:G${total-1})`:'0',result:0}; ws.getCell(total,7).numFmt='$#,##0.00';
-        ws.mergeCells(total+1,1,total+1,7); ws.getRow(total+1).height=140;
-        ws.getCell(total+1,1).value=`Notes:\n• Preliminary configuration; prices are zero for salesperson completion.\n• EXW unless otherwise agreed. Cables, brackets, installation and certificates excluded unless listed.\n• Standard warranty: 1 year; confirm final terms before issue. Force majeure may affect the quotation.\n• Product images pending: ${missing.join(', ')||'none'}.`;
+        ws.mergeCells(total+1,1,total+1,7); ws.getRow(total+1).height=140 + (plan.notes || []).reduce((height,note)=>height + Math.max(18,Math.ceil(note.length/150)*18),0);
+        ws.getCell(total+1,1).value=`Notes:\n• Preliminary configuration; prices are zero for salesperson completion.\n• EXW unless otherwise agreed. Cables, brackets, installation and certificates excluded unless listed.\n• Standard warranty: 1 year; confirm final terms before issue. Force majeure may affect the quotation.\n• Product images pending: ${missing.join(', ')||'none'}.${(plan.notes || []).map(note=>'\n• '+note).join('')}`;
         ws.eachRow(row=>row.eachCell({includeEmpty:true},cell=>{cell.alignment={vertical:'middle',wrapText:true};cell.border={bottom:{style:'thin',color:{argb:'FFCBD5E1'}}};}));
         for(let r=1;r<=5;r++)ws.getCell(r,1).alignment={horizontal:'center',vertical:'middle',wrapText:true};
         ws.getRow(9).font={bold:true}; ws.getRow(9).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFDCE6F1'}};

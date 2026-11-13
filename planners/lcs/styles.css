@@ -53,3 +53,13 @@ input:focus, select:focus {
     .lcs-room-controls select { max-width: 145px; }
     .lcs-app { padding: 8px; }
 }
+
+.lcs-pickup-summary { display:flex; flex-wrap:wrap; align-items:center; gap:8px; font-size:11px; margin-top:6px; }
+.lcs-audio-equipment { border:1px solid #94a3b866; border-radius:10px; padding:10px; margin:12px 0; font-size:12px; }
+.lcs-audio-equipment legend { font-weight:700; }
+.lcs-customer-equipment { margin:10px 0; }
+.lcs-equipment-fields { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:6px 0; }
+.lcs-equipment-note { grid-column:1/-1; }
+.lcs-audio-equipment ul, .lcs-audio-notes { padding-left:16px; list-style:disc; font-size:11px; line-height:1.5; margin-top:8px; }
+.lcs-audio-notes li + li { margin-top:6px; }
+@media (max-width:600px) { .lcs-equipment-fields { grid-template-columns:1fr; } }

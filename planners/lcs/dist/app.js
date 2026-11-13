@@ -471,12 +471,12 @@
     ps610Speaker: "PS610 passive wall speaker",
     ps610AmpReview: "PS610 is passive. Confirm amplifier power, final impedance, per-channel load and zone routing; do not assume the LCS810 2\xD740W amplifier can drive the full distributed layout.",
     delayReview: "Room depth exceeds 18m with front/rear speaker zones: review precedence delay and independent DSP/amplifier outputs. Do not add a processor until the topology is confirmed.",
-    feedbackSuppressor: "FE-224N Feedback Suppressor (L3 third-party; recommended above 200m\xB2)",
-    feedbackDetail: "The 200m\xB2 value is a quotation-review threshold, not an acoustic pass/fail limit. FE-224N is 2-in/2-out; XLR and 6.35mm are connector options, not four channels. Its verified controls are 24 configurable static notch filters and 6 frequency-shift levels; do not claim automatic/dynamic notch behaviour without current documentation. Use it on the microphone reinforcement bus, not as a replacement for A3006 or by default on program/music paths.",
+    feedbackSuppressor: "FE-224N Feedback Suppressor (required for local S210 reinforcement)",
+    feedbackDetail: "Required with S210 and local PS610 reinforcement unless reusable customer equipment is explicitly confirmed. FE-224N has 2 inputs/2 outputs; use on the microphone bus and coordinate DSP with A3006.",
     feedbackSupplyReview: "Reconfirm FE-224N hardware generation, price, stock, lead time, warranty, software compatibility and support owner before quotation.",
     feedbackCoordination: "A3006 AFC and FE-224N static notch/frequency-shift settings must be coordinated to avoid excessive double processing.",
     feedbackExternalRisks: "Reverberation, reflective finishes and roaming microphones are not modelled; they still require an on-site engineering review.",
-    feedbackMicCountReview: "FE-224N engineering review: more than four open S210 microphones increases feedback risk even below 200m\xB2. The device is not auto-added below the area threshold.",
+    feedbackMicCountReview: "More than four open S210 microphones requires engineering review even with feedback suppression.",
     s210CoverageUnmet: "S210 coverage target is not met. Reposition microphones or request an engineered audio design.",
     s210OverCapacity: "More than 10 S210 microphones exceeds the supported layout limit: up to 8 A3006 channels plus 2 direct to the LCS810.",
     lcsLifecycleReview: "LCS810 is the simulation baseline. Reconfirm current host availability, board generation, interfaces and lifecycle before quotation."
@@ -523,12 +523,12 @@
     ps610Speaker: "PS610 \u65E0\u6E90\u58C1\u6302\u97F3\u7BB1",
     ps610AmpReview: "PS610 \u4E3A\u65E0\u6E90\u97F3\u7BB1\uFF0C\u5FC5\u987B\u786E\u8BA4\u529F\u653E\u529F\u7387\u3001\u6700\u7EC8\u963B\u6297\u3001\u6BCF\u901A\u9053\u8D1F\u8F7D\u548C\u5206\u533A\u8DEF\u7531\uFF1B\u4E0D\u5F97\u5047\u8BBE LCS810 \u5185\u7F6E 2\xD740W \u529F\u653E\u53EF\u4EE5\u9A71\u52A8\u5168\u90E8\u5206\u5E03\u5F0F\u97F3\u7BB1\u3002",
     delayReview: "\u623F\u95F4\u6DF1\u5EA6\u8D85\u8FC7 18m \u4E14\u5B58\u5728\u524D\u540E\u97F3\u7BB1\u533A\uFF1A\u9700\u590D\u6838\u4F18\u5148\u6548\u5E94\u5EF6\u65F6\u53CA\u72EC\u7ACB DSP/\u529F\u653E\u8F93\u51FA\uFF1B\u62D3\u6251\u786E\u8BA4\u524D\u4E0D\u81EA\u52A8\u52A0\u5165\u5904\u7406\u5668\u3002",
-    feedbackSuppressor: "FE-224N \u53CD\u9988\u6291\u5236\u5668\uFF08L3 \u7B2C\u4E09\u65B9\uFF1B\u9762\u79EF >200\u33A1\u65F6\u5EFA\u8BAE\uFF09",
-    feedbackDetail: "200\u33A1\u662F\u62A5\u4EF7\u590D\u6838\u9608\u503C\uFF0C\u4E0D\u662F\u58F0\u5B66\u5408\u683C\u7EBF\u3002FE-224N \u4E3A 2\u8FDB2\u51FA\uFF0CXLR \u4E0E 6.35mm \u662F\u63A5\u53E3\u9009\u9879\u800C\u975E\u56DB\u8DEF\u901A\u9053\uFF1B\u5DF2\u9A8C\u8BC1\u7684\u662F 24 \u4E2A\u53EF\u914D\u7F6E\u9759\u6001\u9677\u6CE2\u5668\u548C 6 \u6863\u79FB\u9891\uFF0C\u5F53\u524D\u8D44\u6599\u672A\u786E\u8BA4\u65F6\u4E0D\u5F97\u5BA3\u79F0\u81EA\u52A8/\u52A8\u6001\u9677\u6CE2\uFF1B\u4EC5\u7528\u4E8E\u9EA6\u514B\u98CE\u6269\u58F0\u603B\u7EBF\uFF0C\u4E0D\u66FF\u4EE3 A3006\uFF0C\u4E5F\u4E0D\u9ED8\u8BA4\u5904\u7406\u8282\u76EE/\u97F3\u4E50\u901A\u9053\u3002",
+    feedbackSuppressor: "FE-224N \u53CD\u9988\u6291\u5236\u5668\uFF08S210\u672C\u5730\u6269\u58F0\u5FC5\u914D\uFF09",
+    feedbackDetail: "S210\u4E0EPS610\u672C\u5730\u6269\u58F0\u540C\u65F6\u542F\u7528\u65F6\u5FC5\u914D\uFF1B\u4EC5\u660E\u786E\u786E\u8BA4\u5DF2\u6709\u53EF\u590D\u7528\u8BBE\u5907\u624D\u514D\u91CD\u590D\u91C7\u8D2D\u3002FE-224N\u4E3A2\u8FDB2\u51FA\uFF0C\u7528\u4E8E\u9EA6\u514B\u98CE\u603B\u7EBF\u5E76\u4E0EA3006\u534F\u8C03\u5904\u7406\u3002",
     feedbackSupplyReview: "\u62A5\u4EF7\u524D\u590D\u6838 FE-224N \u786C\u4EF6\u4EE3\u6B21\u3001\u4EF7\u683C\u3001\u5E93\u5B58\u3001\u4EA4\u671F\u3001\u4FDD\u4FEE\u3001\u8F6F\u4EF6\u517C\u5BB9\u6027\u548C\u652F\u6301\u8D1F\u8D23\u4EBA\u3002",
     feedbackCoordination: "\u540C\u65F6\u4F7F\u7528 A3006 AFC \u4E0E FE-224N \u9759\u6001\u9677\u6CE2/\u79FB\u9891\u65F6\u5FC5\u987B\u534F\u8C03\u8BBE\u7F6E\uFF0C\u907F\u514D\u8FC7\u5EA6\u91CD\u590D\u5904\u7406\u3002",
     feedbackExternalRisks: "\u672C\u6A21\u62DF\u5668\u672A\u5EFA\u6A21\u6DF7\u54CD\u3001\u786C\u8D28\u53CD\u5C04\u9762\u548C\u6E38\u8D70\u9EA6\u514B\u98CE\uFF0C\u4ECD\u9700\u73B0\u573A\u5DE5\u7A0B\u590D\u6838\u3002",
-    feedbackMicCountReview: "FE-224N \u5DE5\u7A0B\u590D\u6838\uFF1A\u5373\u4F7F\u9762\u79EF\u4E0D\u8D85\u8FC7 200\u33A1\uFF0C\u8D85\u8FC7 4 \u652F\u5F00\u653E\u7684 S210 \u4E5F\u4F1A\u63D0\u9AD8\u53CD\u9988\u98CE\u9669\uFF1B\u4F4E\u4E8E\u9762\u79EF\u9608\u503C\u65F6\u4E0D\u81EA\u52A8\u52A0\u5165\u8BBE\u5907\u3002",
+    feedbackMicCountReview: "\u8D85\u8FC74\u652F\u5F00\u653ES210\uFF0C\u5373\u4F7F\u914D\u6709\u53CD\u9988\u6291\u5236\u5668\u4ECD\u9700\u5DE5\u7A0B\u590D\u6838\u3002",
     s210CoverageUnmet: "S210 \u8986\u76D6\u76EE\u6807\u672A\u8FBE\u5230\uFF0C\u8BF7\u8C03\u6574\u9EA6\u514B\u98CE\u4F4D\u7F6E\u6216\u8FDB\u884C\u4E13\u9879\u97F3\u9891\u8BBE\u8BA1\u3002",
     s210OverCapacity: "S210\u8D85\u8FC710\u652F\uFF0C\u8D85\u51FA\u652F\u6301\u4E0A\u9650\uFF1AA3006\u6700\u591A\u63A58\u652F\uFF0C\u53E6\u67092\u652F\u53EF\u76F4\u8FDELCS810\u3002",
     lcsLifecycleReview: "LCS810 \u4E3A\u6A21\u62DF\u57FA\u51C6\uFF1B\u62A5\u4EF7\u524D\u8BF7\u590D\u6838\u5F53\u524D\u4E3B\u673A\u4F9B\u8D27\u3001\u4E3B\u677F\u4EE3\u6B21\u3001\u63A5\u53E3\u548C\u751F\u547D\u5468\u671F\u3002"
@@ -628,12 +628,12 @@
     ps610Speaker: "Enceinte murale passive PS610",
     ps610AmpReview: "La PS610 est passive. Confirmez la puissance d\u2019amplification, l\u2019imp\xE9dance finale, la charge par canal et le routage des zones ; ne supposez pas que l\u2019amplificateur 2\xD740W du LCS810 peut alimenter toute l\u2019implantation distribu\xE9e.",
     delayReview: "La profondeur d\xE9passe 18m avec des zones avant/arri\xE8re : \xE9tudiez le retard de pr\xE9c\xE9dence et les sorties DSP/amplificateur ind\xE9pendantes. N\u2019ajoutez pas de processeur avant confirmation de la topologie.",
-    feedbackSuppressor: "Suppresseur de Larsen FE-224N (tiers L3 ; recommand\xE9 au-del\xE0 de 200m\xB2)",
-    feedbackDetail: "200m\xB2 est un seuil de revue du devis, pas une limite acoustique. Le FE-224N poss\xE8de 2 entr\xE9es/2 sorties ; XLR et jack 6,35mm sont des options de connectique, pas quatre canaux. Les fonctions v\xE9rifi\xE9es sont 24 filtres coupe-bande statiques configurables et 6 niveaux de d\xE9calage de fr\xE9quence ; ne revendiquez pas de filtrage automatique/dynamique sans documentation actuelle. Placez-le sur le bus de renforcement des microphones ; il ne remplace pas l\u2019A3006 et ne traite pas par d\xE9faut les programmes musicaux.",
+    feedbackSuppressor: "FE-224N (requis pour le renforcement local S210)",
+    feedbackDetail: "Requis avec S210 et PS610 actifs, sauf \xE9quipement client compatible confirm\xE9. FE-224N : 2 entr\xE9es/2 sorties, bus microphone ; coordonner avec A3006.",
     feedbackSupplyReview: "Avant devis, confirmez la g\xE9n\xE9ration mat\xE9rielle, le prix, le stock, le d\xE9lai, la garantie, la compatibilit\xE9 logicielle et le responsable du support du FE-224N.",
     feedbackCoordination: "Coordonnez l\u2019AFC de l\u2019A3006 avec les filtres statiques et le d\xE9calage de fr\xE9quence du FE-224N afin d\u2019\xE9viter un double traitement excessif.",
     feedbackExternalRisks: "La r\xE9verb\xE9ration, les surfaces r\xE9fl\xE9chissantes et les microphones mobiles ne sont pas mod\xE9lis\xE9s et exigent toujours une \xE9tude sur site.",
-    feedbackMicCountReview: "\xC9tude FE-224N : plus de quatre microphones S210 ouverts accroissent le risque de Larsen m\xEAme sous 200m\xB2. L\u2019appareil n\u2019est pas ajout\xE9 automatiquement sous le seuil de surface.",
+    feedbackMicCountReview: "Plus de quatre microphones S210 ouverts n\xE9cessitent une \xE9tude, m\xEAme avec suppression de Larsen.",
     s210CoverageUnmet: "L\u2019objectif de couverture S210 n\u2019est pas atteint. Repositionnez les microphones ou demandez une \xE9tude audio.",
     s210OverCapacity: "Plus de 10 microphones S210 d\xE9passe la limite : 8 entr\xE9es A3006 et 2 microphones directement raccord\xE9s au LCS810.",
     lcsLifecycleReview: "Le LCS810 est la r\xE9f\xE9rence de simulation. Confirmez la disponibilit\xE9 actuelle, la g\xE9n\xE9ration de carte, les interfaces et le cycle de vie avant devis."
@@ -985,9 +985,10 @@
       { id: 1, x: width / 2, y: rearY, label: "S2", facing: "up" }
     ], width, length);
   };
-  var meetsDirectHostTarget = (mics, width, length) => {
-    const coverage = calculateS210Coverage(mics, width, length);
-    return coverage.best >= s210DirectHostTarget.best && coverage.limit >= s210DirectHostTarget.limit;
+  var isDirectHostPairQualified = (mics, width, length) => {
+    if (mics.length !== 2) return false;
+    const pairCoverage = calculateS210Coverage(mics, width, length);
+    return pairCoverage.best >= s210DirectHostTarget.best && pairCoverage.limit >= s210DirectHostTarget.limit;
   };
   var buildFixedS210Layout = (width, length, count) => {
     if (!Number.isInteger(count) || count < 0 || count > S210_MAX_COUNT) throw new RangeError("Invalid S210 count");
@@ -997,11 +998,6 @@
   };
   var buildS210Layout = (width, length, s210s, fixedCount = null) => {
     if (fixedCount !== null) return buildFixedS210Layout(width, length, fixedCount);
-    const shallowRoom = length <= 6;
-    if (shallowRoom) {
-      const single = buildS210CandidateLayout(width, length, 1, 1);
-      if (meetsDirectHostTarget(single, width, length)) return single;
-    }
     const existingPair = s210s.length === 2 ? placeS210FrontRow(s210s.map((mic, index) => ({
       ...mic,
       id: index,
@@ -1009,16 +1005,12 @@
       y: clamp(mic.y, 0.3, length - 0.3),
       label: mic.label || `S${index + 1}`
     })), width, length) : null;
-    if (existingPair && meetsDirectHostTarget(existingPair, width, length)) {
+    if (existingPair && isDirectHostPairQualified(existingPair, width, length)) {
       return existingPair;
     }
     const proposedPair = buildDirectHostPairLayout(width, length);
-    if (meetsDirectHostTarget(proposedPair, width, length)) {
+    if (isDirectHostPairQualified(proposedPair, width, length)) {
       return proposedPair;
-    }
-    if (shallowRoom) {
-      const optimizedPair = buildFixedS210Layout(width, length, 2);
-      if (meetsDirectHostTarget(optimizedPair, width, length)) return optimizedPair;
     }
     return buildCoverageOptimizedS210Layout(width, length);
   };
@@ -1156,6 +1148,82 @@
     };
   }
 
+  // src/domain/audio-plan.js
+  var AUDIO_POLICY_VERSION = "2026-11-13";
+  var BUILTIN_AMP_MODELS = ["NDP600", "NDP200", "NMP311", "SL100"];
+  var emptyAudioConfig = () => ({ useBuiltInAmp: true, amplifier: {}, feedback: {} });
+  function confirmedEquipment(item, requiredCapacity) {
+    return item?.confirmed === true && typeof item.model === "string" && item.model.trim().length > 0 && typeof item.notes === "string" && item.notes.trim().length > 0 && Number.isInteger(item.capacity) && item.capacity >= requiredCapacity;
+  }
+  function minimumPickup(width, depth) {
+    if (![width, depth].every((n) => Number.isFinite(n) && n > 0)) return null;
+    const layout = buildS210Layout(width, depth, []);
+    const coverage = calculateS210Coverage(layout, width, depth);
+    const target = layout.length <= 2 ? { best: 80, limit: 95 } : { best: 75, limit: 85 };
+    return {
+      count: layout.length,
+      coverage,
+      unmet: coverage.best < target.best || coverage.limit < target.limit
+    };
+  }
+  function evaluateAudioPlan({
+    width,
+    depth,
+    s210Count,
+    speakerCount,
+    qnexModel = "NDP600",
+    audioConfig = {},
+    minimum = minimumPickup(width, depth)
+  }) {
+    const builtInSpeakers = audioConfig.useBuiltInAmp !== false && BUILTIN_AMP_MODELS.includes(qnexModel) ? Math.min(2, speakerCount) : 0;
+    const externalSpeakers = Math.max(0, speakerCount - builtInSpeakers);
+    const amplifierRequired = speakerCount > 0 && (speakerCount >= 6 || width * depth > 150);
+    const feedbackRequired = s210Count > 0 && speakerCount > 0;
+    const amplifierProvided = amplifierRequired && confirmedEquipment(audioConfig.amplifier, externalSpeakers || 1);
+    const feedbackProvided = feedbackRequired && confirmedEquipment(audioConfig.feedback, 1);
+    const amplifierQuantity = amplifierRequired ? Math.max(1, Math.ceil(externalSpeakers / 4)) : 0;
+    return {
+      policyVersion: AUDIO_POLICY_VERSION,
+      minimum,
+      actualCount: s210Count,
+      reviewSuggested: s210Count > 0 && minimum?.count >= 4,
+      suggestedCount: minimum ? Math.min(S210_MAX_COUNT, minimum.count + 2) : null,
+      engineeringReview: !!minimum && (minimum.unmet || minimum.count >= S210_MAX_COUNT || s210Count >= S210_MAX_COUNT),
+      a3006Required: s210Count >= 3,
+      overCapacity: s210Count > S210_MAX_COUNT,
+      amplifierRequired,
+      amplifierQuantity,
+      amplifierProvided,
+      feedbackRequired,
+      feedbackProvided,
+      purchaseAmplifiers: amplifierProvided ? 0 : amplifierQuantity,
+      purchaseFeedback: feedbackRequired && !feedbackProvided ? 1 : 0,
+      builtInSpeakers,
+      externalSpeakers,
+      amplifierDeclarationInvalid: amplifierRequired && audioConfig.amplifier?.confirmed === true && !amplifierProvided,
+      feedbackDeclarationInvalid: feedbackRequired && audioConfig.feedback?.confirmed === true && !feedbackProvided
+    };
+  }
+  function audioPlanNotes(plan, config = {}, lang = "en") {
+    const zh = lang === "zh", notes = [];
+    if (plan.actualCount > 0 && plan.minimum) {
+      notes.push(zh ? `S210\uFF1A\u7B97\u6CD5\u6700\u4F4E ${plan.minimum.count} \u652F\uFF1B\u5F53\u524D\u91C7\u7528 ${plan.actualCount} \u652F\u3002` : `S210: calculated minimum ${plan.minimum.count}; selected ${plan.actualCount}.`);
+      if (plan.reviewSuggested && plan.suggestedCount > plan.minimum.count) notes.push(zh ? `\u5EFA\u8BAE\u4EBA\u5DE5\u6BD4\u8F83 ${plan.minimum.count} \u4E0E ${plan.suggestedCount} \u652F\u65B9\u6848\uFF1B\u589E\u52A0\u6570\u91CF\u987B\u7ECF\u4E1A\u52A1\u786E\u8BA4\u3002` : `Manually compare ${plan.minimum.count} versus ${plan.suggestedCount} microphones; extra units require project confirmation.`);
+      if (plan.engineeringReview) notes.push(zh ? "\u5DF2\u8FBE\u5230\u5BB9\u91CF\u4E0A\u9650\u6216\u6700\u4F4E\u8986\u76D6\u672A\u8FBE\u6807\uFF0C\u8BF7\u5DE5\u7A0B\u590D\u6838\u3002" : "Engineering review required: capacity limit reached or minimum coverage target unmet.");
+      notes.push(zh ? "\u8986\u76D6\u4E3A\u51E0\u4F55\u4F30\u7B97\uFF0C\u9700\u73B0\u573A\u6838\u5B9E\u6DF7\u54CD\u3001\u566A\u58F0\u548C\u5B89\u88C5\u6761\u4EF6\u3002" : "Coverage is a geometric estimate; verify reverberation, noise and mounting on site.");
+    }
+    if (plan.amplifierRequired) {
+      notes.push(zh ? `\u529F\u653E\u5206\u914D\uFF1AQ-NEX \u5185\u7F6E\u529F\u653E\uFF082\xD740W\uFF09\u5E26 ${plan.builtInSpeakers} \u53EA\uFF1B\u5916\u7F6E\u529F\u653E\u5E26 ${plan.externalSpeakers} \u53EA PS610\u3002` : `Amplifier routing: Q-NEX built-in amplifier (2 x 40W) serves ${plan.builtInSpeakers}; external amplification serves ${plan.externalSpeakers} PS610 speakers.`);
+      if (!plan.amplifierProvided) notes.push(zh ? "EKA-415\uFF1A\u6BCF\u901A\u9053\u4E00\u53EAPS610\uFF1B\u987B\u786E\u8BA4\u9650\u5E45/\u589E\u76CA\u8C03\u8BD5\u53CAAC220V/50Hz\u7535\u6E90\u3002\u516D\u53EA\u5168\u90E8\u63A5\u4E00\u53F0\u4EC5\u4F5C\u4E3A\u5DF2\u6838\u5B9E\u8D1F\u8F7D\u4E0E\u63A5\u7EBF\u7684\u4EBA\u5DE5\u5DE5\u7A0B\u5907\u9009\u3002" : "EKA-415: one PS610 per channel; confirm limiter/gain commissioning and AC220V/50Hz supply. Six speakers on one EKA-415 is a manual engineering alternative only after load and wiring verification.");
+    }
+    for (const [key, provided, invalid] of [["amplifier", plan.amplifierProvided, plan.amplifierDeclarationInvalid], ["feedback", plan.feedbackProvided, plan.feedbackDeclarationInvalid]]) {
+      const label = key === "amplifier" ? zh ? "\u529F\u653E" : "Amplifier" : zh ? "\u53CD\u9988\u6291\u5236\u5668" : "Feedback suppressor";
+      if (provided) notes.push(`${zh ? "\u5BA2\u6237\u63D0\u4F9B" : "Customer provided"} \u2014 ${label}: ${config[key].model}; ${zh ? "\u5BB9\u91CF" : "capacity"} ${config[key].capacity}; ${config[key].notes}`);
+      if (invalid) notes.push(zh ? `${label}\u7684\u5DF2\u6709\u8BBE\u5907\u786E\u8BA4\u4E0D\u5B8C\u6574\u6216\u5BB9\u91CF\u4E0D\u8DB3\uFF0C\u4ECD\u8BA1\u5165\u91C7\u8D2D\u3002` : `${label} declaration is incomplete or capacity is insufficient; purchase remains included.`);
+    }
+    return notes;
+  }
+
   // src/domain/plan-snapshot.js
   var PLAN_SNAPSHOT_VERSION = 1;
   var snapshotMessages = {
@@ -1183,6 +1251,17 @@
     if (!room || ![room.width, room.depth, room.height].every(Number.isFinite) || room.width < 4 || room.width > 30 || room.depth < 5 || room.depth > 50 || room.height < 2.4 || room.height > 6) return "roomSize";
     if (!layout || !cameraPlan || !Object.hasOwn(cameraModels, cameraPlan.teacher) || !Object.hasOwn(cameraModels, cameraPlan.student) || !visibility || ["teacher", "student", "s210", "speaker", "display", "ifp"].some((key) => typeof visibility[key] !== "boolean") || typeof snapshot.projectTitle !== "string" || typeof snapshot.lang !== "string" || typeof snapshot.hubName !== "string" || typeof snapshot.displayName !== "string" || !["55", "65", "75"].includes(String(snapshot.displaySize))) return "snapshotInvalid";
     if (!["studentCams", "s210s", "speakers", "displays"].every((key) => Array.isArray(layout[key])) || layout.studentCams.length < 1 || layout.studentCams.length > 3 || layout.s210s.length > 10 || layout.speakers.length > 100 || layout.displays.length > 100 || ![layout.teacherCam, layout.hub, layout.largeScreen, ...layout.studentCams, ...layout.s210s, ...layout.speakers, ...layout.displays].every((point) => pointIsValid(point, room)) || layout.s210s.some((mic) => !["up", "down"].includes(mic.facing)) || !Number.isFinite(layout.largeScreen.width) || layout.largeScreen.width <= 0 || !Number.isInteger(cameraPlan.studentQty) || cameraPlan.studentQty !== layout.studentCams.length || !cameraModels[cameraPlan.student].projectOnly && cameraPlan.studentQty !== 1) return "snapshotInvalid";
+    if (snapshot.qnexModel !== void 0 && !["NDP600", "SL100", "NMP311", "NDP200"].includes(snapshot.qnexModel)) return "snapshotInvalid";
+    if (snapshot.s210Request !== void 0 && (!snapshot.s210Request || !["auto", "fixed"].includes(snapshot.s210Request.mode) || snapshot.s210Request.mode === "fixed" && (!Number.isInteger(snapshot.s210Request.count) || snapshot.s210Request.count < 0 || snapshot.s210Request.count > 10))) return "snapshotInvalid";
+    if (snapshot.audioConfig !== void 0) {
+      const config = snapshot.audioConfig;
+      if (!config || typeof config !== "object" || Array.isArray(config) || config.useBuiltInAmp !== void 0 && typeof config.useBuiltInAmp !== "boolean") return "snapshotInvalid";
+      for (const key of ["amplifier", "feedback"]) {
+        const item = config[key];
+        if (item === void 0) continue;
+        if (!item || typeof item !== "object" || Array.isArray(item) || item.confirmed !== void 0 && typeof item.confirmed !== "boolean" || item.model !== void 0 && (typeof item.model !== "string" || item.model.length > 120) || item.notes !== void 0 && (typeof item.notes !== "string" || item.notes.length > 1e3) || item.capacity !== void 0 && (!Number.isFinite(item.capacity) || item.capacity < 0 || item.capacity > 100)) return "snapshotInvalid";
+      }
+    }
     if (visibility.ifp) {
       const { x, width } = layout.largeScreen;
       if (width + 1.3 > room.width || x - width / 2 < 0 || x + width / 2 > room.width) return "screenSpace";
@@ -1214,7 +1293,10 @@
     showS210,
     showSpeakers,
     showDisplays,
-    showLargeScreen
+    showLargeScreen,
+    qnexModel = "NDP600",
+    audioConfig = emptyAudioConfig(),
+    s210Request = { mode: "fixed", count: s210s.length }
   }) {
     return JSON.parse(JSON.stringify({
       version: PLAN_SNAPSHOT_VERSION,
@@ -1226,6 +1308,9 @@
       hubName,
       displayName,
       displaySize: String(displaySize),
+      qnexModel,
+      audioConfig,
+      s210Request,
       visibility: {
         teacher: showTeacherCam,
         student: showStudentCam,
@@ -1253,7 +1338,8 @@
     if (v.needsA3006) lines.push(line("A3006", 1, "S210 microphone expansion mixer. Confirm GEN2 routing and USB conferencing compatibility."));
     if (v.showSpeakers) lines.push(line("PS610", v.speakers.length, "Room sound reinforcement speaker. Amplification and load matching require confirmation."));
     if (v.needsCameraPoEExpansion) lines.push(line("External PoE switch", 1, "Camera network expansion; select model, PoE budget, VLAN and control path."));
-    if (v.needsFeedbackSuppressor) lines.push(line("Feedback suppressor", 1, "Feedback control for this room; model and routing require selection.", false, false));
+    if (v.audioPlan.purchaseFeedback) lines.push(line("FE-224N", v.audioPlan.purchaseFeedback, "Required feedback suppressor on the microphone reinforcement path; coordinate with A3006 DSP. Confirm generation and routing."));
+    if (v.audioPlan.purchaseAmplifiers) lines.push(line("EKA-415", v.audioPlan.purchaseAmplifiers, `Required external amplifier. Q-NEX serves ${v.audioPlan.builtInSpeakers} PS610; external amplifier(s) serve ${v.audioPlan.externalSpeakers}. One speaker per channel; confirm limiter/gain commissioning and AC220V/50Hz supply.`));
     if (v.showLargeScreen) lines.push(line("QA1400 Pro 86-inch", 1, "86-inch interactive flat panel for teaching presentations, touch interaction and hybrid learning."));
     if (v.showDisplays) lines.push(line(`Auxiliary Display / TV ${v.displaySize}-inch`, v.displays.length, "Auxiliary display coverage; model, mounting and signal distribution require selection."));
     return {
@@ -1264,6 +1350,8 @@
       width: v.roomWidth,
       depth: v.roomLength,
       lines,
+      notes: audioPlanNotes(v.audioPlan, v.audioConfig),
+      audioPlan: v.audioPlan,
       summary: `Teaching, hybrid learning and unified room control with ${v.qnexModel} and LCS lecture capture.`,
       detail: window.Quotation.scenarioDetail(v.qnexModel, true)
     };
@@ -1293,7 +1381,7 @@
     const totalCameraQty = cameraBomLines.reduce((total, line) => total + line.quantity, 0);
     const needsCameraPoEExpansion = totalCameraQty > 3;
     const needsA3006 = showS210 && s210s.length > S210_DIRECT_HOST_CAPACITY && s210s.length <= S210_DIRECT_HOST_CAPACITY + S210_A3006_CAPACITY;
-    const needsFeedbackSuppressor = roomArea > 200 && showS210 && s210s.length > 0 && showSpeakers && speakers.length > 0;
+    const needsFeedbackSuppressor = showS210 && s210s.length > 0 && showSpeakers && speakers.length > 0;
     const needsFeedbackMicCountReview = !needsFeedbackSuppressor && showS210 && s210s.length > 4 && showSpeakers && speakers.length > 0;
     const activeS210CoverageTarget = s210s.length <= 2 ? { best: 80, limit: 95 } : { best: 75, limit: 85 };
     const s210CoverageUnmet = showS210 && s210s.length > 0 && (coverage.best < activeS210CoverageTarget.best || coverage.limit < activeS210CoverageTarget.limit);
@@ -1420,6 +1508,79 @@
   var AppContext = React.createContext(null);
   var useApp = () => React.useContext(AppContext);
 
+  // src/components/AudioPlanning.jsx
+  function PickupSuggestion() {
+    const { audioPlan: p, s210Request, lang, showS210, handleAdoptSuggested, roomIsValid } = useApp();
+    if (!roomIsValid || !showS210 || !p.minimum) return null;
+    const zh = lang === "zh";
+    return /* @__PURE__ */ React.createElement("div", { id: "pickup-suggestion", className: "lcs-pickup-summary", "data-mode": s210Request.mode }, /* @__PURE__ */ React.createElement("span", null, zh ? `S210\uFF1A\u6700\u4F4E ${p.minimum.count} \xB7 \u5F53\u524D ${p.actualCount}` : `S210: minimum ${p.minimum.count} \xB7 selected ${p.actualCount}`, " \xB7 ", s210Request.mode === "auto" ? zh ? "\u81EA\u52A8" : "Automatic" : zh ? "\u6307\u5B9A\u6570\u91CF" : "Specified quantity"), p.reviewSuggested && p.suggestedCount > p.minimum.count && /* @__PURE__ */ React.createElement("span", null, zh ? `\u5EFA\u8BAE\u4EBA\u5DE5\u8BC4\u4F30 ${p.suggestedCount} \u652F\uFF1B\u8986\u76D6\u4E3A\u4F30\u7B97\u3002` : `Review ${p.suggestedCount} microphones on site; coverage is estimated.`), p.reviewSuggested && p.suggestedCount > p.actualCount && /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        id: "adopt-s210-suggestion",
+        onClick: handleAdoptSuggested,
+        className: "border rounded px-2 py-1"
+      },
+      zh ? `\u91C7\u7528 ${p.suggestedCount} \u652F` : `Use ${p.suggestedCount}`
+    ), p.engineeringReview && /* @__PURE__ */ React.createElement("strong", null, zh ? "\u5BB9\u91CF\u6216\u8986\u76D6\u9700\u5DE5\u7A0B\u590D\u6838" : "Capacity / coverage needs engineering review"));
+  }
+  function AudioEquipmentControls() {
+    const { audioConfig, setAudioConfig, audioPlan, lang, th } = useApp();
+    const zh = lang === "zh";
+    const update = (key, field, value) => setAudioConfig((current) => ({ ...current, [key]: { ...current[key], [field]: value } }));
+    const inputClass = `${th.inputBg} ${th.inputText} border rounded p-1 w-full`;
+    return /* @__PURE__ */ React.createElement("fieldset", { id: "audio-equipment", className: "lcs-audio-equipment" }, /* @__PURE__ */ React.createElement("legend", null, zh ? "\u6269\u58F0\u4E0E\u5BA2\u6237\u5DF2\u6709\u8BBE\u5907" : "Amplification and customer equipment"), /* @__PURE__ */ React.createElement("label", null, /* @__PURE__ */ React.createElement(
+      "input",
+      {
+        id: "use-built-in-amp",
+        type: "checkbox",
+        checked: audioConfig.useBuiltInAmp !== false,
+        onChange: (e) => setAudioConfig((current) => ({ ...current, useBuiltInAmp: e.target.checked }))
+      }
+    ), " ", zh ? "\u4F7F\u7528Q-NEX\u5185\u7F6E\u529F\u653E\u5E26\u524D\u4E24\u53EAPS610\uFF082\xD740W\uFF09" : "Use Q-NEX built-in amplification for the first two PS610 (2 x 40W)"), ["amplifier", "feedback"].map((key) => {
+      const item = audioConfig[key] || {};
+      const label = key === "amplifier" ? zh ? "\u529F\u653E" : "Amplifier" : zh ? "\u53CD\u9988\u6291\u5236\u5668" : "Feedback suppressor";
+      return /* @__PURE__ */ React.createElement("div", { key, className: "lcs-customer-equipment" }, /* @__PURE__ */ React.createElement("label", null, /* @__PURE__ */ React.createElement(
+        "input",
+        {
+          id: `existing-${key}`,
+          type: "checkbox",
+          checked: item.confirmed === true,
+          onChange: (e) => update(key, "confirmed", e.target.checked)
+        }
+      ), " ", zh ? `\u5BA2\u6237\u660E\u786E\u786E\u8BA4\u5DF2\u6709\u53EF\u590D\u7528${label}` : `Customer explicitly confirmed a reusable ${label.toLowerCase()}`), item.confirmed && /* @__PURE__ */ React.createElement("div", { className: "lcs-equipment-fields" }, /* @__PURE__ */ React.createElement("label", null, zh ? "\u578B\u53F7" : "Model", /* @__PURE__ */ React.createElement(
+        "input",
+        {
+          id: `${key}-model`,
+          className: inputClass,
+          maxLength: 120,
+          value: item.model || "",
+          onChange: (e) => update(key, "model", e.target.value)
+        }
+      )), /* @__PURE__ */ React.createElement("label", null, key === "amplifier" ? zh ? "\u53EF\u5E26PS610\u6570\u91CF" : "Supported PS610 quantity" : zh ? "\u53EF\u7528\u9EA6\u514B\u98CE\u901A\u9053" : "Usable microphone channels", /* @__PURE__ */ React.createElement(
+        "input",
+        {
+          id: `${key}-capacity`,
+          className: inputClass,
+          type: "number",
+          min: "1",
+          max: "100",
+          step: "1",
+          value: item.capacity || "",
+          onChange: (e) => update(key, "capacity", Number(e.target.value))
+        }
+      )), /* @__PURE__ */ React.createElement("label", { className: "lcs-equipment-note" }, zh ? "\u786E\u8BA4\u4EBA/\u4F9D\u636E\u4E0E\u63A5\u7EBF\u517C\u5BB9\u6027\u8BF4\u660E" : "Confirmation source and routing / compatibility notes", /* @__PURE__ */ React.createElement(
+        "textarea",
+        {
+          id: `${key}-notes`,
+          className: inputClass,
+          maxLength: 1e3,
+          value: item.notes || "",
+          onChange: (e) => update(key, "notes", e.target.value)
+        }
+      ))));
+    }), /* @__PURE__ */ React.createElement("p", null, zh ? "\u672A\u5B8C\u6574\u786E\u8BA4\u578B\u53F7\u3001\u5BB9\u91CF\u53CA\u517C\u5BB9\u6027\u65F6\uFF0C\u5FC5\u914D\u8BBE\u5907\u4ECD\u8BA1\u5165\u91C7\u8D2D\u3002" : "Required purchases remain until model, capacity and compatibility are fully confirmed."), /* @__PURE__ */ React.createElement("ul", null, audioPlanNotes(audioPlan, audioConfig, lang).map((note, i) => /* @__PURE__ */ React.createElement("li", { key: i }, note))));
+  }
+
   // src/components/Controls.jsx
   function Controls() {
     const {
@@ -1497,7 +1658,8 @@
       themeKey,
       handleOpen3D,
       threeDCopy,
-      threeDError
+      threeDError,
+      handleReset
     } = useApp();
     const [optionsOpen, setOptionsOpen] = React.useState(false);
     return /* @__PURE__ */ React.createElement("header", { className: "lcs-toolbar" }, /* @__PURE__ */ React.createElement("div", { className: "lcs-toolbar-main" }, /* @__PURE__ */ React.createElement("a", { href: new URLSearchParams(location.search).get("home") || "../../index.html" }, window.Quotation.words(lang)[3]), /* @__PURE__ */ React.createElement("div", { className: "lcs-brand" }, /* @__PURE__ */ React.createElement("h1", { className: `font-black uppercase tracking-tighter italic ${th.headerText}` }, projectTitle), /* @__PURE__ */ React.createElement("p", { className: `font-mono tracking-widest uppercase ${th.subText}` }, t.subtitle)), /* @__PURE__ */ React.createElement("div", { className: "lcs-room-controls" }, /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.preset, /* @__PURE__ */ React.createElement("select", { value: preset, onChange: (e) => handlePresetChange(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded border` }, /* @__PURE__ */ React.createElement("option", { value: "custom" }, t.presetCustom), /* @__PURE__ */ React.createElement("option", { value: "standard" }, t.presetStandard), /* @__PURE__ */ React.createElement("option", { value: "large" }, t.presetLarge), /* @__PURE__ */ React.createElement("option", { value: "lecture" }, t.presetLecture), /* @__PURE__ */ React.createElement("option", { value: "ultra" }, t.presetUltra))), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.width, /* @__PURE__ */ React.createElement("input", { type: "number", value: roomWidth, min: "0.1", onChange: (e) => {
@@ -1514,7 +1676,7 @@
         className: `font-bold text-[10px] px-3 py-1 rounded transition h-[28px] flex items-center justify-center gap-1 shadow-md border ${roomIsValid ? "bg-amber-500 hover:bg-amber-600 active:scale-95 text-white border-amber-400" : "bg-slate-600 text-slate-300 border-slate-500 cursor-not-allowed"}`
       },
       t.recalculate
-    ), /* @__PURE__ */ React.createElement(
+    ), /* @__PURE__ */ React.createElement("button", { id: "reset-plan", type: "button", disabled: !roomIsValid, onClick: handleReset, className: "font-bold text-[10px] px-3 py-1 rounded h-[28px] border", title: lang === "zh" ? "\u4FDD\u7559\u914D\u7F6E\uFF0C\u6062\u590D\u5F53\u524D\u623F\u95F4\u6700\u4F4E\u5E03\u5C40" : "Keep configuration and restore the minimum layout" }, lang === "zh" ? "\u91CD\u7F6E" : "Reset"), /* @__PURE__ */ React.createElement(
       "button",
       {
         id: "open-3d-button",
@@ -1523,7 +1685,7 @@
         className: "font-bold text-[10px] px-3 py-1 rounded h-[28px] bg-blue-600 hover:bg-blue-700 text-white border border-blue-400"
       },
       threeDCopy.open3D
-    )), /* @__PURE__ */ React.createElement("button", { type: "button", className: `lcs-panel-trigger ${th.inputBg} ${th.inputText} ${th.inputBorder}`, "aria-expanded": optionsOpen, "aria-controls": "lcs-options", onClick: () => setOptionsOpen(!optionsOpen) }, t.moreOptions, " ", /* @__PURE__ */ React.createElement("span", { "aria-hidden": "true" }, optionsOpen ? "\u25B4" : "\u25BE"))), !roomIsValid && /* @__PURE__ */ React.createElement("p", { className: "text-[10px] font-bold text-red-500" }, t.invalidDimensions), threeDError && /* @__PURE__ */ React.createElement("p", { id: "open-3d-error", role: "alert", className: "text-[10px] font-bold text-red-500" }, threeDError), roomHeight >= 3.5 && /* @__PURE__ */ React.createElement("p", { className: "lcs-height-warning text-[10px] font-bold text-amber-500" }, "\u26A0 ", t.heightWarning), optionsOpen && /* @__PURE__ */ React.createElement("aside", { id: "lcs-options", className: `lcs-options-panel ${th.panelBg} ${th.panelBorder}` }, /* @__PURE__ */ React.createElement("button", { id: "export-quotation", className: "p-2 rounded bg-blue-600 text-white", onClick: (e) => window.Quotation.download(e.currentTarget, quote) }, window.Quotation.words(lang)[0]), /* @__PURE__ */ React.createElement("div", { className: "lcs-options-grid" }, /* @__PURE__ */ React.createElement("label", { className: "text-xs flex flex-col" }, "Q-NEX ", lang === "zh" ? "\u7CFB\u7EDF" : "System", /* @__PURE__ */ React.createElement("select", { id: "qnex-model", value: qnexModel, onChange: (e) => setQnexModel(e.target.value), className: `${th.inputBg} ${th.inputText} p-1 rounded border` }, window.Quotation.qnexModels.map((model) => /* @__PURE__ */ React.createElement("option", { key: model, value: model }, model)))), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.cameraPackage, /* @__PURE__ */ React.createElement("select", { value: cameraPackage, onChange: (e) => handleCameraPackageChange(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded border` }, /* @__PURE__ */ React.createElement("option", { value: "CV870" }, t.cv870Package), /* @__PURE__ */ React.createElement("option", { value: "CV210" }, t.cv210Package))), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.s210Count, /* @__PURE__ */ React.createElement("select", { id: "s210-count", value: s210s.length, onChange: (e) => handleS210CountChange(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded border` }, Array.from({ length: S210_MAX_COUNT + 1 }, (_, n) => n).map((n) => /* @__PURE__ */ React.createElement("option", { key: n, value: n }, n)))), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.dispSize, /* @__PURE__ */ React.createElement("select", { value: displaySize, onChange: (e) => setDisplaySize(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded border` }, /* @__PURE__ */ React.createElement("option", { value: "55" }, '55" (', t.maximumShort, " 4.1m)"), /* @__PURE__ */ React.createElement("option", { value: "65" }, '65" (', t.maximumShort, " 5.0m)"), /* @__PURE__ */ React.createElement("option", { value: "75" }, '75" (', t.maximumShort, " 5.6m)"))), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.dispRename, /* @__PURE__ */ React.createElement("input", { type: "text", value: displayName, onChange: (e) => setDisplayName(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded w-24 border` })), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.titleRename, /* @__PURE__ */ React.createElement("input", { type: "text", value: projectTitle, onChange: (e) => setProjectTitle(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded w-48 border` })), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.hubRename, /* @__PURE__ */ React.createElement("input", { type: "text", value: hubName, onChange: (e) => setHubName(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded w-20 border` })), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.theme, /* @__PURE__ */ React.createElement("select", { value: themeKey, onChange: (e) => setThemeKey(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded border` }, /* @__PURE__ */ React.createElement("option", { value: "dark" }, t.themeDark), /* @__PURE__ */ React.createElement("option", { value: "light" }, t.themeLight), /* @__PURE__ */ React.createElement("option", { value: "highContrast" }, t.themeHighContrast))), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.language, /* @__PURE__ */ React.createElement("select", { value: lang, onChange: (e) => setLang(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded border` }, /* @__PURE__ */ React.createElement("option", { value: "en" }, "English"), /* @__PURE__ */ React.createElement("option", { value: "zh" }, "\u7B80\u4F53\u4E2D\u6587"), /* @__PURE__ */ React.createElement("option", { value: "fr" }, "Fran\xE7ais"), /* @__PURE__ */ React.createElement("option", { value: "es" }, "Espa\xF1ol"), /* @__PURE__ */ React.createElement("option", { value: "ja" }, "\u65E5\u672C\u8A9E"), /* @__PURE__ */ React.createElement("option", { value: "ko" }, "\uD55C\uAD6D\uC5B4"), /* @__PURE__ */ React.createElement("option", { value: "it" }, "Italiano"), /* @__PURE__ */ React.createElement("option", { value: "hu" }, "Magyar"), /* @__PURE__ */ React.createElement("option", { value: "ar" }, "\u0627\u0644\u0639\u0631\u0628\u064A\u0629"))), /* @__PURE__ */ React.createElement(
+    )), /* @__PURE__ */ React.createElement("button", { type: "button", className: `lcs-panel-trigger ${th.inputBg} ${th.inputText} ${th.inputBorder}`, "aria-expanded": optionsOpen, "aria-controls": "lcs-options", onClick: () => setOptionsOpen(!optionsOpen) }, t.moreOptions, " ", /* @__PURE__ */ React.createElement("span", { "aria-hidden": "true" }, optionsOpen ? "\u25B4" : "\u25BE"))), /* @__PURE__ */ React.createElement(PickupSuggestion, null), !roomIsValid && /* @__PURE__ */ React.createElement("p", { className: "text-[10px] font-bold text-red-500" }, t.invalidDimensions), threeDError && /* @__PURE__ */ React.createElement("p", { id: "open-3d-error", role: "alert", className: "text-[10px] font-bold text-red-500" }, threeDError), roomHeight >= 3.5 && /* @__PURE__ */ React.createElement("p", { className: "lcs-height-warning text-[10px] font-bold text-amber-500" }, "\u26A0 ", t.heightWarning), optionsOpen && /* @__PURE__ */ React.createElement("aside", { id: "lcs-options", className: `lcs-options-panel ${th.panelBg} ${th.panelBorder}` }, /* @__PURE__ */ React.createElement("button", { id: "export-quotation", className: "p-2 rounded bg-blue-600 text-white", onClick: (e) => window.Quotation.download(e.currentTarget, quote) }, window.Quotation.words(lang)[0]), /* @__PURE__ */ React.createElement(AudioEquipmentControls, null), /* @__PURE__ */ React.createElement("div", { className: "lcs-options-grid" }, /* @__PURE__ */ React.createElement("label", { className: "text-xs flex flex-col" }, "Q-NEX ", lang === "zh" ? "\u7CFB\u7EDF" : "System", /* @__PURE__ */ React.createElement("select", { id: "qnex-model", value: qnexModel, onChange: (e) => setQnexModel(e.target.value), className: `${th.inputBg} ${th.inputText} p-1 rounded border` }, window.Quotation.qnexModels.map((model) => /* @__PURE__ */ React.createElement("option", { key: model, value: model }, model)))), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.cameraPackage, /* @__PURE__ */ React.createElement("select", { value: cameraPackage, onChange: (e) => handleCameraPackageChange(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded border` }, /* @__PURE__ */ React.createElement("option", { value: "CV870" }, t.cv870Package), /* @__PURE__ */ React.createElement("option", { value: "CV210" }, t.cv210Package))), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.s210Count, /* @__PURE__ */ React.createElement("select", { id: "s210-count", value: s210s.length, onChange: (e) => handleS210CountChange(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded border` }, Array.from({ length: S210_MAX_COUNT + 1 }, (_, n) => n).map((n) => /* @__PURE__ */ React.createElement("option", { key: n, value: n }, n)))), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.dispSize, /* @__PURE__ */ React.createElement("select", { value: displaySize, onChange: (e) => setDisplaySize(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded border` }, /* @__PURE__ */ React.createElement("option", { value: "55" }, '55" (', t.maximumShort, " 4.1m)"), /* @__PURE__ */ React.createElement("option", { value: "65" }, '65" (', t.maximumShort, " 5.0m)"), /* @__PURE__ */ React.createElement("option", { value: "75" }, '75" (', t.maximumShort, " 5.6m)"))), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.dispRename, /* @__PURE__ */ React.createElement("input", { type: "text", value: displayName, onChange: (e) => setDisplayName(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded w-24 border` })), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.titleRename, /* @__PURE__ */ React.createElement("input", { type: "text", value: projectTitle, onChange: (e) => setProjectTitle(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded w-48 border` })), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.hubRename, /* @__PURE__ */ React.createElement("input", { type: "text", value: hubName, onChange: (e) => setHubName(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded w-20 border` })), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.theme, /* @__PURE__ */ React.createElement("select", { value: themeKey, onChange: (e) => setThemeKey(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded border` }, /* @__PURE__ */ React.createElement("option", { value: "dark" }, t.themeDark), /* @__PURE__ */ React.createElement("option", { value: "light" }, t.themeLight), /* @__PURE__ */ React.createElement("option", { value: "highContrast" }, t.themeHighContrast))), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.language, /* @__PURE__ */ React.createElement("select", { value: lang, onChange: (e) => setLang(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded border` }, /* @__PURE__ */ React.createElement("option", { value: "en" }, "English"), /* @__PURE__ */ React.createElement("option", { value: "zh" }, "\u7B80\u4F53\u4E2D\u6587"), /* @__PURE__ */ React.createElement("option", { value: "fr" }, "Fran\xE7ais"), /* @__PURE__ */ React.createElement("option", { value: "es" }, "Espa\xF1ol"), /* @__PURE__ */ React.createElement("option", { value: "ja" }, "\u65E5\u672C\u8A9E"), /* @__PURE__ */ React.createElement("option", { value: "ko" }, "\uD55C\uAD6D\uC5B4"), /* @__PURE__ */ React.createElement("option", { value: "it" }, "Italiano"), /* @__PURE__ */ React.createElement("option", { value: "hu" }, "Magyar"), /* @__PURE__ */ React.createElement("option", { value: "ar" }, "\u0627\u0644\u0639\u0631\u0628\u064A\u0629"))), /* @__PURE__ */ React.createElement(
       "button",
       {
         onClick: () => setIsRotated(!isRotated),
@@ -1539,7 +1701,7 @@
       },
       "\u{1F4BE} ",
       t.exportPng
-    )), cameraPackage === "CV210" && /* @__PURE__ */ React.createElement("p", { className: "mt-2 text-[9px] font-bold text-amber-500" }, t.cv210PackageNote), /* @__PURE__ */ React.createElement("div", { className: `mt-3 p-2 rounded border ${th.panelBorder} ${th.panelBg} inline-block` }, /* @__PURE__ */ React.createElement("p", { className: `text-[10px] font-bold uppercase mb-1 ${th.subText}` }, t.toggleVis), /* @__PURE__ */ React.createElement("div", { className: "flex flex-wrap gap-4" }, /* @__PURE__ */ React.createElement("label", { className: "text-[10px] flex items-center gap-1 cursor-pointer" }, /* @__PURE__ */ React.createElement("input", { type: "checkbox", checked: showTeacherCam, onChange: (e) => setShowTeacherCam(e.target.checked) }), t.tCamLbl), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] flex items-center gap-1 cursor-pointer" }, /* @__PURE__ */ React.createElement("input", { type: "checkbox", checked: showStudentCam, onChange: (e) => setShowStudentCam(e.target.checked) }), t.sCamLbl), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] flex items-center gap-1 cursor-pointer" }, /* @__PURE__ */ React.createElement("input", { type: "checkbox", checked: showS210, onChange: (e) => setShowS210(e.target.checked) }), t.s210Lbl), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] flex items-center gap-1 cursor-pointer" }, /* @__PURE__ */ React.createElement("input", { type: "checkbox", checked: showSpeakers, onChange: (e) => setShowSpeakers(e.target.checked) }), t.ps610Speaker), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] flex items-center gap-1 cursor-pointer" }, /* @__PURE__ */ React.createElement("input", { type: "checkbox", checked: showDisplays, onChange: (e) => setShowDisplays(e.target.checked) }), displayName), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] flex items-center gap-1 cursor-pointer" }, /* @__PURE__ */ React.createElement("input", { type: "checkbox", checked: showLargeScreen, onChange: (e) => setShowLargeScreen(e.target.checked) }), "QA1400 Pro 86\u2033 IFP"))), longRoomEnabled && /* @__PURE__ */ React.createElement(
+    )), cameraPackage === "CV210" && /* @__PURE__ */ React.createElement("p", { className: "mt-2 text-[9px] font-bold text-amber-500" }, t.cv210PackageNote), /* @__PURE__ */ React.createElement("div", { id: "device-visibility", className: `mt-3 p-2 rounded border ${th.panelBorder} ${th.panelBg} inline-block` }, /* @__PURE__ */ React.createElement("p", { className: `text-[10px] font-bold uppercase mb-1 ${th.subText}` }, t.toggleVis), /* @__PURE__ */ React.createElement("div", { className: "flex flex-wrap gap-4" }, /* @__PURE__ */ React.createElement("label", { className: "text-[10px] flex items-center gap-1 cursor-pointer" }, /* @__PURE__ */ React.createElement("input", { type: "checkbox", checked: showTeacherCam, onChange: (e) => setShowTeacherCam(e.target.checked) }), t.tCamLbl), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] flex items-center gap-1 cursor-pointer" }, /* @__PURE__ */ React.createElement("input", { type: "checkbox", checked: showStudentCam, onChange: (e) => setShowStudentCam(e.target.checked) }), t.sCamLbl), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] flex items-center gap-1 cursor-pointer" }, /* @__PURE__ */ React.createElement("input", { type: "checkbox", checked: showS210, onChange: (e) => setShowS210(e.target.checked) }), t.s210Lbl), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] flex items-center gap-1 cursor-pointer" }, /* @__PURE__ */ React.createElement("input", { type: "checkbox", checked: showSpeakers, onChange: (e) => setShowSpeakers(e.target.checked) }), t.ps610Speaker), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] flex items-center gap-1 cursor-pointer" }, /* @__PURE__ */ React.createElement("input", { type: "checkbox", checked: showDisplays, onChange: (e) => setShowDisplays(e.target.checked) }), displayName), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] flex items-center gap-1 cursor-pointer" }, /* @__PURE__ */ React.createElement("input", { type: "checkbox", checked: showLargeScreen, onChange: (e) => setShowLargeScreen(e.target.checked) }), "QA1400 Pro 86\u2033 IFP"))), longRoomEnabled && /* @__PURE__ */ React.createElement(
       "button",
       {
         onClick: () => setIsLongDistancePanelOpen(true),
@@ -1685,8 +1847,8 @@
 
   // src/components/BomPanel.jsx
   function BomPanel() {
-    const { quote, t, th } = useApp();
-    return /* @__PURE__ */ React.createElement("div", { className: `lcs-details-card p-4 rounded-2xl border ${th.panelBg} ${th.panelBorder}` }, /* @__PURE__ */ React.createElement("h3", null, t.deviceStats), quote.lines.filter((l) => l.quantity > 0).map((l, i) => /* @__PURE__ */ React.createElement("div", { key: i, className: "flex justify-between gap-2 text-xs py-1" }, /* @__PURE__ */ React.createElement("span", null, l.model), /* @__PURE__ */ React.createElement("strong", null, l.quantity))), /* @__PURE__ */ React.createElement("p", { className: "text-xs mt-3" }, document.documentElement.lang === "zh" ? "GEN2\uFF1A2 HDMI\u8F93\u5165/2\u8F93\u51FA\u30014\u8DEF\u7F51\u7EDC\u89C6\u9891\u30013 PoE\u53E3\u30012\u8DEF\u5E7B\u8C61\u4F9B\u7535\u9EA6\u514B\u98CE\u8F93\u5165\u3002\u97F3\u9891\u5904\u7406\u4E0E\u4E92\u52A8\u6A21\u5757\u9009\u914D\u3002\u8986\u76D6\u4E3A\u4F30\u7B97\uFF0C\u517C\u5BB9\u6027\u4E0E\u4F9B\u8D27\u987B\u6838\u5B9E\u3002" : "GEN2: optional audio processing and interaction; confirm final configuration."));
+    const { quote, t, th, audioPlan, audioConfig, lang } = useApp();
+    return /* @__PURE__ */ React.createElement("div", { className: `lcs-details-card p-4 rounded-2xl border ${th.panelBg} ${th.panelBorder}` }, /* @__PURE__ */ React.createElement("h3", null, t.deviceStats), quote.lines.filter((l) => l.quantity > 0).map((l, i) => /* @__PURE__ */ React.createElement("div", { key: i, className: "flex justify-between gap-2 text-xs py-1" }, /* @__PURE__ */ React.createElement("span", null, l.model), /* @__PURE__ */ React.createElement("strong", null, l.quantity))), /* @__PURE__ */ React.createElement("ul", { className: "lcs-audio-notes" }, audioPlanNotes(audioPlan, audioConfig, lang).map((note, i) => /* @__PURE__ */ React.createElement("li", { key: i }, note))), /* @__PURE__ */ React.createElement("p", { className: "text-xs mt-3" }, document.documentElement.lang === "zh" ? "GEN2\uFF1A2 HDMI\u8F93\u5165/2\u8F93\u51FA\u30014\u8DEF\u7F51\u7EDC\u89C6\u9891\u30013 PoE\u53E3\u30012\u8DEF\u5E7B\u8C61\u4F9B\u7535\u9EA6\u514B\u98CE\u8F93\u5165\u3002\u97F3\u9891\u5904\u7406\u4E0E\u4E92\u52A8\u6A21\u5757\u9009\u914D\u3002\u8986\u76D6\u4E3A\u4F30\u7B97\uFF0C\u517C\u5BB9\u6027\u4E0E\u4F9B\u8D27\u987B\u6838\u5B9E\u3002" : "GEN2: optional audio processing and interaction; confirm final configuration."));
   }
 
   // src/components/RoomCanvas.jsx
@@ -2002,6 +2164,10 @@
     const [teacherCam, setTeacherCam] = useState(initialLayout.teacherCam);
     const [studentCams, setStudentCams] = useState(initialLayout.studentCams);
     const [s210s, setS210s] = useState(initialLayout.s210s);
+    const [s210Request, setS210Request] = useState({ mode: "auto" });
+    const [audioConfig, setAudioConfig] = useState(emptyAudioConfig);
+    const [resetKey, setResetKey] = useState(0);
+    const minimum = React.useMemo(() => minimumPickup(roomWidth, roomLength), [roomWidth, roomLength]);
     const [hub, setHub] = useState({ x: 1.5, y: 1 });
     const [speakers, setSpeakers] = useState(initialLayout.speakers);
     const [displays, setDisplays] = useState(initialLayout.displays);
@@ -2101,6 +2267,15 @@
       roomLength,
       coverage
     });
+    const audioPlan = evaluateAudioPlan({
+      width: roomWidth,
+      depth: roomLength,
+      s210Count: showS210 ? s210s.length : 0,
+      speakerCount: showSpeakers ? speakers.length : 0,
+      qnexModel,
+      audioConfig,
+      minimum
+    });
     const cameraPoEExpansionLabel = t.cameraPoEExpansion;
     const feedbackSuppressorLabel = t.feedbackSuppressor;
     const resizeStudentCameraLayout = (currentCameras, quantity) => {
@@ -2135,7 +2310,27 @@
         students: studentCams,
         teacherModel: activeCameraPlan.teacher,
         studentModel: activeCameraPlan.student,
-        s210s,
+        s210s: [],
+        displaySize,
+        s210Count: s210Request.mode === "fixed" ? s210Request.count : null
+      });
+      setTeacherCam(next.teacherCam);
+      setStudentCams(next.studentCams);
+      setS210s(next.s210s);
+      setSpeakers(next.speakers);
+      setDisplays(next.displays);
+      setLargeScreen(next.largeScreen);
+    };
+    const handleReset = () => {
+      if (!roomIsValid) return;
+      const students = Array.from({ length: activeStudentQty }, (_, id) => ({ id, x: roomWidth * (id + 1) / (activeStudentQty + 1), y: 0 }));
+      const next = recalculateLayout({
+        width: roomWidth,
+        depth: roomLength,
+        teacher: { x: roomWidth / 2, y: Math.min(roomLength, 10) },
+        students,
+        teacherModel: activeCameraPlan.teacher,
+        studentModel: activeCameraPlan.student,
         displaySize
       });
       setTeacherCam(next.teacherCam);
@@ -2144,6 +2339,34 @@
       setSpeakers(next.speakers);
       setDisplays(next.displays);
       setLargeScreen(next.largeScreen);
+      setHub({ x: Math.min(1.5, roomWidth / 2), y: Math.min(1, roomLength / 2) });
+      setS210Request({ mode: "auto" });
+      setIsDragging(null);
+      setThreeDError("");
+      setIsLongDistancePanelOpen(false);
+      setShowWideFovCones(false);
+      setIsRotated(false);
+      prevWidthRef.current = roomWidth;
+      prevLengthRef.current = roomLength;
+      previousCameraModels.current = { teacher: activeCameraPlan.teacher, student: activeCameraPlan.student };
+      setResetKey((key) => key + 1);
+    };
+    const handleAdoptSuggested = () => {
+      if (!roomIsValid || !audioPlan.reviewSuggested || audioPlan.suggestedCount <= s210s.length) return;
+      const count = audioPlan.suggestedCount;
+      const next = recalculateLayout({
+        width: roomWidth,
+        depth: roomLength,
+        teacher: teacherCam,
+        students: studentCams,
+        teacherModel: activeCameraPlan.teacher,
+        studentModel: activeCameraPlan.student,
+        displaySize,
+        s210Count: count
+      });
+      setS210Request({ mode: "fixed", count });
+      setS210s(next.s210s);
+      setIsDragging(null);
     };
     useEffect(() => {
       const oldW = prevWidthRef.current;
@@ -2214,6 +2437,7 @@
       setPreset(p);
       const layout = getPresetLayout(p);
       if (!layout) return;
+      setS210Request({ mode: "auto" });
       setRoomWidth(layout.width);
       setRoomLength(layout.length);
       prevWidthRef.current = layout.width;
@@ -2241,6 +2465,7 @@
     const handleS210CountChange = (count) => {
       const newCount = parseInt(count);
       if (!Number.isInteger(newCount) || newCount < 0 || newCount > S210_MAX_COUNT) return;
+      setS210Request({ mode: "fixed", count: newCount });
       const currentCount = s210s.length;
       let newS210s = [...s210s];
       if (newCount > currentCount) {
@@ -2269,6 +2494,7 @@
     };
     const handleAddS210 = () => {
       if (s210s.length >= S210_MAX_COUNT) return;
+      setS210Request({ mode: "fixed", count: s210s.length + 1 });
       const maxId = s210s.length > 0 ? Math.max(...s210s.map((m) => m.id)) : -1;
       const nextId = maxId + 1;
       setS210s([
@@ -2285,6 +2511,7 @@
       setPreset("custom");
     };
     const handleDeleteS210 = (id) => {
+      setS210Request({ mode: "fixed", count: s210s.filter((m) => m.id !== id).length });
       setS210s(s210s.filter((mic) => mic.id !== id));
       setPreset("custom");
     };
@@ -2352,7 +2579,10 @@
           showS210,
           showSpeakers,
           showDisplays,
-          showLargeScreen
+          showLargeScreen,
+          qnexModel,
+          audioConfig,
+          s210Request
         });
         const url = new URL("../../demos/lcs/index.html", window.location.href);
         url.hash = encodePlanSnapshot(snapshot);
@@ -2387,6 +2617,13 @@
       return () => window.removeEventListener("mouseup", handleMouseUp);
     }, []);
     const view = {
+      audioPlan,
+      audioConfig,
+      setAudioConfig,
+      s210Request,
+      handleReset,
+      handleAdoptSuggested,
+      resetKey,
       activeCameraPlan,
       qnexModel,
       setQnexModel,
@@ -2507,7 +2744,7 @@
     };
     view.quote = quotationForPlan(view);
     window.currentLcsQuote = view.quote;
-    return /* @__PURE__ */ React.createElement(AppContext.Provider, { value: view }, /* @__PURE__ */ React.createElement("div", { className: `lcs-app flex flex-col h-screen overflow-hidden select-none ${th.appBg} ${th.text}`, onMouseMove: handleMouseMove }, /* @__PURE__ */ React.createElement(Controls, null), /* @__PURE__ */ React.createElement(LongDistancePanel, null), /* @__PURE__ */ React.createElement(RoomCanvas, null), /* @__PURE__ */ React.createElement("footer", { className: "mt-2 text-center flex-shrink-0 pointer-events-none" }, /* @__PURE__ */ React.createElement("p", { className: `${th.subText} text-[10px] italic opacity-80 px-4` }, t.disclaimer))));
+    return /* @__PURE__ */ React.createElement(AppContext.Provider, { value: view }, /* @__PURE__ */ React.createElement("div", { className: `lcs-app flex flex-col h-screen overflow-hidden select-none ${th.appBg} ${th.text}`, onMouseMove: handleMouseMove }, /* @__PURE__ */ React.createElement(Controls, { key: `controls-${resetKey}` }), /* @__PURE__ */ React.createElement(LongDistancePanel, null), /* @__PURE__ */ React.createElement(RoomCanvas, { key: `canvas-${resetKey}` }), /* @__PURE__ */ React.createElement("footer", { className: "mt-2 text-center flex-shrink-0 pointer-events-none" }, /* @__PURE__ */ React.createElement("p", { className: `${th.subText} text-[10px] italic opacity-80 px-4` }, t.disclaimer))));
   };
 
   // src/main.jsx

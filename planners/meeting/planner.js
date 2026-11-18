@@ -27,7 +27,9 @@
     $('#doorCount').value = String(s.doorCount || 1);
   }
   function draw() {
-    window.drawMeetingPlan(s, svg);
+    const table = M.roomTable(s.room);
+    $('#table-value').value = table.w.toFixed(2) + ' × ' + table.d.toFixed(2) + ' m';
+    window.drawMeetingPlan(s, svg, $('#table-size').checked);
   }
   function point(e) {
     let q = svg.createSVGPoint();
@@ -76,6 +78,12 @@
       draw();
     }
   }
+  $('#table-size').onchange = draw;
+  $('#show-labels').onchange = e => svg.classList.toggle('hide-names', !e.target.checked);
+  $('#reset-table').onclick = () => {
+    s.devices = M.resetLayout(s).devices;
+    draw();
+  };
   $('#apply').onclick = () => apply(false);
   $('#reset').onclick = () => apply(true);
   $('#s350-count').onchange = (e) => {
@@ -99,7 +107,7 @@
     }
     const url = new URL('three-demo/index.html', location.href);
     url.searchParams.set('lang', M.lang);
-    url.searchParams.set('v', '20261102-devices');
+    url.searchParams.set('v', '20261118-tabs');
     url.hash = 'plan=' + encodeURIComponent(JSON.stringify(s));
     window.open(url, '_blank', 'noopener');
   };

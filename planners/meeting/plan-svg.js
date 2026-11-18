@@ -1,4 +1,4 @@
-window.drawMeetingPlan = function (s, svg) {
+window.drawMeetingPlan = function (s, svg, showTableSize) {
   const M = window.Meeting,
     C = window.MeetingCoverage,
     $ = (q) => document.querySelector(q);
@@ -8,7 +8,7 @@ window.drawMeetingPlan = function (s, svg) {
   $('#dimensions').textContent = `${r.width} × ${r.depth} × ${r.height} m`;
   svg.setAttribute('viewBox', `-1.5 -1.2 ${r.width + 3} ${r.depth + 2.4}`);
   let text = (x, y, v, size = 0.23) =>
-    `<text x="${x}" y="${y}" text-anchor="middle" fill="${document.documentElement.dataset.theme === 'dark' ? '#d8edf5' : '#173c50'}" font-size="${size}" font-family="sans-serif">${esc(v)}</text>`;
+    `<text class="plan-name" x="${x}" y="${y}" text-anchor="middle" fill="${document.documentElement.dataset.theme === 'dark' ? '#d8edf5' : '#173c50'}" font-size="${size}" font-family="sans-serif">${esc(v)}</text>`;
   const micIds = ['s350', 's350b'].slice(0, s.s350Count);
   let overlay =
     '<defs><clipPath id="bounds"><rect width="' +
@@ -61,5 +61,9 @@ window.drawMeetingPlan = function (s, svg) {
   }
   let laptop = s.devices.laptop;
   out += `<rect x="${laptop.x + 0.23}" y="${laptop.z - 0.12}" width=".26" height=".12" rx=".05" fill="#111c22"/>`;
+  if (showTableSize) {
+    const x = b.x, y = b.z - b.d / 2 - 0.12;
+    out += `<text x="${x}" y="${y}" text-anchor="middle" fill="var(--text)" stroke="var(--surface)" stroke-width=".06" paint-order="stroke" font-size=".21">${b.w.toFixed(2)} × ${b.d.toFixed(2)} m</text>`;
+  }
   svg.innerHTML = out;
 };

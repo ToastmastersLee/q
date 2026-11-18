@@ -29,7 +29,18 @@ const qualityCopy={
  ar:['جودة العرض','قياسي','عالية الدقة','وضع الدقة العالية غير متاح. تم تفعيل الوضع القياسي.']
 };
 const langs=['en','zh','ko','mn','ja','es','fr','ar']; let lang=new URLSearchParams(location.search).get('lang')||'en'; if(!langs.includes(lang))lang='en';
-function t(k){if(k==='camera')return 'CV810 Gen 2';let i=keys.indexOf(k);return i<0?((editorKeys.includes(k)?editorCopy[lang][editorKeys.indexOf(k)]:null)||(k==='s350Count'?quantityCopy[lang]:null)||(k==='penCount'?penCopy[lang]:null)||(k==='smartpen'?'IQ SmartPen':null)||(uiExtra[lang]||uiExtra.en)[k]||qualityCopy[lang][qualityKeys.indexOf(k)]||(extra[lang]||extra.en)[extraKeys.indexOf(k)]||k):(texts[lang]||texts.en)[i]||k} function setLang(l){lang=langs.includes(l)?l:'en'; document.documentElement.lang=lang; document.documentElement.dir=lang==='ar'?'rtl':'ltr'; document.querySelectorAll('[data-t]').forEach(e=>e.textContent=t(e.dataset.t)); document.title=t('title'); const sel=document.querySelector('#language');if(sel)sel.value=lang;}
+const sidebarKeys=['setupTab','coverageTab','displayTab','tableSize','resetTable'];
+const sidebarCopy = {
+  en: ["Setup", "Coverage", "Display", "Table dimensions", "Reset tabletop devices"],
+  zh: ["配置", "覆盖", "显示", "桌面尺寸", "复位桌面设备"],
+  ko: ["설정", "커버리지", "표시", "탁자 크기", "탁자 위 장치 위치 초기화"],
+  mn: ["Тохиргоо", "Хамрах хүрээ", "Харагдац", "Ширээний хэмжээ", "Ширээн дээрх төхөөрөмжийн байрлалыг сэргээх"],
+  ja: ["構成", "カバー範囲", "表示", "テーブル寸法", "卓上機器の配置をリセット"],
+  es: ["Ajustes", "Cobertura", "Vista", "Dimensiones de la mesa", "Restablecer equipos de mesa"],
+  fr: ["Configuration", "Couverture", "Affichage", "Dimensions de la table", "Réinitialiser les appareils sur table"],
+  ar: ["الإعداد", "التغطية", "العرض", "أبعاد الطاولة", "إعادة ضبط أجهزة الطاولة"],
+};
+function t(k){if(sidebarKeys.includes(k))return sidebarCopy[lang][sidebarKeys.indexOf(k)];if(k==='camera')return 'CV810 Gen 2';let i=keys.indexOf(k);return i<0?((editorKeys.includes(k)?editorCopy[lang][editorKeys.indexOf(k)]:null)||(k==='s350Count'?quantityCopy[lang]:null)||(k==='penCount'?penCopy[lang]:null)||(k==='smartpen'?'IQ SmartPen':null)||(uiExtra[lang]||uiExtra.en)[k]||qualityCopy[lang][qualityKeys.indexOf(k)]||(extra[lang]||extra.en)[extraKeys.indexOf(k)]||k):(texts[lang]||texts.en)[i]||k} function setLang(l){lang=langs.includes(l)?l:'en'; document.documentElement.lang=lang; document.documentElement.dir=lang==='ar'?'rtl':'ltr'; document.querySelectorAll('[data-t]').forEach(e=>e.textContent=t(e.dataset.t)); document.title=t('title'); const sel=document.querySelector('#language');if(sel)sel.value=lang;}
 function roomTable(r){return {w:Math.min(2.2,r.width-3),d:Math.min(5,r.depth-3),x:r.width/2,z:r.depth/2+.25}}
 function resizeLayout(s,room){const next=structuredClone(s),old=roomTable(s.room),b=roomTable(room);next.room=room;for(const id of Object.keys(s.devices).filter(id=>['laptop','s350','s350b'].includes(id))){const q=s.devices[id];next.devices[id]={x:b.x+(q.x-old.x)*(b.w-.5)/(old.w-.5),z:b.z+(q.z-old.z)*(b.d-.5)/(old.d-.5)}}return next}
 function resetLayout(s){const next=structuredClone(s),b=roomTable(s.room);next.devices={...next.devices,laptop:{x:b.x-.4*(b.w-.5)/1.7,z:b.z-.25*(b.d-.5)/4.5},s350:{x:b.x,z:b.z-b.d*.25}};if(next.devices.s350b)next.devices.s350b=MeetingCoverage.secondMic(s.room,next.devices.s350);return next}

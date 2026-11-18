@@ -1,15 +1,17 @@
 // Shared controls for the SVG plan and the Three.js view.
 window.coveragePanel = function (state, change) {
   const panel = document.querySelector('#coverage');
+  const radius = MeetingCoverage.radius;
+  const diameter = 2 * radius;
   const words = {
-    en: ['Camera field of view', 'Microphone pickup · up to 6 m', 'Wide', 'Tele', 'Pan', 'Tilt'],
-    zh: ['摄像头视野', '麦克风拾音 · 最远 6 m', '广角', '长焦', '水平', '俯仰'],
-    ko: ['카메라 시야', '마이크 수음 · 최대 6 m', '광각', '망원', '팬', '틸트'],
-    mn: ['Камерын харах хүрээ', 'Микрофоны хамрах хүрээ · 6 м хүртэл', 'Өргөн', 'Теле', 'Хэвтээ', 'Босоо'],
-    ja: ['カメラ視野', 'マイク集音 · 最大 6 m', '広角', '望遠', 'パン', 'チルト'],
-    es: ['Campo de visión', 'Captación · hasta 6 m', 'Gran angular', 'Tele', 'Giro', 'Inclinación'],
-    fr: ['Champ de vision', 'Captation · jusqu’à 6 m', 'Grand-angle', 'Télé', 'Panoramique', 'Inclinaison'],
-    ar: ['مجال رؤية الكاميرا', 'التقاط الصوت · حتى 6 م', 'واسع', 'مقرب', 'أفقي', 'رأسي'],
+    en: ['Camera field of view', '360° pickup', 'Wide', 'Tele', 'Pan', 'Tilt', `Max. radius ${radius} m · diameter ${diameter} m`],
+    zh: ['摄像头视野', '360° 全向拾音', '广角', '长焦', '水平', '俯仰', `最大半径 ${radius} m · 直径 ${diameter} m`],
+    ko: ['카메라 시야', '360° 전방향 수음', '광각', '망원', '팬', '틸트', `최대 반경 ${radius} m · 지름 ${diameter} m`],
+    mn: ['Камерын харах хүрээ', '360° дуу хүлээн авалт', 'Өргөн', 'Теле', 'Хэвтээ', 'Босоо', `Дээд радиус ${radius} м · диаметр ${diameter} м`],
+    ja: ['カメラ視野', '360° 全指向性集音', '広角', '望遠', 'パン', 'チルト', `最大半径 ${radius} m・直径 ${diameter} m`],
+    es: ['Campo de visión', 'Captación de 360°', 'Gran angular', 'Tele', 'Giro', 'Inclinación', `Radio máx. ${radius} m · diámetro ${diameter} m`],
+    fr: ['Champ de vision', 'Captation à 360°', 'Grand-angle', 'Télé', 'Panoramique', 'Inclinaison', `Rayon max. ${radius} m · diamètre ${diameter} m`],
+    ar: ['مجال رؤية الكاميرا', 'التقاط الصوت بزاوية 360°', 'واسع', 'مقرب', 'أفقي', 'رأسي', `أقصى نصف قطر ${radius} م · القطر ${diameter} م`],
   };
   panel.innerHTML =
     '<label><input type="checkbox" data-cover="camera"> CV810 Gen 2 · <span></span></label>' +
@@ -26,9 +28,10 @@ window.coveragePanel = function (state, change) {
           '"></label>',
       )
       .join('') +
-    '</div><label><input type="checkbox" data-cover="mic"> S350 · <span></span></label>';
+    '</div><label><input type="checkbox" data-cover="mic"> S350 · <span></span><br><small class="hint"></small></label>';
   function refresh() {
-    const [camera, mic, wide, tele, pan, tilt] = words[Meeting.lang];
+    const [camera, mic, wide, tele, pan, tilt, size] = words[Meeting.lang];
+    panel.querySelector('small').textContent = size;
     const labels = panel.querySelectorAll('span');
     [camera, pan, tilt, mic].forEach((v, i) => (labels[i].textContent = v));
     panel.querySelectorAll('option').forEach((opt, i) => {

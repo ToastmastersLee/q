@@ -2,16 +2,16 @@
 window.coveragePanel = function (state, change) {
   const panel = document.querySelector('#coverage');
   const radius = MeetingCoverage.radius;
-  const diameter = 2 * radius;
+  const testedLimit = 10; // Approximate device-to-speaker distance observed in a field test.
   const words = {
-    en: ['Camera field of view', '360° pickup', 'Wide', 'Tele', 'Pan', 'Tilt', `Max. radius ${radius} m · diameter ${diameter} m`],
-    zh: ['摄像头视野', '360° 全向拾音', '广角', '长焦', '水平', '俯仰', `最大半径 ${radius} m · 直径 ${diameter} m`],
-    ko: ['카메라 시야', '360° 전방향 수음', '광각', '망원', '팬', '틸트', `최대 반경 ${radius} m · 지름 ${diameter} m`],
-    mn: ['Камерын харах хүрээ', '360° дуу хүлээн авалт', 'Өргөн', 'Теле', 'Хэвтээ', 'Босоо', `Дээд радиус ${radius} м · диаметр ${diameter} м`],
-    ja: ['カメラ視野', '360° 全指向性集音', '広角', '望遠', 'パン', 'チルト', `最大半径 ${radius} m・直径 ${diameter} m`],
-    es: ['Campo de visión', 'Captación de 360°', 'Gran angular', 'Tele', 'Giro', 'Inclinación', `Radio máx. ${radius} m · diámetro ${diameter} m`],
-    fr: ['Champ de vision', 'Captation à 360°', 'Grand-angle', 'Télé', 'Panoramique', 'Inclinaison', `Rayon max. ${radius} m · diamètre ${diameter} m`],
-    ar: ['مجال رؤية الكاميرا', 'التقاط الصوت بزاوية 360°', 'واسع', 'مقرب', 'أفقي', 'رأسي', `أقصى نصف قطر ${radius} م · القطر ${diameter} م`],
+    en: ['Camera field of view', '360° pickup', 'Wide', 'Tele', 'Pan', 'Tilt', `Best within ${radius} m (shown radius). Field-tested limit ≈ ${testedLimit} m.`],
+    zh: ['摄像头视野', '360° 全向拾音', '广角', '长焦', '水平', '俯仰', `最佳拾音在 ${radius} 米内（图示半径），实测极限约 ${testedLimit} 米。`],
+    ko: ['카메라 시야', '360° 전방향 수음', '광각', '망원', '팬', '틸트', `권장 거리 ${radius} m 이내(표시 반경). 현장 시험 한계 약 ${testedLimit} m.`],
+    mn: ['Камерын харах хүрээ', '360° дуу хүлээн авалт', 'Өргөн', 'Теле', 'Хэвтээ', 'Босоо', `Зурагт үзүүлсэн ${radius} м радиус дотор хамгийн сайн. Туршилтаар дээд хязгаар ойролцоогоор ${testedLimit} м.`],
+    ja: ['カメラ視野', '360° 全指向性集音', '広角', '望遠', 'パン', 'チルト', `推奨は ${radius} m 以内（図の半径）。実測限界は約 ${testedLimit} m。`],
+    es: ['Campo de visión', 'Captación de 360°', 'Gran angular', 'Tele', 'Giro', 'Inclinación', `Óptimo dentro de ${radius} m (radio mostrado). Límite en pruebas ≈ ${testedLimit} m.`],
+    fr: ['Champ de vision', 'Captation à 360°', 'Grand-angle', 'Télé', 'Panoramique', 'Inclinaison', `Portée optimale dans un rayon de ${radius} m (illustré). Limite observée en essai ≈ ${testedLimit} m.`],
+    ar: ['مجال رؤية الكاميرا', 'التقاط الصوت بزاوية 360°', 'واسع', 'مقرب', 'أفقي', 'رأسي', `أفضل التقاط ضمن ${radius} م (نصف القطر المرسوم). الحد في الاختبار الميداني نحو ${testedLimit} م.`],
   };
   panel.innerHTML =
     '<label><input type="checkbox" data-cover="camera"> CV810 Gen 2 · <span></span></label>' +

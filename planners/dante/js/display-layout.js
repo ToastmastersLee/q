@@ -110,7 +110,6 @@
                 'right',
                 s.heightProfile,
             ),
-            locked: Boolean(s.displayPlan),
             lang: document.getElementById('langSelect').value,
         };
     };

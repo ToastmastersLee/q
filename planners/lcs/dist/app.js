@@ -236,6 +236,56 @@
         );
       return { ...plan, screens };
     }
+    function resizeStage(plan, stageMm, room) {
+      const candidate = { ...plan, stageMm };
+      if (!valid(candidate)) return fit(candidate, room);
+      const sides = plan.screens.filter((s) => s.zone !== "front");
+      function placeStage(layout) {
+        const placed = fit(layout, room);
+        if (!sides.length || placed.status === "blocked") return placed;
+        const positions = new Map(placed.plan.screens.map((s) => [s.id, s]));
+        const screens = layout.screens.map((s) => s.zone === "front" ? positions.get(s.id) : s);
+        const retained = fit({ stageMm, screens }, room, { fixed: true });
+        return retained.status === "blocked" ? placed : retained;
+      }
+      const original = placeStage(candidate);
+      if (original.status !== "blocked" || original.zone !== "front" || ["stage", "dimensions"].includes(original.reason))
+        return original;
+      const previous = plan.screens.filter((s) => s.zone === "front");
+      if (!previous.length) return original;
+      const empty = placeStage({ stageMm, screens: sides });
+      if (empty.status === "blocked") return empty;
+      const guide = viewingGuide(room.depth);
+      const smaller = Object.keys(main).map(Number).filter((size) => size < guide[0][1]).reverse();
+      function tryConfiguration(count, size) {
+        const screens = [...sides];
+        for (let i = 0; i < count; i++) {
+          const prior = previous[i];
+          screens.push(
+            standard(
+              "front",
+              size,
+              prior?.id ?? nextId([...screens, ...previous]),
+              prior?.x ?? room.width / 2,
+              0.15
+            )
+          );
+        }
+        return placeStage({ stageMm, screens });
+      }
+      for (const choices of [guide, smaller.map((size) => [1, size])]) {
+        let tight;
+        for (const [count, size] of choices) {
+          const trial = tryConfiguration(count, size);
+          if (trial.status === "blocked") continue;
+          if (!trial.results.find((row) => row.zone === "front").tight)
+            return { ...trial, replacedBecause: original };
+          tight ?? (tight = trial);
+        }
+        if (tight) return { ...tight, replacedBecause: original };
+      }
+      return { ...empty, replacedBecause: original };
+    }
     globalThis.DisplayFit = {
       catalog,
       standard,
@@ -247,6 +297,7 @@
       groups,
       doorSpans,
       fit,
+      resizeStage,
       counts,
       nextId
     };
@@ -259,7 +310,7 @@
       en: [
         "Display layout",
         "Stage width (m)",
-        "Confirm width",
+        "Enter a positive width in metres, to the nearest millimetre.",
         "Stage",
         "Left wall",
         "Right wall",
@@ -284,17 +335,17 @@
         "No continuous space at this position",
         "Opposite side panels overlap",
         "Enter valid dimensions",
-        "Confirm the measured stage width to configure screens",
+        "Screen size",
         "Add custom screen",
         "Change dimensions",
-        "Locked for this plan",
+        "Next screen size",
         "Available",
         "Select fewer or smaller screens"
       ],
       zh: [
         "\u6DB2\u6676\u5C4F\u5E03\u5C40",
         "\u821E\u53F0\u603B\u5BBD\uFF08\u7C73\uFF09",
-        "\u786E\u8BA4\u5BBD\u5EA6",
+        "\u8BF7\u8F93\u5165\u5927\u4E8E\u96F6\u7684\u821E\u53F0\u5BBD\u5EA6\uFF0C\u6700\u591A\u4FDD\u7559\u4E09\u4F4D\u5C0F\u6570\uFF081 \u6BEB\u7C73\uFF09\u3002",
         "\u821E\u53F0",
         "\u5DE6\u4FA7\u5899",
         "\u53F3\u4FA7\u5899",
@@ -316,13 +367,13 @@
         "\u53EF\u5B89\u88C5\u5BBD\u5EA6\u4E0D\u8DB3",
         "\u53EF\u5B89\u88C5\u9AD8\u5EA6\u4E0D\u8DB3",
         "\u5411\u5BA4\u5185\u4F38\u51FA\u7A7A\u95F4\u4E0D\u8DB3",
-        "\u5F53\u524D\u4F4D\u7F6E\u6CA1\u6709\u8FDE\u7EED\u5B89\u88C5\u7A7A\u95F4",
+        "\u5C4F\u5E55\u653E\u4E0D\u8FDB\u8FDE\u7EED\u7A7A\u4F4D\uFF0C\u8BF7\u68C0\u67E5\u8BBE\u5907\u6216\u95E8\u6D1E\u4F4D\u7F6E",
         "\u4E24\u4FA7\u5C4F\u4F53\u76F8\u4EA4",
         "\u8BF7\u8F93\u5165\u6709\u6548\u5C3A\u5BF8",
-        "\u8BF7\u5148\u786E\u8BA4\u5B9E\u6D4B\u821E\u53F0\u5BBD\u5EA6\uFF0C\u518D\u914D\u7F6E\u5C4F\u5E55",
+        "\u5C4F\u5E55\u5C3A\u5BF8",
         "\u6DFB\u52A0\u81EA\u5B9A\u4E49\u5C4F",
         "\u4FEE\u6539\u5C3A\u5BF8",
-        "\u672C\u65B9\u6848\u5DF2\u9501\u5B9A",
+        "\u4E0B\u4E00\u53F0\u5C4F\u5E55\u5C3A\u5BF8",
         "\u53EF\u5B89\u88C5",
         "\u5EFA\u8BAE\u51CF\u5C0F\u5C3A\u5BF8\u6216\u51CF\u5C11\u53F0\u6570"
       ]
@@ -343,32 +394,31 @@
           w[19],
           w[zoneIndex[result.zone]],
           w[reasons[result.reason]],
-          result.missing ? Math.ceil(result.missing) + " mm" : ""
+          result.missing ? (lang === "zh" ? "\u8FD8\u5DEE " : "short by ") + Math.ceil(result.missing) / 1e3 + " m" : ""
         ].filter(Boolean).join(" \xB7 ");
       const row = result.results.find((r) => r.zone === zone);
       return [w[row.tight ? 18 : 31], w[17] + " " + Math.round(row.slack) + " mm", row.tight ? w[32] : ""].filter(Boolean).join(" \xB7 ");
     }
     function bind(host, read, save) {
       const root = host.shadowRoot || host.attachShadow({ mode: "open" });
-      const addSizes = { front: 86, left: 55, right: 55 };
-      let zone = "front", editing = null, notice = "", previous = "", draftWidth = null, repairPlan = null;
+      const addSizes = {};
+      let zone = "front", editing = null, notice = "", previous = "", noticeState = "blocked", repairPlan = null;
       const node = (tag, txt) => {
         const n = document.createElement(tag);
         if (txt != null) n.textContent = txt;
         return n;
       };
       function refresh(force = false) {
-        const { plan, locked, room, lang } = read(), w = words[lang] || words.en;
-        const key = JSON.stringify([plan, locked, room, lang, zone, editing, notice]);
+        const { plan, room, lang } = read(), w = words[lang] || words.en;
+        const key = JSON.stringify([plan, room, lang, zone, editing, notice, noticeState]);
         if (!force && previous === key) return;
         previous = key;
-        const inputWidth = locked ? plan.stageMm / 1e3 : draftWidth ?? plan.stageMm / 1e3;
-        const base = { ...repairPlan || plan, stageMm: Math.round(Number(inputWidth) * 1e3) };
+        const base = repairPlan || plan;
         const result = F2.fit(base, room);
         const current = base.screens.filter((s) => s.zone === zone);
         root.replaceChildren();
         const style = node("style");
-        style.textContent = ":host{display:block;min-width:0;color:inherit;font:inherit}section{padding:12px;border:1px solid #8295a755;border-radius:8px;display:grid;gap:9px}h3,p{margin:0}h3{font-size:14px}label,.row{display:flex;gap:6px;align-items:center;justify-content:space-between;flex-wrap:wrap;font-size:12px}input,select,button{font:inherit;color:inherit;background:transparent;border:1px solid #8295a788;border-radius:5px;padding:5px;max-width:100%;box-sizing:border-box}input[type=number]{width:85px}option{background:Canvas;color:CanvasText}button{cursor:pointer}button:disabled,select:disabled{opacity:.55}output{font-size:12px;line-height:1.45}output[data-state=tight]{color:#b6790c}output[data-state=blocked]{color:#dc5549}fieldset{margin:0;padding:9px;display:grid;gap:6px;border:1px solid #8295a755}";
+        style.textContent = ":host{display:block;min-width:0;color:inherit;font:inherit}section{padding:12px;border:1px solid #8295a755;border-radius:8px;display:grid;gap:9px}h3,p{margin:0}h3{font-size:14px}label,.row{display:flex;gap:6px;align-items:center;justify-content:space-between;flex-wrap:wrap;font-size:12px}input,select,button{font:inherit;color:inherit;background:transparent;border:1px solid #8295a788;border-radius:5px;padding:5px;max-width:100%;box-sizing:border-box}input[type=number]{width:85px}option{background:Canvas;color:CanvasText}button{cursor:pointer}button:disabled,select:disabled{opacity:.55}output{font-size:12px;line-height:1.45}output[data-state=tight]{color:#b6790c}output[data-state=blocked]{color:#dc5549}output[data-state=adjusted],output[data-state=blocked]{border-inline-start:3px solid #de6652;padding:6px 9px;background:#b7483315}output[data-state=adjusted]{font-weight:600;color:#822d20;background:#fff1ec}small.limit{line-height:1.4}fieldset{margin:0;padding:9px;display:grid;gap:6px;border:1px solid #8295a755}";
         root.append(style);
         const box = node("section");
         root.append(box);
@@ -399,6 +449,17 @@
           s.onchange = () => fn(s.value);
           return field(label, s, parent);
         }
+        function apply(next, feedback = "") {
+          notice = feedback;
+          noticeState = feedback ? "adjusted" : "blocked";
+          editing = null;
+          repairPlan = null;
+          if (save(next.plan) === false) {
+            notice = lang === "zh" ? "\u5F53\u524D\u573A\u666F\u672A\u80FD\u5E94\u7528\u8FD9\u9879\u4FEE\u6539\uFF0C\u5DF2\u4FDD\u7559\u539F\u914D\u7F6E\u3002" : "The scene could not apply this change. The previous layout was kept.";
+            noticeState = "blocked";
+          }
+          refresh(true);
+        }
         function commit(candidate2) {
           const next = F2.fit(candidate2, room);
           if (next.status === "blocked") {
@@ -407,49 +468,56 @@
               editing = null;
             }
             notice = message(next, lang);
+            noticeState = "blocked";
             refresh(true);
             return;
           }
-          notice = "";
-          editing = null;
-          draftWidth = null;
-          repairPlan = null;
-          save(next.plan);
-          refresh(true);
+          apply(next);
         }
         const width = node("input");
         width.type = "number";
         width.step = "0.001";
         width.min = "0.001";
         width.max = room.width;
-        width.value = inputWidth;
-        width.disabled = locked;
-        const widthRow = node("div");
-        widthRow.className = "row";
-        box.append(widthRow);
-        field(w[1], width, widthRow);
-        width.oninput = () => {
-          draftWidth = width.value;
-          notice = "";
+        width.value = base.stageMm / 1e3;
+        field(w[1], width);
+        width.onkeydown = (event) => {
+          if (event.key === "Enter") {
+            event.preventDefault();
+            width.blur();
+          }
         };
-        if (!locked)
-          button(
-            w[2],
-            () => {
-              const candidate2 = { ...base, stageMm: Math.round(Number(width.value) * 1e3) };
-              if (!width.reportValidity() || !F2.valid(candidate2)) return;
-              const fit = F2.fit(candidate2, room);
-              if (fit.status === "blocked" && fit.reason !== "stage") {
-                notice = message(fit, lang);
-                draftWidth = width.value;
-                refresh(true);
-                return;
-              }
-              commit(candidate2);
-            },
-            widthRow
-          );
-        else widthRow.append(node("small", w[30]));
+        width.onchange = () => {
+          const metres = width.valueAsNumber;
+          const stageMm = Math.round(metres * 1e3);
+          if (!Number.isFinite(metres) || width.validity.stepMismatch || stageMm < 1) {
+            notice = w[2];
+            noticeState = "blocked";
+            refresh(true);
+            return;
+          }
+          const next = F2.resizeStage(base, stageMm, room);
+          if (next.status === "blocked") {
+            notice = message(next, lang);
+            if (next.reason === "stage")
+              notice += lang === "zh" ? "\u3002\u5F53\u524D\u623F\u95F4\u5BBD " + room.width + " \u7C73\uFF0C\u8BF7\u5148\u8C03\u6574\u623F\u95F4\u5BBD\u5EA6\u3002" : ". Room width is " + room.width + " m. Increase the room width first.";
+            noticeState = "blocked";
+            refresh(true);
+            return;
+          }
+          let feedback = "";
+          if (next.replacedBecause) {
+            const describe = (screens) => F2.groups(screens.filter((s) => s.zone === "front")).map(
+              ({ screen, count }) => count + " \xD7 " + (screen.size ? screen.size + "\u2033" : screen.name)
+            ).join(" + ");
+            const from = describe(base.screens);
+            const to = describe(next.plan.screens);
+            const why = message(next.replacedBecause, lang);
+            feedback = lang === "zh" ? "\u821E\u53F0\u5BBD\u5EA6\u5DF2\u6539\u4E3A " + metres + " \u7C73\u3002\u539F\u914D\u7F6E " + from + "\uFF1A" + why + "\u3002" + (to ? "\u5DF2\u81EA\u52A8\u6539\u4E3A\u63A8\u8350\u914D\u7F6E " + to + "\u3002" : "\u6CA1\u6709\u53EF\u5B89\u88C5\u7684\u6807\u51C6\u4E3B\u5C4F\uFF0C\u4E3B\u5C4F\u6570\u91CF\u5DF2\u8BBE\u4E3A 0\u3002\u53EF\u8F93\u5165\u81EA\u5B9A\u4E49\u5C4F\u5C3A\u5BF8\u3002") : "Stage width changed to " + metres + " m. " + from + " \u2014 " + why + ". " + (to ? "Switched to the recommended " + to + "." : "No standard screen fits. Stage screen count is now 0. You can enter custom dimensions.");
+            delete addSizes.front;
+          }
+          apply(next, feedback);
+        };
         select(
           Object.entries(zoneIndex).map(([k, i]) => [k, w[i]]),
           zone,
@@ -462,17 +530,7 @@
           w[6]
         );
         const zoneSizes = Object.keys(F2.catalog(zone)).map(Number);
-        const seedSize = addSizes[zone];
-        const addingSize = select(
-          zoneSizes.map((size) => [size, size + "\u2033"]),
-          seedSize,
-          (v) => {
-            addSizes[zone] = Number(v);
-            refresh(true);
-          },
-          lang === "zh" ? "\u65B0\u589E\u5C4F\u5E55\u5C3A\u5BF8" : "Size for additional screens"
-        );
-        addingSize.disabled = !locked;
+        const seedSize = addSizes[zone] ?? current[current.length - 1]?.size ?? (zone === "front" ? 86 : 55);
         const max = Math.min(
           99,
           Math.max(
@@ -495,14 +553,13 @@
           if (disabled && !firstBlocked) firstBlocked = { n, trial };
           countOptions.push([n, String(n), disabled, disabled ? message(trial, lang, zone) : ""]);
         }
-        const count = select(
+        select(
           countOptions,
           current.length,
           (v) => commit(F2.counts(base, zone, Number(v), room, seedSize)),
           w[7]
         );
-        const canEdit = locked || draftWidth !== null && result.status === "blocked" && result.reason !== "stage";
-        count.disabled = !canEdit;
+        const sizeLimits = /* @__PURE__ */ new Map();
         for (const [index, s] of current.entries()) {
           const row = node("div");
           row.className = "row";
@@ -515,6 +572,11 @@
           });
           const options = zoneSizes.map((size) => {
             const test = F2.fit(change(size), room);
+            if (test.status === "blocked" && result.status !== "blocked") {
+              const reason = message(test, lang, zone);
+              if (!sizeLimits.has(reason)) sizeLimits.set(reason, []);
+              sizeLimits.get(reason).push("#" + (index + 1) + " \xB7 " + size + "\u2033");
+            }
             return [
               size,
               size + "\u2033",
@@ -523,7 +585,7 @@
             ];
           });
           options.push(["custom", s.size === null ? s.name : w[8]]);
-          const choice = select(
+          select(
             options,
             s.size ?? "custom",
             (v) => {
@@ -531,12 +593,14 @@
                 editing = s.id;
                 notice = "";
                 refresh(true);
-              } else commit(change(Number(v)));
+              } else {
+                delete addSizes[zone];
+                commit(change(Number(v)));
+              }
             },
-            "#" + (index + 1),
+            w[27] + " #" + (index + 1),
             row
           );
-          choice.disabled = !canEdit;
           if (s.size === null)
             button(
               w[29],
@@ -545,29 +609,66 @@
                 refresh(true);
               },
               row
-            ).disabled = !canEdit;
+            );
           button(
             w[16],
             () => commit({ ...base, screens: base.screens.filter((p) => p.id !== s.id) }),
             row
-          ).disabled = !canEdit;
+          );
         }
+        const nextSizes = zoneSizes.map((size) => {
+          const trial = F2.fit(F2.counts(base, zone, current.length + 1, room, size), room);
+          const disabled = trial.status === "blocked";
+          const reason = disabled ? message(trial, lang, zone) : "";
+          if (disabled) {
+            if (!sizeLimits.has(reason)) sizeLimits.set(reason, []);
+            sizeLimits.get(reason).push(w[30] + " " + size + "\u2033");
+          }
+          return [size, size + "\u2033", disabled, reason];
+        });
+        select(
+          nextSizes,
+          seedSize,
+          (v) => {
+            addSizes[zone] = Number(v);
+            notice = "";
+            refresh(true);
+          },
+          w[30]
+        );
         button(w[28], () => {
           editing = "new";
           notice = "";
           refresh(true);
-        }).disabled = !canEdit;
+        });
         const output = node("output");
-        output.setAttribute("role", "status");
-        box.append(output);
-        output.dataset.state = notice ? "blocked" : result.status;
-        output.textContent = notice || (!locked && result.status !== "blocked" ? w[27] : message(result, lang, zone));
-        if (firstBlocked && locked && !editing) {
-          const hint = node(
-            "small",
-            w[7] + " " + firstBlocked.n + " (" + (lang === "zh" ? "\u65B0\u589E" : "add") + " " + seedSize + "\u2033) \xB7 " + message(firstBlocked.trial, lang, zone)
-          );
-          box.append(hint);
+        output.setAttribute("role", notice ? "alert" : "status");
+        output.setAttribute("aria-atomic", "true");
+        if (notice && !editing) width.parentElement.after(output);
+        else box.append(output);
+        output.dataset.state = notice ? noticeState : result.status;
+        output.textContent = notice || message(result, lang, zone);
+        if (!editing) {
+          let showLimit2 = function(text) {
+            const hint = node("small", text);
+            hint.className = "limit";
+            box.append(hint);
+          };
+          var showLimit = showLimit2;
+          if (firstBlocked) {
+            showLimit2(
+              (lang === "zh" ? "\u6309\u4E0B\u4E00\u53F0 " + seedSize + "\u2033 \u589E\u81F3 " + firstBlocked.n + " \u53F0\uFF1A" : "Increasing to " + firstBlocked.n + " with another " + seedSize + "\u2033: ") + message(firstBlocked.trial, lang, zone)
+            );
+          }
+          if (sizeLimits.size) {
+            const details = node("details");
+            details.append(
+              node("summary", lang === "zh" ? "\u54EA\u4E9B\u5C3A\u5BF8\u53D7\u9650\uFF1F" : "Which sizes are unavailable?")
+            );
+            for (const [reason, entries] of sizeLimits)
+              details.append(node("p", entries.join(", ") + " \xB7 " + reason));
+            box.append(details);
+          }
         }
         if (zone === "front" && room.depth > 0 && !editing) {
           const zh = lang === "zh";
@@ -639,10 +740,10 @@
             screens: old ? base.screens.map((s) => s.id === old.id ? screen : s) : [...base.screens, screen]
           };
         }
-        const apply = button(w[14], () => commit(candidate()), form);
+        const applyButton = button(w[14], () => commit(candidate()), form);
         function preview() {
           const r = F2.fit(candidate(), room);
-          apply.disabled = r.status === "blocked" && !(result.status === "blocked" && F2.valid(candidate()));
+          applyButton.disabled = r.status === "blocked" && !(result.status === "blocked" && F2.valid(candidate()));
           output.dataset.state = r.status;
           output.textContent = message(r, lang, zone);
         }
@@ -663,6 +764,7 @@
         refresh,
         report(msg) {
           notice = msg;
+          noticeState = "blocked";
           refresh(true);
         }
       };
@@ -2308,7 +2410,8 @@
       editor.current = globalThis.DisplayEditor.bind(
         host.current,
         () => current.current.screenContext,
-        (plan) => current.current.applyDisplayPlan(plan)
+        // The shared editor reads its host again before the next native input event.
+        (plan) => ReactDOM.flushSync(() => current.current.applyDisplayPlan(plan))
       );
       return () => {
         editor.current = null;
@@ -2430,7 +2533,7 @@
         className: "font-bold text-[10px] px-3 py-1 rounded h-[28px] bg-blue-600 hover:bg-blue-700 text-white border border-blue-400"
       },
       threeDCopy.open3D
-    )), /* @__PURE__ */ React.createElement("button", { type: "button", className: `lcs-panel-trigger ${th.inputBg} ${th.inputText} ${th.inputBorder}`, "aria-expanded": optionsOpen, "aria-controls": "lcs-options", onClick: () => setOptionsOpen(!optionsOpen) }, t.moreOptions, " ", /* @__PURE__ */ React.createElement("span", { "aria-hidden": "true" }, optionsOpen ? "\u25B4" : "\u25BE"))), /* @__PURE__ */ React.createElement(PickupSuggestion, null), !roomIsValid && /* @__PURE__ */ React.createElement("p", { className: "text-[10px] font-bold text-red-500" }, t.invalidDimensions), (threeDError || screenError) && /* @__PURE__ */ React.createElement("p", { id: "open-3d-error", role: "alert", className: "text-[10px] font-bold text-red-500" }, threeDError || screenError), roomHeight >= 3.5 && /* @__PURE__ */ React.createElement("p", { className: "lcs-height-warning text-[10px] font-bold text-amber-500" }, "\u26A0 ", t.heightWarning), optionsOpen && /* @__PURE__ */ React.createElement("aside", { id: "lcs-options", className: `lcs-options-panel ${th.panelBg} ${th.panelBorder}` }, /* @__PURE__ */ React.createElement("button", { disabled: Boolean(screenError), id: "export-quotation", className: "p-2 rounded bg-blue-600 text-white", onClick: (e) => window.Quotation.download(e.currentTarget, quote) }, window.Quotation.words(lang)[0]), /* @__PURE__ */ React.createElement(DisplayLayout, null), /* @__PURE__ */ React.createElement(AudioEquipmentControls, null), /* @__PURE__ */ React.createElement("div", { className: "lcs-options-grid" }, /* @__PURE__ */ React.createElement("label", { className: "text-xs flex flex-col" }, "Q-NEX ", lang === "zh" ? "\u7CFB\u7EDF" : "System", /* @__PURE__ */ React.createElement("select", { id: "qnex-model", value: qnexModel, onChange: (e) => setQnexModel(e.target.value), className: `${th.inputBg} ${th.inputText} p-1 rounded border` }, window.Quotation.qnexModels.map((model) => /* @__PURE__ */ React.createElement("option", { key: model, value: model }, model)))), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.cameraPackage, /* @__PURE__ */ React.createElement("select", { value: cameraPackage, onChange: (e) => handleCameraPackageChange(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded border` }, /* @__PURE__ */ React.createElement("option", { value: "CV870" }, t.cv870Package), /* @__PURE__ */ React.createElement("option", { value: "CV210" }, t.cv210Package))), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.s210Count, /* @__PURE__ */ React.createElement("select", { id: "s210-count", value: s210s.length, onChange: (e) => handleS210CountChange(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded border` }, Array.from({ length: S210_MAX_COUNT + 1 }, (_, n) => n).map((n) => /* @__PURE__ */ React.createElement("option", { key: n, value: n }, n)))), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.dispSize, /* @__PURE__ */ React.createElement("select", { disabled: Boolean(displayPlan), value: displaySize, onChange: (e) => setDisplaySize(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded border` }, /* @__PURE__ */ React.createElement("option", { value: "55" }, '55" (', t.maximumShort, " 4.1m)"), /* @__PURE__ */ React.createElement("option", { value: "65" }, '65" (', t.maximumShort, " 5.0m)"), /* @__PURE__ */ React.createElement("option", { value: "75" }, '75" (', t.maximumShort, " 5.6m)"))), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.dispRename, /* @__PURE__ */ React.createElement("input", { type: "text", value: displayName, onChange: (e) => setDisplayName(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded w-24 border` })), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.titleRename, /* @__PURE__ */ React.createElement("input", { type: "text", value: projectTitle, onChange: (e) => setProjectTitle(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded w-48 border` })), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.hubRename, /* @__PURE__ */ React.createElement("input", { type: "text", value: hubName, onChange: (e) => setHubName(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded w-20 border` })), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.theme, /* @__PURE__ */ React.createElement("select", { value: themeKey, onChange: (e) => setThemeKey(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded border` }, /* @__PURE__ */ React.createElement("option", { value: "dark" }, t.themeDark), /* @__PURE__ */ React.createElement("option", { value: "light" }, t.themeLight), /* @__PURE__ */ React.createElement("option", { value: "highContrast" }, t.themeHighContrast))), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.language, /* @__PURE__ */ React.createElement("select", { value: lang, onChange: (e) => setLang(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded border` }, /* @__PURE__ */ React.createElement("option", { value: "en" }, "English"), /* @__PURE__ */ React.createElement("option", { value: "zh" }, "\u7B80\u4F53\u4E2D\u6587"), /* @__PURE__ */ React.createElement("option", { value: "fr" }, "Fran\xE7ais"), /* @__PURE__ */ React.createElement("option", { value: "es" }, "Espa\xF1ol"), /* @__PURE__ */ React.createElement("option", { value: "ja" }, "\u65E5\u672C\u8A9E"), /* @__PURE__ */ React.createElement("option", { value: "ko" }, "\uD55C\uAD6D\uC5B4"), /* @__PURE__ */ React.createElement("option", { value: "it" }, "Italiano"), /* @__PURE__ */ React.createElement("option", { value: "hu" }, "Magyar"), /* @__PURE__ */ React.createElement("option", { value: "ar" }, "\u0627\u0644\u0639\u0631\u0628\u064A\u0629"))), /* @__PURE__ */ React.createElement(
+    )), /* @__PURE__ */ React.createElement("button", { type: "button", className: `lcs-panel-trigger ${th.inputBg} ${th.inputText} ${th.inputBorder}`, "aria-expanded": optionsOpen, "aria-controls": "lcs-options", onClick: () => setOptionsOpen(!optionsOpen) }, t.moreOptions, " ", /* @__PURE__ */ React.createElement("span", { "aria-hidden": "true" }, optionsOpen ? "\u25B4" : "\u25BE"))), /* @__PURE__ */ React.createElement(PickupSuggestion, null), !roomIsValid && /* @__PURE__ */ React.createElement("p", { className: "text-[10px] font-bold text-red-500" }, t.invalidDimensions), (threeDError || screenError) && /* @__PURE__ */ React.createElement("p", { id: "open-3d-error", role: "alert", className: "text-[10px] font-bold text-red-500" }, threeDError || screenError), roomHeight >= 3.5 && /* @__PURE__ */ React.createElement("p", { className: "lcs-height-warning text-[10px] font-bold text-amber-500" }, "\u26A0 ", t.heightWarning), optionsOpen && /* @__PURE__ */ React.createElement("aside", { id: "lcs-options", className: `lcs-options-panel ${th.panelBg} ${th.panelBorder}` }, /* @__PURE__ */ React.createElement("button", { disabled: Boolean(screenError), id: "export-quotation", className: "p-2 rounded bg-blue-600 text-white", onClick: (e) => window.Quotation.download(e.currentTarget, quote) }, window.Quotation.words(lang)[0]), /* @__PURE__ */ React.createElement(DisplayLayout, null), /* @__PURE__ */ React.createElement(AudioEquipmentControls, null), /* @__PURE__ */ React.createElement("div", { className: "lcs-options-grid" }, /* @__PURE__ */ React.createElement("label", { className: "text-xs flex flex-col" }, "Q-NEX ", lang === "zh" ? "\u7CFB\u7EDF" : "System", /* @__PURE__ */ React.createElement("select", { id: "qnex-model", value: qnexModel, onChange: (e) => setQnexModel(e.target.value), className: `${th.inputBg} ${th.inputText} p-1 rounded border` }, window.Quotation.qnexModels.map((model) => /* @__PURE__ */ React.createElement("option", { key: model, value: model }, model)))), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.cameraPackage, /* @__PURE__ */ React.createElement("select", { value: cameraPackage, onChange: (e) => handleCameraPackageChange(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded border` }, /* @__PURE__ */ React.createElement("option", { value: "CV870" }, t.cv870Package), /* @__PURE__ */ React.createElement("option", { value: "CV210" }, t.cv210Package))), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.s210Count, /* @__PURE__ */ React.createElement("select", { id: "s210-count", value: s210s.length, onChange: (e) => handleS210CountChange(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded border` }, Array.from({ length: S210_MAX_COUNT + 1 }, (_, n) => n).map((n) => /* @__PURE__ */ React.createElement("option", { key: n, value: n }, n)))), !displayPlan && /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.dispSize, /* @__PURE__ */ React.createElement("select", { value: displaySize, onChange: (e) => setDisplaySize(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded border` }, /* @__PURE__ */ React.createElement("option", { value: "55" }, '55" (', t.maximumShort, " 4.1m)"), /* @__PURE__ */ React.createElement("option", { value: "65" }, '65" (', t.maximumShort, " 5.0m)"), /* @__PURE__ */ React.createElement("option", { value: "75" }, '75" (', t.maximumShort, " 5.6m)"))), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.dispRename, /* @__PURE__ */ React.createElement("input", { type: "text", value: displayName, onChange: (e) => setDisplayName(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded w-24 border` })), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.titleRename, /* @__PURE__ */ React.createElement("input", { type: "text", value: projectTitle, onChange: (e) => setProjectTitle(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded w-48 border` })), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.hubRename, /* @__PURE__ */ React.createElement("input", { type: "text", value: hubName, onChange: (e) => setHubName(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded w-20 border` })), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.theme, /* @__PURE__ */ React.createElement("select", { value: themeKey, onChange: (e) => setThemeKey(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded border` }, /* @__PURE__ */ React.createElement("option", { value: "dark" }, t.themeDark), /* @__PURE__ */ React.createElement("option", { value: "light" }, t.themeLight), /* @__PURE__ */ React.createElement("option", { value: "highContrast" }, t.themeHighContrast))), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.language, /* @__PURE__ */ React.createElement("select", { value: lang, onChange: (e) => setLang(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded border` }, /* @__PURE__ */ React.createElement("option", { value: "en" }, "English"), /* @__PURE__ */ React.createElement("option", { value: "zh" }, "\u7B80\u4F53\u4E2D\u6587"), /* @__PURE__ */ React.createElement("option", { value: "fr" }, "Fran\xE7ais"), /* @__PURE__ */ React.createElement("option", { value: "es" }, "Espa\xF1ol"), /* @__PURE__ */ React.createElement("option", { value: "ja" }, "\u65E5\u672C\u8A9E"), /* @__PURE__ */ React.createElement("option", { value: "ko" }, "\uD55C\uAD6D\uC5B4"), /* @__PURE__ */ React.createElement("option", { value: "it" }, "Italiano"), /* @__PURE__ */ React.createElement("option", { value: "hu" }, "Magyar"), /* @__PURE__ */ React.createElement("option", { value: "ar" }, "\u0627\u0644\u0639\u0631\u0628\u064A\u0629"))), /* @__PURE__ */ React.createElement(
       "button",
       {
         onClick: () => setIsRotated(!isRotated),
@@ -2925,7 +3028,6 @@
     const screenContext = {
       room: lcsRoom(roomWidth, roomLength, roomHeight, hub),
       lang,
-      locked: Boolean(displayPlan),
       plan: displayPlan || legacyDisplays(roomWidth, largeScreen, true, displays, displaySize)
     };
     const screenResult = displayPlan ? DisplayFit.fit(displayPlan, screenContext.room, { fixed: true }) : null;

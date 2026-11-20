@@ -290,6 +290,66 @@
             );
         return { ...plan, screens };
     }
+    // A width edit may replace the stage screens. Editing an individual screen never does.
+    function resizeStage(plan, stageMm, room) {
+        const candidate = { ...plan, stageMm };
+        if (!valid(candidate)) return fit(candidate, room);
+        const sides = plan.screens.filter((s) => s.zone !== 'front');
+        function placeStage(layout) {
+            const placed = fit(layout, room);
+            if (!sides.length || placed.status === 'blocked') return placed;
+            const positions = new Map(placed.plan.screens.map((s) => [s.id, s]));
+            const screens = layout.screens.map((s) => (s.zone === 'front' ? positions.get(s.id) : s));
+            const retained = fit({ stageMm, screens }, room, { fixed: true });
+            return retained.status === 'blocked' ? placed : retained;
+        }
+        const original = placeStage(candidate);
+        if (
+            original.status !== 'blocked' ||
+            original.zone !== 'front' ||
+            ['stage', 'dimensions'].includes(original.reason)
+        )
+            return original;
+
+        const previous = plan.screens.filter((s) => s.zone === 'front');
+        if (!previous.length) return original;
+        const empty = placeStage({ stageMm, screens: sides });
+        if (empty.status === 'blocked') return empty;
+
+        const guide = viewingGuide(room.depth);
+        const smaller = Object.keys(main)
+            .map(Number)
+            .filter((size) => size < guide[0][1])
+            .reverse();
+        function tryConfiguration(count, size) {
+            const screens = [...sides];
+            for (let i = 0; i < count; i++) {
+                const prior = previous[i];
+                screens.push(
+                    standard(
+                        'front',
+                        size,
+                        prior?.id ?? nextId([...screens, ...previous]),
+                        prior?.x ?? room.width / 2,
+                        0.15,
+                    ),
+                );
+            }
+            return placeStage({ stageMm, screens });
+        }
+        for (const choices of [guide, smaller.map((size) => [1, size])]) {
+            let tight;
+            for (const [count, size] of choices) {
+                const trial = tryConfiguration(count, size);
+                if (trial.status === 'blocked') continue;
+                if (!trial.results.find((row) => row.zone === 'front').tight)
+                    return { ...trial, replacedBecause: original };
+                tight ??= trial;
+            }
+            if (tight) return { ...tight, replacedBecause: original };
+        }
+        return { ...empty, replacedBecause: original };
+    }
     globalThis.DisplayFit = {
         catalog,
         standard,
@@ -301,6 +361,7 @@
         groups,
         doorSpans,
         fit,
+        resizeStage,
         counts,
         nextId,
     };

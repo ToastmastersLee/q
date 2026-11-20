@@ -5,7 +5,7 @@
         en: [
             'Display layout',
             'Stage width (m)',
-            'Confirm width',
+            'Enter a positive width in metres, to the nearest millimetre.',
             'Stage',
             'Left wall',
             'Right wall',
@@ -30,17 +30,17 @@
             'No continuous space at this position',
             'Opposite side panels overlap',
             'Enter valid dimensions',
-            'Confirm the measured stage width to configure screens',
+            'Screen size',
             'Add custom screen',
             'Change dimensions',
-            'Locked for this plan',
+            'Next screen size',
             'Available',
             'Select fewer or smaller screens',
         ],
         zh: [
             '液晶屏布局',
             '舞台总宽（米）',
-            '确认宽度',
+            '请输入大于零的舞台宽度，最多保留三位小数（1 毫米）。',
             '舞台',
             '左侧墙',
             '右侧墙',
@@ -62,13 +62,13 @@
             '可安装宽度不足',
             '可安装高度不足',
             '向室内伸出空间不足',
-            '当前位置没有连续安装空间',
+            '屏幕放不进连续空位，请检查设备或门洞位置',
             '两侧屏体相交',
             '请输入有效尺寸',
-            '请先确认实测舞台宽度，再配置屏幕',
+            '屏幕尺寸',
             '添加自定义屏',
             '修改尺寸',
-            '本方案已锁定',
+            '下一台屏幕尺寸',
             '可安装',
             '建议减小尺寸或减少台数',
         ],
@@ -90,7 +90,9 @@
                 w[19],
                 w[zoneIndex[result.zone]],
                 w[reasons[result.reason]],
-                result.missing ? Math.ceil(result.missing) + ' mm' : '',
+                result.missing
+                    ? (lang === 'zh' ? '还差 ' : 'short by ') + Math.ceil(result.missing) / 1000 + ' m'
+                    : '',
             ]
                 .filter(Boolean)
                 .join(' · ');
@@ -101,12 +103,12 @@
     }
     function bind(host, read, save) {
         const root = host.shadowRoot || host.attachShadow({ mode: 'open' });
-        const addSizes = { front: 86, left: 55, right: 55 };
+        const addSizes = {};
         let zone = 'front',
             editing = null,
             notice = '',
             previous = '',
-            draftWidth = null,
+            noticeState = 'blocked',
             repairPlan = null;
         const node = (tag, txt) => {
             const n = document.createElement(tag);
@@ -114,19 +116,18 @@
             return n;
         };
         function refresh(force = false) {
-            const { plan, locked, room, lang } = read(),
+            const { plan, room, lang } = read(),
                 w = words[lang] || words.en;
-            const key = JSON.stringify([plan, locked, room, lang, zone, editing, notice]);
+            const key = JSON.stringify([plan, room, lang, zone, editing, notice, noticeState]);
             if (!force && previous === key) return;
             previous = key;
-            const inputWidth = locked ? plan.stageMm / 1000 : (draftWidth ?? plan.stageMm / 1000);
-            const base = { ...(repairPlan || plan), stageMm: Math.round(Number(inputWidth) * 1000) };
+            const base = repairPlan || plan;
             const result = F.fit(base, room);
             const current = base.screens.filter((s) => s.zone === zone);
             root.replaceChildren();
             const style = node('style');
             style.textContent =
-                ':host{display:block;min-width:0;color:inherit;font:inherit}section{padding:12px;border:1px solid #8295a755;border-radius:8px;display:grid;gap:9px}h3,p{margin:0}h3{font-size:14px}label,.row{display:flex;gap:6px;align-items:center;justify-content:space-between;flex-wrap:wrap;font-size:12px}input,select,button{font:inherit;color:inherit;background:transparent;border:1px solid #8295a788;border-radius:5px;padding:5px;max-width:100%;box-sizing:border-box}input[type=number]{width:85px}option{background:Canvas;color:CanvasText}button{cursor:pointer}button:disabled,select:disabled{opacity:.55}output{font-size:12px;line-height:1.45}output[data-state=tight]{color:#b6790c}output[data-state=blocked]{color:#dc5549}fieldset{margin:0;padding:9px;display:grid;gap:6px;border:1px solid #8295a755}';
+                ':host{display:block;min-width:0;color:inherit;font:inherit}section{padding:12px;border:1px solid #8295a755;border-radius:8px;display:grid;gap:9px}h3,p{margin:0}h3{font-size:14px}label,.row{display:flex;gap:6px;align-items:center;justify-content:space-between;flex-wrap:wrap;font-size:12px}input,select,button{font:inherit;color:inherit;background:transparent;border:1px solid #8295a788;border-radius:5px;padding:5px;max-width:100%;box-sizing:border-box}input[type=number]{width:85px}option{background:Canvas;color:CanvasText}button{cursor:pointer}button:disabled,select:disabled{opacity:.55}output{font-size:12px;line-height:1.45}output[data-state=tight]{color:#b6790c}output[data-state=blocked]{color:#dc5549}output[data-state=adjusted],output[data-state=blocked]{border-inline-start:3px solid #de6652;padding:6px 9px;background:#b7483315}output[data-state=adjusted]{font-weight:600;color:#822d20;background:#fff1ec}small.limit{line-height:1.4}fieldset{margin:0;padding:9px;display:grid;gap:6px;border:1px solid #8295a755}';
             root.append(style);
             const box = node('section');
             root.append(box);
@@ -157,6 +158,20 @@
                 s.onchange = () => fn(s.value);
                 return field(label, s, parent);
             }
+            function apply(next, feedback = '') {
+                notice = feedback;
+                noticeState = feedback ? 'adjusted' : 'blocked';
+                editing = null;
+                repairPlan = null;
+                if (save(next.plan) === false) {
+                    notice =
+                        lang === 'zh'
+                            ? '当前场景未能应用这项修改，已保留原配置。'
+                            : 'The scene could not apply this change. The previous layout was kept.';
+                    noticeState = 'blocked';
+                }
+                refresh(true);
+            }
             function commit(candidate) {
                 const next = F.fit(candidate, room);
                 if (next.status === 'blocked') {
@@ -165,49 +180,84 @@
                         editing = null;
                     }
                     notice = message(next, lang);
+                    noticeState = 'blocked';
                     refresh(true);
                     return;
                 }
-                notice = '';
-                editing = null;
-                draftWidth = null;
-                repairPlan = null;
-                save(next.plan);
-                refresh(true);
+                apply(next);
             }
             const width = node('input');
             width.type = 'number';
             width.step = '0.001';
             width.min = '0.001';
             width.max = room.width;
-            width.value = inputWidth;
-            width.disabled = locked;
-            const widthRow = node('div');
-            widthRow.className = 'row';
-            box.append(widthRow);
-            field(w[1], width, widthRow);
-            width.oninput = () => {
-                draftWidth = width.value;
-                notice = '';
+            width.value = base.stageMm / 1000;
+            field(w[1], width);
+            width.onkeydown = (event) => {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    width.blur();
+                }
             };
-            if (!locked)
-                button(
-                    w[2],
-                    () => {
-                        const candidate = { ...base, stageMm: Math.round(Number(width.value) * 1000) };
-                        if (!width.reportValidity() || !F.valid(candidate)) return;
-                        const fit = F.fit(candidate, room);
-                        if (fit.status === 'blocked' && fit.reason !== 'stage') {
-                            notice = message(fit, lang);
-                            draftWidth = width.value;
-                            refresh(true);
-                            return;
-                        }
-                        commit(candidate);
-                    },
-                    widthRow,
-                );
-            else widthRow.append(node('small', w[30]));
+            width.onchange = () => {
+                const metres = width.valueAsNumber;
+                const stageMm = Math.round(metres * 1000);
+                if (!Number.isFinite(metres) || width.validity.stepMismatch || stageMm < 1) {
+                    notice = w[2];
+                    noticeState = 'blocked';
+                    refresh(true);
+                    return;
+                }
+                const next = F.resizeStage(base, stageMm, room);
+                if (next.status === 'blocked') {
+                    notice = message(next, lang);
+                    if (next.reason === 'stage')
+                        notice +=
+                            lang === 'zh'
+                                ? '。当前房间宽 ' + room.width + ' 米，请先调整房间宽度。'
+                                : '. Room width is ' + room.width + ' m. Increase the room width first.';
+                    noticeState = 'blocked';
+                    refresh(true);
+                    return;
+                }
+                let feedback = '';
+                if (next.replacedBecause) {
+                    const describe = (screens) =>
+                        F.groups(screens.filter((s) => s.zone === 'front'))
+                            .map(
+                                ({ screen, count }) =>
+                                    count + ' × ' + (screen.size ? screen.size + '″' : screen.name),
+                            )
+                            .join(' + ');
+                    const from = describe(base.screens);
+                    const to = describe(next.plan.screens);
+                    const why = message(next.replacedBecause, lang);
+                    feedback =
+                        lang === 'zh'
+                            ? '舞台宽度已改为 ' +
+                              metres +
+                              ' 米。原配置 ' +
+                              from +
+                              '：' +
+                              why +
+                              '。' +
+                              (to
+                                  ? '已自动改为推荐配置 ' + to + '。'
+                                  : '没有可安装的标准主屏，主屏数量已设为 0。可输入自定义屏尺寸。')
+                            : 'Stage width changed to ' +
+                              metres +
+                              ' m. ' +
+                              from +
+                              ' — ' +
+                              why +
+                              '. ' +
+                              (to
+                                  ? 'Switched to the recommended ' + to + '.'
+                                  : 'No standard screen fits. Stage screen count is now 0. You can enter custom dimensions.');
+                    delete addSizes.front;
+                }
+                apply(next, feedback);
+            };
             select(
                 Object.entries(zoneIndex).map(([k, i]) => [k, w[i]]),
                 zone,
@@ -220,17 +270,8 @@
                 w[6],
             );
             const zoneSizes = Object.keys(F.catalog(zone)).map(Number);
-            const seedSize = addSizes[zone];
-            const addingSize = select(
-                zoneSizes.map((size) => [size, size + '″']),
-                seedSize,
-                (v) => {
-                    addSizes[zone] = Number(v);
-                    refresh(true);
-                },
-                lang === 'zh' ? '新增屏幕尺寸' : 'Size for additional screens',
-            );
-            addingSize.disabled = !locked;
+            const seedSize =
+                addSizes[zone] ?? current[current.length - 1]?.size ?? (zone === 'front' ? 86 : 55);
             const max = Math.min(
                 99,
                 Math.max(
@@ -254,15 +295,13 @@
                 if (disabled && !firstBlocked) firstBlocked = { n, trial };
                 countOptions.push([n, String(n), disabled, disabled ? message(trial, lang, zone) : '']);
             }
-            const count = select(
+            select(
                 countOptions,
                 current.length,
                 (v) => commit(F.counts(base, zone, Number(v), room, seedSize)),
                 w[7],
             );
-            const canEdit =
-                locked || (draftWidth !== null && result.status === 'blocked' && result.reason !== 'stage');
-            count.disabled = !canEdit;
+            const sizeLimits = new Map();
             for (const [index, s] of current.entries()) {
                 const row = node('div');
                 row.className = 'row';
@@ -275,6 +314,11 @@
                 });
                 const options = zoneSizes.map((size) => {
                     const test = F.fit(change(size), room);
+                    if (test.status === 'blocked' && result.status !== 'blocked') {
+                        const reason = message(test, lang, zone);
+                        if (!sizeLimits.has(reason)) sizeLimits.set(reason, []);
+                        sizeLimits.get(reason).push('#' + (index + 1) + ' · ' + size + '″');
+                    }
                     return [
                         size,
                         size + '″',
@@ -283,7 +327,7 @@
                     ];
                 });
                 options.push(['custom', s.size === null ? s.name : w[8]]);
-                const choice = select(
+                select(
                     options,
                     s.size ?? 'custom',
                     (v) => {
@@ -291,12 +335,14 @@
                             editing = s.id;
                             notice = '';
                             refresh(true);
-                        } else commit(change(Number(v)));
+                        } else {
+                            delete addSizes[zone];
+                            commit(change(Number(v)));
+                        }
                     },
-                    '#' + (index + 1),
+                    w[27] + ' #' + (index + 1),
                     row,
                 );
-                choice.disabled = !canEdit;
                 if (s.size === null)
                     button(
                         w[29],
@@ -305,38 +351,68 @@
                             refresh(true);
                         },
                         row,
-                    ).disabled = !canEdit;
+                    );
                 button(
                     w[16],
                     () => commit({ ...base, screens: base.screens.filter((p) => p.id !== s.id) }),
                     row,
-                ).disabled = !canEdit;
+                );
             }
+            const nextSizes = zoneSizes.map((size) => {
+                const trial = F.fit(F.counts(base, zone, current.length + 1, room, size), room);
+                const disabled = trial.status === 'blocked';
+                const reason = disabled ? message(trial, lang, zone) : '';
+                if (disabled) {
+                    if (!sizeLimits.has(reason)) sizeLimits.set(reason, []);
+                    sizeLimits.get(reason).push(w[30] + ' ' + size + '″');
+                }
+                return [size, size + '″', disabled, reason];
+            });
+            select(
+                nextSizes,
+                seedSize,
+                (v) => {
+                    addSizes[zone] = Number(v);
+                    notice = '';
+                    refresh(true);
+                },
+                w[30],
+            );
             button(w[28], () => {
                 editing = 'new';
                 notice = '';
                 refresh(true);
-            }).disabled = !canEdit;
+            });
             const output = node('output');
-            output.setAttribute('role', 'status');
-            box.append(output);
-            output.dataset.state = notice ? 'blocked' : result.status;
-            output.textContent =
-                notice || (!locked && result.status !== 'blocked' ? w[27] : message(result, lang, zone));
-            if (firstBlocked && locked && !editing) {
-                const hint = node(
-                    'small',
-                    w[7] +
-                        ' ' +
-                        firstBlocked.n +
-                        ' (' +
-                        (lang === 'zh' ? '新增' : 'add') +
-                        ' ' +
-                        seedSize +
-                        '″) · ' +
-                        message(firstBlocked.trial, lang, zone),
-                );
-                box.append(hint);
+            output.setAttribute('role', notice ? 'alert' : 'status');
+            output.setAttribute('aria-atomic', 'true');
+            if (notice && !editing) width.parentElement.after(output);
+            else box.append(output);
+            output.dataset.state = notice ? noticeState : result.status;
+            output.textContent = notice || message(result, lang, zone);
+            if (!editing) {
+                function showLimit(text) {
+                    const hint = node('small', text);
+                    hint.className = 'limit';
+                    box.append(hint);
+                }
+                if (firstBlocked) {
+                    showLimit(
+                        (lang === 'zh'
+                            ? '按下一台 ' + seedSize + '″ 增至 ' + firstBlocked.n + ' 台：'
+                            : 'Increasing to ' + firstBlocked.n + ' with another ' + seedSize + '″: ') +
+                            message(firstBlocked.trial, lang, zone),
+                    );
+                }
+                if (sizeLimits.size) {
+                    const details = node('details');
+                    details.append(
+                        node('summary', lang === 'zh' ? '哪些尺寸受限？' : 'Which sizes are unavailable?'),
+                    );
+                    for (const [reason, entries] of sizeLimits)
+                        details.append(node('p', entries.join(', ') + ' · ' + reason));
+                    box.append(details);
+                }
             }
             if (zone === 'front' && room.depth > 0 && !editing) {
                 const zh = lang === 'zh';
@@ -431,10 +507,10 @@
                         : [...base.screens, screen],
                 };
             }
-            const apply = button(w[14], () => commit(candidate()), form);
+            const applyButton = button(w[14], () => commit(candidate()), form);
             function preview() {
                 const r = F.fit(candidate(), room);
-                apply.disabled =
+                applyButton.disabled =
                     r.status === 'blocked' && !(result.status === 'blocked' && F.valid(candidate()));
                 output.dataset.state = r.status;
                 output.textContent = message(r, lang, zone);
@@ -456,6 +532,7 @@
             refresh,
             report(msg) {
                 notice = msg;
+                noticeState = 'blocked';
                 refresh(true);
             },
         };

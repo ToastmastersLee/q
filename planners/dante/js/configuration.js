@@ -11,6 +11,10 @@
     const stationHalfWidth = 0.36; // metres in the floor plan
     const markerWidths = { ifp: 90, camera: 32, qnex: 65, station: 2 * stationHalfWidth * App.PPM };
     const markerHeight = 14;
+    // Floor-plan metres measured from the left and front walls.
+    App.defaultPodiumPosition = (length, index = 0) => ({
+        x: Math.min(1.7, length / 2) + index * 1.7, y: 1.2
+    });
     const clamp = (v, max, inset = 0.15) => Math.max(inset, Math.min(max - inset, v));
     const quantity = value => value !== '' && value !== null && Number.isInteger(Number(value)) && Number(value) >= 0 && Number(value) <= 99;
     App.validQuantity = quantity;
@@ -66,7 +70,8 @@
                 const point = type === 'camera' ? { x: len / 2 + Math.floor(i / 2) * 0.45,
                     y: i % 2 ? wid - 0.3 : 0.3 } : type === 'ifp' ? { x: frontPosition(type, retained, len), y: 0.15 }
                     : type === 'station' ? { x: frontPosition(type, retained, len), y: 0.3 }
-                    : { x: len * 0.32 + i * 1.7, y: 1.2 };
+                    : e.qnexModel === 'NMP311' ? { x: len * 0.32 + i * 1.7, y: 1.2 }
+                    : App.defaultPodiumPosition(len, i);
                 return { id: `teaching-${n}`, type, ...point, role: i % 2 ? 'teacher' : 'student' };
             });
         }

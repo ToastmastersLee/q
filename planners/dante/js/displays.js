@@ -38,6 +38,8 @@
         updateAuxiliaryDisplaySummary();
 
         const layer = document.getElementById('displayLayer');
+        const ranges = document.getElementById('overlay-auxRange');
+        ranges.replaceChildren();
         layer.innerHTML = '';
         const copy = getDisplayCopy(document.getElementById('langSelect').value || 'en');
         const screenWidth = 86 * 0.0254 * 16 / Math.sqrt(337) * PPM;
@@ -59,7 +61,7 @@
             coverage.setAttribute('stroke-width', '2');
             coverage.setAttribute('stroke-dasharray', '6,5');
             coverage.setAttribute('opacity', '0.7');
-            group.appendChild(coverage);
+            ranges.appendChild(coverage);
 
             const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
             rect.setAttribute('x', pxX);

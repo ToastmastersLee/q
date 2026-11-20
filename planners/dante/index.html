@@ -11,7 +11,7 @@
 <script src="../shared-quotation/images.js?v=20261120-right-wall-doors"></script>
 <script src="../shared-quotation/quotation.js?v=20261120-right-wall-doors"></script>
 <link rel="stylesheet" href="css/configuration.css?v=20261026-quantities">
-<link rel="stylesheet" href="css/workspace.css?v=20261120-coverage-legend">
+<link rel="stylesheet" href="css/workspace.css?v=20261120-plan-guides">
 </head>
 <body>
 
@@ -205,6 +205,8 @@
             <label><input type="checkbox" data-legend="remote"><span class="legend-key" aria-hidden="true"><i class="color-box color-m100-pickup"></i><i class="color-box color-m40-pickup"></i></span><span data-legend-text="remote">Remote pickup</span></label>
             <label><input type="checkbox" data-legend="local"><span class="legend-key" aria-hidden="true"><i class="color-box color-m100-pa"></i><i class="color-box color-m40-pa"></i></span><span data-legend-text="local">Local PA pickup</span></label>
             <label><input type="checkbox" data-legend="speaker"><span class="legend-key" aria-hidden="true"><i class="color-box color-dc20"></i></span><span data-legend-text="speaker">Speaker coverage</span></label>
+            <label><input type="checkbox" data-visibility="heightSplit" aria-controls="overlay-heightSplit"><span class="legend-line height-key" aria-hidden="true"></span><span data-legend-text="heightSplit">Ceiling height boundary</span></label>
+            <label><input type="checkbox" data-visibility="auxRange" aria-controls="overlay-auxRange"><span class="legend-line aux-key" aria-hidden="true"></span><span data-legend-text="auxRange">Auxiliary display viewing range</span></label>
         </fieldset>
         <svg id="canvas" aria-label="Classroom plan">
             <defs>
@@ -224,7 +226,7 @@
 
             <!-- Room Bounds Rectangle -->
             <rect id="roomBounds" x="0" y="0" width="500" height="400" fill="var(--room-fill)" stroke="var(--room-stroke)" stroke-width="3" />
-            <line id="heightSplitLine" x1="0" x2="500" y1="250" y2="250" stroke="#f59e0b" stroke-width="2" stroke-dasharray="8 5" hidden />
+            <line id="overlay-heightSplit" x1="0" x2="500" y1="250" y2="250" stroke="#f59e0b" stroke-width="2" stroke-dasharray="8 5" display="none" pointer-events="none" />
 
             <g id="audioCoverageLayer" pointer-events="none" stroke-width="1.5">
                 <g id="overlay-m100_pickup" data-kind="m100" data-radius="m100Pickup" display="none" fill="#22c55e" fill-opacity=".15" stroke="#22c55e"></g>
@@ -248,6 +250,7 @@
             </g>
 
             <!-- Auxiliary Display Layer -->
+            <g id="overlay-auxRange" display="none" pointer-events="none"></g>
             <g id="displayLayer"></g>
 
             <!-- Device Layer -->
@@ -292,9 +295,9 @@
     <script defer src="js/locales-hu-it.js?v=20261026-quantities"></script>
     <script defer src="js/locales-es-ja.js?v=20261026-quantities"></script>
     <script defer src="js/locales-ko-ar.js?v=20261026-quantities"></script>
-    <script defer src="js/i18n.js?v=20261120-coverage-legend"></script>
-    <script defer src="js/displays.js?v=20261026-quantities"></script>
-    <script defer src="js/room.js?v=20261120-right-wall-doors"></script>
+    <script defer src="js/i18n.js?v=20261120-plan-guides"></script>
+    <script defer src="js/displays.js?v=20261120-plan-guides"></script>
+    <script defer src="js/room.js?v=20261120-plan-guides"></script>
     <script defer src="js/devices.js?v=20261120-coverage-legend"></script>
     <script defer src="js/coverage.js?v=20261026-quantities"></script>
     <script defer src="js/recommend-mics.js?v=20261026-quantities"></script>

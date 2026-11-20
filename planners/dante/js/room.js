@@ -18,8 +18,7 @@
         const bounds = document.getElementById('roomBounds');
         bounds.setAttribute('width', pxLen);
         bounds.setAttribute('height', pxWid);
-        const splitLine = document.getElementById('heightSplitLine');
-        splitLine.hidden = state.heightProfile.mode !== 'split';
+        const splitLine = document.getElementById('overlay-heightSplit');
         splitLine.setAttribute('x2', pxLen);
         splitLine.setAttribute('y1', state.heightProfile.split * PPM);
         splitLine.setAttribute('y2', state.heightProfile.split * PPM);

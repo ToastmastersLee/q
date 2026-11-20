@@ -4,18 +4,30 @@ body {display:grid;grid-template-columns:58px minmax(0,1fr);grid-template-rows:6
 .workspace-brand {margin-inline-end:auto;color:var(--primary);font-size:19px;white-space:nowrap;}
 .top-nav button,.top-nav select,.workspace-more summary {border:1px solid var(--border);border-radius:8px;background:var(--panel);color:var(--text);padding:10px 14px;font-size:13px;font-weight:600;cursor:pointer;}
 .top-nav #t_recalculate {width:auto;margin:0;background:#f59e0b;color:#111827;}
-.top-nav #t_open3d {width:auto;flex:0 0 auto;margin:0;background:var(--primary);color:white;}
+.workspace-rail .planner-views {display:grid;gap:3px;padding:3px;margin:0 0 6px;border:1px solid var(--border);border-radius:8px;}
+.planner-views [aria-current],.workspace-rail #t_open3d {display:grid;place-items:center;width:100%;min-height:32px;margin:0;padding:3px 0;border:0;border-radius:5px;box-sizing:border-box;font-family:inherit;font-size:12px;font-weight:700;}
+.planner-views [aria-current] {color:var(--primary);background:var(--card-bg);}
+.workspace-rail #t_open3d {color:var(--text);background:transparent;}
+.workspace-rail #t_open3d:hover {background:var(--card-bg);}
+.editable-bom-row label[for="qnex-model"] {grid-column:1/-1;font-weight:700;}
+body > #handoff-error {position:fixed;z-index:90;inset-inline-start:64px;top:20%;max-width:min(340px,74vw);padding:12px;background:var(--panel);border:1px solid var(--border);border-radius:8px;}
 .workspace-more {position:relative;}.workspace-more summary {list-style:none;}
 .workspace-more[open] {box-shadow:0 10px 24px #0003;border-radius:8px;}
 .workspace-more[open] a,.workspace-more[open] button {position:absolute;inset-inline-end:0;top:46px;min-width:160px;white-space:nowrap;box-shadow:0 8px 16px #0002;}
 .workspace-more[open] button {top:90px;}
-.workspace-rail {grid-column:1;grid-row:2;display:flex;flex-direction:column;gap:8px;padding:12px 4px;background:var(--panel);border-inline-end:1px solid var(--border);z-index:65;}
+.workspace-rail {grid-column:1;grid-row:2;display:flex;flex-direction:column;gap:8px;padding:12px 4px;background:var(--panel);border-inline-end:1px solid var(--border);z-index:65;overflow-y:auto;}
 .workspace-rail button {display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;width:50px;min-height:68px;padding:7px 2px;border:0;border-radius:9px;background:transparent;color:var(--text-muted);cursor:pointer;}
 .workspace-rail button span:first-child {font-size:21px;}.workspace-rail button span:last-child {font-size:10px;line-height:1.3;overflow-wrap:anywhere;}
 .workspace-rail button:hover,.workspace-rail button[aria-pressed="true"] {background:var(--card-bg);color:var(--primary);}
 body .sidebar {grid-column:2;grid-row:2;width:100%;min-width:0;min-height:0;padding:12px;gap:10px;box-shadow:none;overflow-y:auto;overflow-x:hidden;}
 .workspace-close {align-self:flex-end;border:1px solid var(--border);border-radius:7px;background:var(--panel);color:var(--text);padding:6px 12px;cursor:pointer;}
 .workspace-panels {min-width:0;}.workspace-panels > section {display:flex;flex-direction:column;gap:14px;}
+.settings-categories {position:sticky;top:0;z-index:2;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:3px;padding:4px;background:var(--panel);border:1px solid var(--border);border-radius:9px;}
+.settings-categories button {min-height:34px;padding:5px 8px;border:0;border-radius:6px;color:var(--text-muted);background:transparent;font:inherit;font-size:13px;cursor:pointer;}
+.settings-categories button:hover,.settings-categories button[aria-pressed="true"] {background:var(--card-bg);color:var(--primary);}
+.settings-categories button[aria-pressed="true"] {font-weight:700;box-shadow:inset 0 0 0 1px var(--primary);}
+.settings-category,#display-options {display:grid;gap:12px;min-width:0;}
+#display-options label {display:flex;align-items:center;gap:8px;margin:0;}
 .workspace-panels [hidden],.audio-count-card [hidden] {display:none!important;}
 .workspace-panels .instruction,.workspace-panels .specs-panel {position:static;inset:auto;transform:none;width:100%;max-width:none;min-width:0;box-shadow:none;margin:0;white-space:normal;background:var(--card-bg);color:var(--text);border:1px solid var(--border);border-radius:10px;padding:14px;pointer-events:auto;text-align:start;}
 .workspace-panels .instruction summary,.workspace-panels .specs-panel summary {pointer-events:none;list-style:none;}

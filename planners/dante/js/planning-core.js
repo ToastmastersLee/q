@@ -14,6 +14,12 @@
         return { m100Pickup: pickup, m100PA: pickup * 5 / 8 };
     }
 
+    function sideWallDoors(roomDepth) {
+        const width = Math.min(1.16, (roomDepth - 0.36) / 2);
+        const inset = Math.max(width / 2 + 0.08, Math.min(1.45, roomDepth * 0.2));
+        return { width, centers: [inset, roomDepth - inset] };
+    }
+
     function heightAt(profile, y, roomWidth) {
         if (!profile || profile.mode !== 'split') return profile?.front ?? profile?.height ?? 3;
         const split = Math.min(Math.max(profile.split, 0), roomWidth);
@@ -125,6 +131,7 @@
     App.m100RadiiForHeight = m100RadiiForHeight;
     App.radiiForDevice = radiiForDevice;
     App.heightAt = heightAt;
+    App.sideWallDoors = sideWallDoors;
     App.auxiliaryDisplaysForWidth = auxiliaryDisplaysForWidth;
     App.bomForPlan = bomForPlan;
 })(window.AISpeech = window.AISpeech || {});

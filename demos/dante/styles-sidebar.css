@@ -180,10 +180,14 @@
   color:var(--text);
   white-space:nowrap
 }
-.device-list {
-  max-height:225px;
-  overflow-y:auto
-}
+.equipment-controls .podium-field { margin:0 0 10px; padding-bottom:10px; border-bottom:1px solid var(--divider); color:var(--text); font-size:14px; font-weight:700; }
+.equipment-controls .podium-field select { padding:7px; min-width:110px; }
+.equipment-controls .select-field:last-child { margin-bottom:0; }
+.inventory .section-heading { margin-bottom:4px; }
+.inventory-group { padding:6px 0; border-bottom:1px solid var(--divider); }
+.inventory-group .bom-row { border:0; padding:3px 0; color:var(--text); font-size:12px; }
+.inventory-group .bom-row strong { color:var(--muted); }
+.inventory-instances { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(115px,100%),1fr)); gap:4px; margin-top:3px; }
 .device-row {
   width:100%;
   display:flex;
@@ -198,6 +202,12 @@
 .device-row.selected {
   border-color:var(--teal)
 }
+.inventory .device-row { text-align:start; margin:0; min-width:0; border-radius:6px; }
+.inventory .device-row:hover,.inventory .device-row.selected { background:var(--accent-soft); color:var(--accent-text); }
+.inventory .device-icon { width:7px; height:7px; }
+.inventory .device-row small { font-size:10px; }
+.demo-indicator { margin-inline-start:6px; color:var(--muted); font-size:10px; }
+.inventory #device-selection { margin-top:5px; padding:10px; background:var(--field); border-radius:8px; box-shadow:none; }
 .device-row span:nth-child(2) {
   flex:1;
   font-size:11px

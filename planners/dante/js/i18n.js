@@ -3,7 +3,8 @@
 
     const displayI18n = {
         en: {
-            title: '🖥️ Auxiliary Displays (AVIXA 6×)',
+            title: 'Auxiliary Displays',
+            size: 'Screen size',
             none: 'Main display covers the usable audience depth; no auxiliary display is required.',
             summary: (count, models, end) => `${count} auxiliary displays in left/right pairs: ${models}. Main display: first 6.0m; rear 2.0m excluded. Detailed-reading coverage through ${end.toFixed(1)}m.`,
             rule: '55″ ≤4.1m · 65″ ≤5.0m · 75″ ≤5.6m',
@@ -11,7 +12,8 @@
             main: 'MAIN DISPLAY'
         },
         zh: {
-            title: '🖥️ 辅助显示屏（AVIXA 6×）',
+            title: '辅助显示屏',
+            size: '屏幕尺寸',
             none: '主显示屏已覆盖可用听课深度，无需辅助显示屏。',
             summary: (count, models, end) => `建议 ${count} 台辅助显示屏，左右成对：${models}。主显示屏覆盖前 6.0m，后方 2.0m 不布置座位；细节阅读覆盖至 ${end.toFixed(1)}m。`,
             rule: '55英寸 ≤4.1m · 65英寸 ≤5.0m · 75英寸 ≤5.6m',
@@ -28,7 +30,8 @@
         const i18n = { [lang]: App.presentCopy(App.i18n[lang], lang, App.state.showModels) };
         document.documentElement.lang = lang;
         const presentation = App.presentationCopy(lang);
-        document.getElementById('t_open3d').textContent = presentation.open3d;
+        document.getElementById('t_open3d').title = presentation.open3d;
+        document.getElementById('t_open3d').setAttribute('aria-label', presentation.open3d);
         document.getElementById('t_showModels').textContent = presentation.showModels;
         document.getElementById('t_reference').textContent = presentation.reference;
         document.getElementById('handoff-error').hidden = true;
@@ -82,15 +85,12 @@
                 <div class="spec-entry"><strong>${App.audioName('m100', lang, App.state.showModels)}:</strong><br>${i18n[lang].specM100}</div>
                 <div class="spec-entry"><strong>${App.audioName('m40', lang, App.state.showModels)}:</strong><br>${i18n[lang].specM40}</div>
                 <div><strong>${App.audioName('dc20', lang, App.state.showModels)}:</strong><br>${i18n[lang].specDC20}</div>
-                <div class="spec-rule"><strong>AVIXA 6×:</strong><br>${getDisplayCopy(lang).rule}</div>
+                <div class="spec-rule"><strong>${getDisplayCopy(lang).title}</strong><br>${getDisplayCopy(lang).rule}</div>
             `;
         }
 
         // Update door labels in SVG
-        const doorText = document.getElementById('doorText');
-        if (doorText) {
-            doorText.textContent = i18n[lang].door;
-        }
+        document.querySelectorAll('#doorGroup text').forEach(label => { label.textContent = i18n[lang].door; });
 
         // Re-trigger layout measurement calculations
         renderRoom();

@@ -50,7 +50,7 @@
         if (input.version === 3 || (input.version === 4 && input.equipment)) {
             const e = input.equipment;
             const qty = n => Number.isInteger(n) && number(n, 0, 99);
-            if (!e || !['NDP600','SL100','NMP311'].includes(e.qnexModel) || !['DP44','DP88'].includes(e.processorModel) ||
+            if (!e || !App.qnexModels.includes(e.qnexModel) || !['DP44','DP88'].includes(e.processorModel) ||
                 !['qnexCount','ifpCount','lcsCount','cameraCount'].every(k => qty(e[k])) || typeof e.lcsEnabled !== 'boolean' ||
                 !['processorCount','du11Count'].every(k => e[k] === null || qty(e[k])) || !Array.isArray(input.teachingDevices)) fail();
             equipment = Object.fromEntries(['qnexModel','qnexCount','ifpCount','lcsEnabled','lcsCount','cameraCount','processorModel','processorCount','du11Count'].map(k => [k,e[k]]));

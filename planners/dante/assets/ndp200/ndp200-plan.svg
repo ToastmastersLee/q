@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2210mm" height="658mm"
+     viewBox="-902 -329 2210 658" role="img" aria-labelledby="title desc">
+  <title id="title">NDP200 讲台俯视符号</title>
+  <desc id="desc">局部单位为毫米，收合台面中心为原点，上方为教师操作侧。
+    实线为 870 × 609 毫米收合外廓。虚线为左手滑盖及右手折板展开后的占用范围，
+    总宽 2162 毫米。现场安装净距另行确定。</desc>
+  <defs>
+    <rect id="ndp200-footprint" x="-435" y="-304.5" width="870" height="609" rx="18"/>
+  </defs>
+  <g id="ndp200-expanded" fill="none" stroke="#347477" stroke-width="9"
+     stroke-linejoin="round" stroke-dasharray="26 18">
+    <use href="#ndp200-footprint"/>
+    <!-- Teacher's right: the shelf hinges at the cabinet, inside the tabletop edge. -->
+    <rect x="-878" y="-272.5" width="578" height="545" rx="12"/>
+    <!-- Teacher's left: the lid still overlaps the console at full travel. -->
+    <rect x="414" y="-295.5" width="870" height="591" rx="18"/>
+  </g>
+  <g id="ndp200-closed">
+    <use href="#ndp200-footprint" fill="#dee5e9" stroke="#263b49" stroke-width="10"/>
+    <rect x="-425" y="-295.5" width="850" height="591" rx="14"
+          fill="#eff2f3" stroke="#788993" stroke-width="3"/>
+    <!-- Retaining ledge on the operator edge of the closed sliding cover. -->
+    <rect x="-347" y="-239" width="694" height="15" rx="5" fill="#566672"/>
+  </g>
+</svg>

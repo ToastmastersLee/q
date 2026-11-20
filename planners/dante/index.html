@@ -8,10 +8,10 @@
     <link rel="stylesheet" href="css/layout.css?v=20261026-quantities">
     <link rel="stylesheet" href="css/components.css?v=20261026-quantities">
 <script src="../shared-quotation/vendor/exceljs.min.js?v=20261026-quantities"></script>
-<script src="../shared-quotation/images.js?v=20261026-quantities"></script>
-<script src="../shared-quotation/quotation.js?v=20261026-quantities"></script>
+<script src="../shared-quotation/images.js?v=20261120-right-wall-doors"></script>
+<script src="../shared-quotation/quotation.js?v=20261120-right-wall-doors"></script>
 <link rel="stylesheet" href="css/configuration.css?v=20261026-quantities">
-<link rel="stylesheet" href="css/workspace.css?v=20261026-quantities">
+<link rel="stylesheet" href="css/workspace.css?v=20261120-settings-groups">
 </head>
 <body>
 
@@ -36,7 +36,7 @@
         </div>
 
         <!-- Presets Card -->
-        <div class="control-group">
+        <div data-settings-category="room" class="control-group">
             <label id="t_scenarioLabel" class="group-title">🏫 Preset Scenarios</label>
             <select class="custom-select" id="presetSelect">
                 <option value="medium" id="t_presetMedium">Medium Classroom (10x8m)</option>
@@ -49,7 +49,7 @@
         </div>
 
         <!-- Room Config Card -->
-        <div class="control-group">
+        <div data-settings-category="room" class="control-group">
             <label id="t_roomConfigLabel" class="group-title">📐 Room Dimensions</label>
             
             <div class="slider-row">
@@ -94,14 +94,17 @@
             </div>
 
             <button id="t_recalculate" class="recalculate-btn">Recalculate</button>
-            <button id="t_open3d" class="recalculate-btn">View 3D</button>
+            <nav class="planner-views" aria-label="2D / 3D"><span aria-current="page">2D</span><button id="t_open3d" type="button">3D</button></nav>
             <p id="handoff-error" class="handoff-error" role="alert" hidden></p>
+        </div>
+
+        <div id="display-options" class="control-group" data-settings-category="display">
             <label class="model-toggle"><input type="checkbox" id="show-models"><span id="t_showModels">Show model numbers</span></label>
             <p id="t_reference" class="height-note">Reference configuration. Adjust parameters for customer-owned equipment.</p>
         </div>
 
         <!-- Stats Card -->
-        <div class="control-group">
+        <div data-settings-category="coverage" class="control-group">
             <label id="t_statsLabel" class="group-title">📈 Coverage Statistics</label>
             <div class="stat-row">
                 <div class="stat-label-container">
@@ -139,13 +142,13 @@
         </div>
 
         <!-- Auxiliary Display Recommendation Card -->
-        <div class="control-group data-panel">
-            <label id="t_auxDisplaysLabel" class="group-title">🖥️ Auxiliary Displays (AVIXA 6×)</label>
+        <div data-settings-category="display" class="control-group data-panel">
+            <label id="t_auxDisplaysLabel" class="group-title">Auxiliary Displays</label>
             <div id="auxDisplaySummary" class="aux-display-summary"></div>
         </div>
 
         <!-- Live Radii Card -->
-        <div class="control-group data-panel">
+        <div data-settings-category="coverage" class="control-group data-panel">
             <label id="t_dataLabel" class="group-title">📊 Live Radii (Editable)</label>
             <div class="data-row">
                 <label class="visibility-label">
@@ -185,7 +188,7 @@
         </div>
 
         <!-- Device Controls Card -->
-        <div class="control-group">
+        <div data-settings-category="audio" class="control-group">
             <label id="t_devicesLabel" class="group-title">🔧 Device Controls</label>
             <div id="audio-count-controls"></div>
             <div class="device-actions">
@@ -204,6 +207,10 @@
                 <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
                     <path d="M 0 0 L 10 5 L 0 10 z" fill="#3b82f6" />
                 </marker>
+                <g id="doorSwing" fill="none" stroke="#ef4444">
+                    <path d="M0 1 V0 H-1" vector-effect="non-scaling-stroke" stroke-width="2.5"/>
+                    <path d="M0 1 A1 1 0 0 1 -1 0" vector-effect="non-scaling-stroke" stroke-width="1.5" stroke-dasharray="4 3"/>
+                </g>
             </defs>
             <!-- Background Grid -->
             <rect id="gridRect" x="-100" y="-100" width="2000" height="2000" fill="url(#grid)" />
@@ -225,18 +232,15 @@
                 <text id="widthDimText" x="-28" y="200" font-size="14" fill="#3b82f6" text-anchor="middle" font-weight="bold" transform="rotate(-90 -28 200)">8.0 m</text>
             </g>
 
-            <!-- Door Group -->
-            <g id="doorGroup">
-                <!-- Drawn dynamically in JS -->
-                <path id="doorPath" d="" stroke="#ef4444" stroke-width="3" fill="none" stroke-dasharray="4,3" />
-                <text id="doorText" x="0" y="0" font-size="13" fill="#ef4444" font-weight="bold" text-anchor="middle">Door 🚪</text>
-            </g>
-
             <!-- Auxiliary Display Layer -->
             <g id="displayLayer"></g>
 
             <!-- Device Layer -->
             <g id="devicesLayer"></g>
+            <g id="doorGroup" pointer-events="none" fill="#ef4444" font-size="10" text-anchor="middle">
+                <g><use href="#doorSwing"/><text>Door</text></g>
+                <g><use href="#doorSwing"/><text>Door</text></g>
+            </g>
         </svg>
 
         <details class="instruction"><summary data-config-copy="instructions">Instructions</summary><div>
@@ -261,31 +265,31 @@
         </div>
     </div>
 
-    <script defer src="js/planning-core.js?v=20261026-quantities"></script>
+    <script defer src="js/planning-core.js?v=20261120-right-wall-doors"></script>
     <script defer src="js/core.js?v=20261026-quantities"></script>
     <script defer src="js/presentation.js?v=20261026-quantities"></script>
-    <script defer src="js/configuration.js?v=20261026-quantities"></script>
-    <script defer src="js/configuration-copy.js?v=20261026-quantities"></script>
+    <script defer src="js/configuration.js?v=20261120-right-wall-doors"></script>
+    <script defer src="js/configuration-copy.js?v=20261120-device-sidebar"></script>
     <script defer src="js/audio-layout.js?v=20261026-quantities"></script>
     <script defer src="js/audio-controls.js?v=20261026-quantities"></script>
-    <script defer src="js/plan-snapshot.js?v=20261026-quantities"></script>
+    <script defer src="js/plan-snapshot.js?v=20261120-right-wall-doors"></script>
     <script defer src="js/locales-en-zh.js?v=20261026-quantities"></script>
     <script defer src="js/locales-hu-it.js?v=20261026-quantities"></script>
     <script defer src="js/locales-es-ja.js?v=20261026-quantities"></script>
     <script defer src="js/locales-ko-ar.js?v=20261026-quantities"></script>
-    <script defer src="js/i18n.js?v=20261026-quantities"></script>
+    <script defer src="js/i18n.js?v=20261120-right-wall-doors"></script>
     <script defer src="js/displays.js?v=20261026-quantities"></script>
-    <script defer src="js/room.js?v=20261026-quantities"></script>
+    <script defer src="js/room.js?v=20261120-right-wall-doors"></script>
     <script defer src="js/devices.js?v=20261026-quantities"></script>
     <script defer src="js/coverage.js?v=20261026-quantities"></script>
     <script defer src="js/recommend-mics.js?v=20261026-quantities"></script>
     <script defer src="js/recommend-speakers.js?v=20261026-quantities"></script>
     <script defer src="js/recommendation.js?v=20261026-quantities"></script>
     <script defer src="js/presets.js?v=20261026-quantities"></script>
-    <script defer src="js/bom.js?v=20261026-quantities"></script>
+    <script defer src="js/bom.js?v=20261120-display-size"></script>
     <script defer src="js/interactions.js?v=20261026-quantities"></script>
-    <script defer src="js/main.js?v=20261026-quantities"></script>
-<script defer src="js/quotation.js?v=20261026-quantities"></script>
-<script defer src="js/workspace.js?v=20261026-quantities"></script>
+    <script defer src="js/main.js?v=20261120-right-wall-doors"></script>
+<script defer src="js/quotation.js?v=20261120-settings-groups"></script>
+<script defer src="js/workspace.js?v=20261120-settings-groups"></script>
 </body>
 </html>

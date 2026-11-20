@@ -55,6 +55,7 @@
     const line = (model, quantity, description, pending = false, perRoom = true) => ({ model, quantity, description, pending, perRoom });
     const qnexModels=['NDP600','SL100','NMP311'];
     function qnexLines(model='NDP600') {
+        if(model==='NDP200')return [line(model,1,'Q-NEX floor-standing digital podium with a sliding cover and folding side shelf.')];
         if(!qnexModels.includes(model))throw new Error('Unsupported Q-NEX model');
         const names={NDP600:'Digital podium sales set including body, active stylus and wireless microphone.',SL100:'Smart podium for teaching presentations and integrated room device control.',NMP311:'Networked media processor for teaching AV and integrated room device control.'};
         const rows=[line(model,1,names[model])];

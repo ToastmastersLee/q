@@ -29,12 +29,12 @@
         exportButton.onclick = () => Quotation.download(exportButton, App.quotationForPlan()); sidebar.prepend(exportButton);
         const bom = document.getElementById('bomPanel'); sidebar.prepend(bom);
         const warning = document.createElement('p'); warning.id = 'processor-warning'; bom.append(warning);
-        const note = document.createElement('p'); note.id = 'configuration-note'; sidebar.prepend(note);
-        const restore = document.createElement('button'); restore.id = 'restore-recommended'; restore.className = 'action-btn'; restore.onclick = () => App.restoreRecommended(); bom.after(restore);
+        const note = document.createElement('p'); note.id = 'configuration-note'; note.dataset.settingsCategory = 'audio'; sidebar.append(note);
+        const restore = document.createElement('button'); restore.id = 'restore-recommended'; restore.dataset.settingsCategory = 'audio'; restore.className = 'action-btn'; restore.onclick = () => App.restoreRecommended(); bom.after(restore);
         function checkbox(id, text, checked, change) {
             const label = document.createElement('label'), input = document.createElement('input'), title = document.createElement('span');
             input.type = 'checkbox'; input.id = id; input.checked = checked; title.textContent = text;
-            label.append(input, title); bom.before(label); input.onchange = () => { change(input.checked); App.renderRoom(); };
+            label.append(input, title); sidebar.querySelector('#display-options .model-toggle').before(label); input.onchange = () => { change(input.checked); App.renderRoom(); };
             return { input, title };
         }
         const lcs = checkbox('include-lcs', '', false, v => { s.equipment.lcsEnabled = v; });

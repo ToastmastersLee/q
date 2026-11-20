@@ -1,5 +1,6 @@
 // One editable configuration for the drawing, handoff and quotation.
 (function (App) {
+    App.qnexModels = Object.freeze(['NDP600', 'NDP200', 'SL100', 'NMP311']);
     const defaults = () => ({ qnexModel: 'NDP600', qnexCount: 1, ifpCount: 1,
         lcsEnabled: false, lcsCount: 1, cameraCount: 2, processorModel: 'DP88',
         processorCount: null, du11Count: null });
@@ -113,10 +114,24 @@
             g.setAttribute('class', 'device teaching-device'); g.dataset.teachingId = d.id;
             g.setAttribute('transform', `translate(${d.x * App.PPM},${d.y * App.PPM})`);
             const rect = document.createElementNS(svg.namespaceURI, 'rect');
-            const width = d.type === 'ifp' ? 90 : d.type === 'camera' ? 32 : 65;
-            for (const [k, v] of Object.entries({ x: -width / 2, y: -7, width, height: 14, rx: 3, fill: d.type === 'camera' ? '#7c3aed' : '#0072ce' })) rect.setAttribute(k, v);
+            let labelY = -12;
+            if (d.type === 'qnex' && d.model === 'NDP200') {
+                const mm = App.PPM / 1000;
+                const image = document.createElementNS(svg.namespaceURI, 'image');
+                image.setAttribute('href', 'assets/ndp200/ndp200-plan.svg');
+                // The asymmetric SVG viewBox is anchored at the closed cabinet centre.
+                for (const [k, v] of Object.entries({ x: -902, y: -329, width: 2210, height: 658 })) image.setAttribute(k, v * mm);
+                image.setAttribute('pointer-events', 'none');
+                g.append(image);
+                for (const [k, v] of Object.entries({ x: -435, y: -304.5, width: 870, height: 609, rx: 18 })) rect.setAttribute(k, v * mm);
+                rect.setAttribute('fill', 'transparent');
+                labelY = -304.5 * mm - 5;
+            } else {
+                const width = d.type === 'ifp' ? 90 : d.type === 'camera' ? 32 : 65;
+                for (const [k, v] of Object.entries({ x: -width / 2, y: -7, width, height: 14, rx: 3, fill: d.type === 'camera' ? '#7c3aed' : '#0072ce' })) rect.setAttribute(k, v);
+            }
             const text = document.createElementNS(svg.namespaceURI, 'text');
-            text.setAttribute('y', -12); text.setAttribute('text-anchor', 'middle');
+            text.setAttribute('y', labelY); text.setAttribute('text-anchor', 'middle');
             text.setAttribute('font-size', '10'); text.setAttribute('fill', 'var(--text)');
             text.textContent = d.type === 'qnex' ? `Q-NEX ${d.model}${eCount(d.type) > 1 ? ' #' + (s.teachingDevices.filter(v => v.type === d.type).indexOf(d) + 1) : ''}` : `${d.model}${d.size ? ' 86″' : ''} #${s.teachingDevices.filter(v => v.type === d.type).indexOf(d) + 1}`;
             g.append(rect, text); layer.append(g);

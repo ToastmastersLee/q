@@ -40,23 +40,16 @@
         widthDimText.textContent = wid.toFixed(1) + ' m';
         widthDimText.setAttribute('transform', `rotate(-90 -28 ${pxWid / 2})`);
 
-        // Door drawing (Bottom-right corner)
-        const doorSize = 0.9 * PPM; // 90cm door width
-        const doorPath = document.getElementById('doorPath');
-        const doorText = document.getElementById('doorText');
-        
-        if (pxLen >= doorSize && pxWid >= doorSize) {
-            // Draw door panel line and dashed arc swing inwards
-            doorPath.setAttribute('d', `M ${pxLen} ${pxWid} A ${doorSize} ${doorSize} 0 0 0 ${pxLen - doorSize} ${pxWid - doorSize} L ${pxLen - doorSize} ${pxWid}`);
-            doorPath.style.display = '';
-            doorText.setAttribute('x', pxLen - doorSize / 2);
-            doorText.setAttribute('y', pxWid - doorSize - 6);
-            doorText.style.display = '';
-        } else {
-            // Hide door if room is too small
-            doorPath.style.display = 'none';
-            doorText.style.display = 'none';
-        }
+        const doors = App.sideWallDoors(wid);
+        const doorSize = doors.width * PPM;
+        document.querySelectorAll('#doorGroup > g').forEach((door, index) => {
+            const hingeY = doors.centers[index] * PPM - doorSize / 2;
+            door.setAttribute('transform', `translate(${pxLen} ${hingeY})`);
+            door.querySelector('use').setAttribute('transform', `scale(${doorSize})`);
+            const label = door.querySelector('text');
+            label.setAttribute('x', -doorSize / 2);
+            label.setAttribute('y', doorSize / 2);
+        });
 
         // Update SVG viewBox and sizes for responsiveness
         const padding = 45;

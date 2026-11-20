@@ -8,7 +8,10 @@
     const s = App.state;
     s.auxDisplays = []; s.equipment = defaults(); s.teachingDevices = []; s.manualAudio = false; s.manualAux = false;
     s.showIFP = true; s.showAuxDisplays = true;
-    const clamp = (v, max) => Math.max(0.15, Math.min(max - 0.15, v));
+    const stationHalfWidth = 0.36; // metres in the floor plan
+    const markerWidths = { ifp: 90, camera: 32, qnex: 65, station: 2 * stationHalfWidth * App.PPM };
+    const markerHeight = 14;
+    const clamp = (v, max, inset = 0.15) => Math.max(inset, Math.min(max - inset, v));
     const quantity = value => value !== '' && value !== null && Number.isInteger(Number(value)) && Number(value) >= 0 && Number(value) <= 99;
     App.validQuantity = quantity;
     function slot(index, length, width, retained) {
@@ -19,12 +22,12 @@
         })[0];
     }
     function frontPosition(type, retained, length) {
-        const half = type === 'ifp' ? 1 : 0.36;
+        const half = type === 'ifp' ? 1 : stationHalfWidth;
         const obstacles = [...retained, ...s.teachingDevices.filter(d => d.type !== type && ['ifp','station'].includes(d.type) && d.y < 0.8)];
         const candidates = [length / 2, ...Array.from({length:41}, (_,i) => half + 0.05 + (length - 2 * half - 0.1) * i / 40),
-            ...obstacles.flatMap(d => { const gap = half + (d.type === 'ifp' ? 1 : 0.36) + 0.08; return [d.x-gap,d.x+gap]; })]
+            ...obstacles.flatMap(d => { const gap = half + (d.type === 'ifp' ? 1 : stationHalfWidth) + 0.08; return [d.x-gap,d.x+gap]; })]
             .filter(x => x >= half && x <= length-half);
-        const available = candidates.filter(x => obstacles.every(d => Math.abs(x-d.x) >= half + (d.type === 'ifp' ? 1 : 0.36) + 0.079));
+        const available = candidates.filter(x => obstacles.every(d => Math.abs(x-d.x) >= half + (d.type === 'ifp' ? 1 : stationHalfWidth) + 0.079));
         const score = x => retained.length ? Math.min(...retained.map(d => Math.abs(d.x-x))) : type === 'ifp' ? -Math.abs(x-length/2) : -x;
         return (available.length ? available : candidates).sort((a,b) => score(b)-score(a))[0] ?? length/2;
     }
@@ -34,6 +37,11 @@
         return [...items.filter(d => d.type !== type), ...retained];
     };
     function fitTeaching(d) {
+        if (d.type === 'station') {
+            d.x = clamp(d.x, s.roomLength, stationHalfWidth + 0.05);
+            d.y = clamp(d.y, s.roomWidth, markerHeight / (2 * App.PPM) + 0.05);
+            return;
+        }
         d.x = clamp(d.x, s.roomLength); d.y = clamp(d.y, s.roomWidth);
         if (d.type === 'ifp') {
             const half = (86 * 0.0254 * 16 / Math.sqrt(337) + 0.07) / 2;
@@ -114,10 +122,18 @@
             g.setAttribute('class', 'device teaching-device'); g.dataset.teachingId = d.id;
             g.setAttribute('transform', `translate(${d.x * App.PPM},${d.y * App.PPM})`);
             const rect = document.createElementNS(svg.namespaceURI, 'rect');
-            const width = d.type === 'ifp' ? 90 : d.type === 'camera' ? 32 : 65;
-            for (const [k, v] of Object.entries({ x: -width / 2, y: -7, width, height: 14, rx: 3, fill: d.type === 'camera' ? '#7c3aed' : '#0072ce' })) rect.setAttribute(k, v);
+            const width = markerWidths[d.type];
+            for (const [k, v] of Object.entries({ x: -width / 2, y: -markerHeight / 2, width, height: markerHeight, rx: 3, fill: d.type === 'camera' ? '#7c3aed' : '#0072ce' })) rect.setAttribute(k, v);
             const text = document.createElementNS(svg.namespaceURI, 'text');
             text.setAttribute('y', -12); text.setAttribute('text-anchor', 'middle');
+            if (d.type === 'station') {
+                if (d.y * App.PPM < 24) text.setAttribute('y', 20);
+                if (d.x < 1 || s.roomLength - d.x < 1) {
+                    const left = d.x < 1;
+                    text.setAttribute('text-anchor', left ? 'start' : 'end');
+                    text.setAttribute('x', left ? -width / 2 : width / 2);
+                }
+            }
             text.setAttribute('font-size', '10'); text.setAttribute('fill', 'var(--text)');
             text.textContent = d.type === 'qnex' ? `Q-NEX ${d.model}${eCount(d.type) > 1 ? ' #' + (s.teachingDevices.filter(v => v.type === d.type).indexOf(d) + 1) : ''}` : `${d.model}${d.size ? ' 86″' : ''} #${s.teachingDevices.filter(v => v.type === d.type).indexOf(d) + 1}`;
             g.append(rect, text); layer.append(g);

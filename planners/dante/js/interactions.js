@@ -39,6 +39,7 @@
             tx = Math.max(0, Math.min(state.roomLength, tx));
             ty = Math.max(0, Math.min(state.roomWidth, ty));
             
+            if (App.checkDisplayMove?.(draggingDevice,tx,ty)) return;
             draggingDevice.x = tx;
             draggingDevice.y = ty;
             
@@ -54,6 +55,11 @@
         }
         if (target && target.classList?.contains('device')) {
             const id = parseInt(target.getAttribute('data-id'));
+            const screenId=target.dataset.teachingId || target.dataset.auxId;
+            if (state.displayPlan?.screens.some(s=>s.id===screenId)) {
+                state.displayPlan={...state.displayPlan,screens:state.displayPlan.screens.filter(s=>s.id!==screenId)};
+                App.renderRoom();return;
+            }
             if (target.dataset.teachingId) {
                 const d = state.teachingDevices.find(v => v.id === target.dataset.teachingId);
                 const key = {qnex:'qnexCount',ifp:'ifpCount',station:'lcsCount',camera:'cameraCount'}[d.type];

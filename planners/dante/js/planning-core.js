@@ -69,7 +69,7 @@
     function bomForPlan(roomLength, roomWidth, devices, displays) {
         const counts = { m100: 0, m40: 0, dc20: 0, 55: 0, 65: 0, 75: 0 };
         devices.forEach(device => { counts[device.type]++; });
-        displays.forEach(display => { counts[display.size]++; });
+        displays.forEach(display => { if ([55,65,75].includes(display.size)) counts[display.size]++; });
         const microphones = counts.m100 + counts.m40;
         const channels = microphones * 2 + (counts.dc20 > 0 ? 1 : 0);
         return {

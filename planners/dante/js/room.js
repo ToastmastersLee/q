@@ -13,6 +13,9 @@
         const wid = state.roomWidth;
         const pxLen = len * PPM;
         const pxWid = wid * PPM;
+        const stage = document.getElementById('stageBounds');
+        const stageWidth = state.displayPlan ? state.displayPlan.stageMm/1000 : len;
+        stage.setAttribute('x',(len-stageWidth)*PPM/2);stage.setAttribute('width',stageWidth*PPM);
 
         // Update bounds rect
         const bounds = document.getElementById('roomBounds');

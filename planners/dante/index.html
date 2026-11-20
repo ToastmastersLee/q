@@ -255,6 +255,7 @@
 
             <!-- Device Layer -->
             <g id="devicesLayer"></g>
+            <rect id="stageBounds" x="0" y="2" height="3" fill="var(--room-stroke)" opacity="0.45" pointer-events="none" />
             <g id="doorGroup" pointer-events="none" fill="#ef4444" font-size="10" text-anchor="middle">
                 <g><use href="#doorSwing"/><text>Door</text></g>
                 <g><use href="#doorSwing"/><text>Door</text></g>
@@ -283,31 +284,34 @@
         </div>
     </div>
 
-    <script defer src="js/planning-core.js?v=20261120-right-wall-doors"></script>
+    <script defer src="js/planning-core.js?v=20261120-display-layout"></script>
     <script defer src="js/core.js?v=20261026-quantities"></script>
     <script defer src="js/presentation.js?v=20261026-quantities"></script>
-    <script defer src="js/configuration.js?v=20261120-station-marker"></script>
+    <script defer src="../shared-planning/display-fit.js?v=20261120-display-layout"></script>
+    <script defer src="../shared-planning/display-editor.js?v=20261120-display-layout"></script>
+    <script defer src="js/display-layout.js?v=20261120-display-layout"></script>
+    <script defer src="js/configuration.js?v=20261120-display-layout"></script>
     <script defer src="js/configuration-copy.js?v=20261120-device-sidebar"></script>
     <script defer src="js/audio-layout.js?v=20261026-quantities"></script>
     <script defer src="js/audio-controls.js?v=20261026-quantities"></script>
-    <script defer src="js/plan-snapshot.js?v=20261120-right-wall-doors"></script>
+    <script defer src="js/plan-snapshot.js?v=20261120-display-layout"></script>
     <script defer src="js/locales-en-zh.js?v=20261026-quantities"></script>
     <script defer src="js/locales-hu-it.js?v=20261026-quantities"></script>
     <script defer src="js/locales-es-ja.js?v=20261026-quantities"></script>
     <script defer src="js/locales-ko-ar.js?v=20261026-quantities"></script>
     <script defer src="js/i18n.js?v=20261120-plan-guides"></script>
-    <script defer src="js/displays.js?v=20261120-plan-guides"></script>
-    <script defer src="js/room.js?v=20261120-plan-guides"></script>
+    <script defer src="js/displays.js?v=20261120-display-layout"></script>
+    <script defer src="js/room.js?v=20261120-display-layout"></script>
     <script defer src="js/devices.js?v=20261120-coverage-legend"></script>
     <script defer src="js/coverage.js?v=20261026-quantities"></script>
     <script defer src="js/recommend-mics.js?v=20261026-quantities"></script>
     <script defer src="js/recommend-speakers.js?v=20261026-quantities"></script>
     <script defer src="js/recommendation.js?v=20261026-quantities"></script>
-    <script defer src="js/presets.js?v=20261026-quantities"></script>
-    <script defer src="js/bom.js?v=20261120-display-size"></script>
-    <script defer src="js/interactions.js?v=20261026-quantities"></script>
-    <script defer src="js/main.js?v=20261120-coverage-legend"></script>
-<script defer src="js/quotation.js?v=20261120-settings-groups"></script>
+    <script defer src="js/presets.js?v=20261120-display-layout"></script>
+    <script defer src="js/bom.js?v=20261120-display-layout"></script>
+    <script defer src="js/interactions.js?v=20261120-display-layout"></script>
+    <script defer src="js/main.js?v=20261120-display-layout"></script>
+<script defer src="js/quotation.js?v=20261120-display-layout"></script>
 <script defer src="js/workspace.js?v=20261120-settings-groups"></script>
 </body>
 </html>

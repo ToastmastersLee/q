@@ -25,9 +25,9 @@
         const half = type === 'ifp' ? 1 : stationHalfWidth;
         const obstacles = [...retained, ...s.teachingDevices.filter(d => d.type !== type && ['ifp','station'].includes(d.type) && d.y < 0.8)];
         const candidates = [length / 2, ...Array.from({length:41}, (_,i) => half + 0.05 + (length - 2 * half - 0.1) * i / 40),
-            ...obstacles.flatMap(d => { const gap = half + (d.type === 'ifp' ? 1 : stationHalfWidth) + 0.08; return [d.x-gap,d.x+gap]; })]
+            ...obstacles.flatMap(d => { const gap = half + (d.type === 'ifp' ? (d.panel?.widthMm/2000 || 1) : stationHalfWidth) + 0.08; return [d.x-gap,d.x+gap]; })]
             .filter(x => x >= half && x <= length-half);
-        const available = candidates.filter(x => obstacles.every(d => Math.abs(x-d.x) >= half + (d.type === 'ifp' ? 1 : stationHalfWidth) + 0.079));
+        const available = candidates.filter(x => obstacles.every(d => Math.abs(x-d.x) >= half + (d.type === 'ifp' ? (d.panel?.widthMm/2000 || 1) : stationHalfWidth) + 0.079));
         const score = x => retained.length ? Math.min(...retained.map(d => Math.abs(d.x-x))) : type === 'ifp' ? -Math.abs(x-length/2) : -x;
         return (available.length ? available : candidates).sort((a,b) => score(b)-score(a))[0] ?? length/2;
     }
@@ -37,6 +37,7 @@
         return [...items.filter(d => d.type !== type), ...retained];
     };
     function fitTeaching(d) {
+        if (d.panel) return;
         if (d.type === 'station') {
             d.x = clamp(d.x, s.roomLength, stationHalfWidth + 0.05);
             d.y = clamp(d.y, s.roomWidth, markerHeight / (2 * App.PPM) + 0.05);
@@ -59,6 +60,7 @@
         const specs = [ ['qnex', e.qnexCount], ['ifp', s.showIFP ? e.ifpCount : 0],
             ['station', e.lcsEnabled ? e.lcsCount : 0], ['camera', e.lcsEnabled ? e.cameraCount : 0] ];
         for (const [type, count] of specs) {
+            if (s.displayPlan && type === 'ifp') continue;
             s.teachingDevices = App.reconcileInstances(s.teachingDevices, type, count, (i, retained) => {
                 const n = App.idCounter++;
                 const point = type === 'camera' ? { x: len / 2 + Math.floor(i / 2) * 0.45,
@@ -68,7 +70,9 @@
                 return { id: `teaching-${n}`, type, ...point, role: i % 2 ? 'teacher' : 'student' };
             });
         }
+        App.applyScreenEntries?.();
         for (const d of s.teachingDevices) {
+            if (d.panel) continue;
             d.model = d.type === 'qnex' ? e.qnexModel : d.type === 'ifp' ? 'QA1400 Pro' : d.type === 'camera' ? 'CV870' : 'LCS810 GEN2';
             if (d.type === 'ifp') d.size = 86;
         }
@@ -118,12 +122,14 @@
         layer.replaceChildren();
         const eCount = type => s.teachingDevices.filter(v => v.type === type).length;
         for (const d of s.teachingDevices) {
+            if (d.type==='ifp' && !s.showIFP) continue;
             const g = document.createElementNS(svg.namespaceURI, 'g');
             g.setAttribute('class', 'device teaching-device'); g.dataset.teachingId = d.id;
             g.setAttribute('transform', `translate(${d.x * App.PPM},${d.y * App.PPM})`);
             const rect = document.createElementNS(svg.namespaceURI, 'rect');
-            const width = markerWidths[d.type];
-            for (const [k, v] of Object.entries({ x: -width / 2, y: -markerHeight / 2, width, height: markerHeight, rx: 3, fill: d.type === 'camera' ? '#7c3aed' : '#0072ce' })) rect.setAttribute(k, v);
+            const width = d.panel ? d.panel.widthMm * App.PPM / 1000 : markerWidths[d.type];
+            const height=d.panel ? d.panel.depthMm * App.PPM / 1000 : markerHeight;
+            for (const [k, v] of Object.entries({ x: -width / 2, y: -height / 2, width, height, rx: 3, fill: d.type === 'camera' ? '#7c3aed' : '#0072ce' })) rect.setAttribute(k, v);
             const text = document.createElementNS(svg.namespaceURI, 'text');
             text.setAttribute('y', -12); text.setAttribute('text-anchor', 'middle');
             if (d.type === 'station') {
@@ -135,7 +141,7 @@
                 }
             }
             text.setAttribute('font-size', '10'); text.setAttribute('fill', 'var(--text)');
-            text.textContent = d.type === 'qnex' ? `Q-NEX ${d.model}${eCount(d.type) > 1 ? ' #' + (s.teachingDevices.filter(v => v.type === d.type).indexOf(d) + 1) : ''}` : `${d.model}${d.size ? ' 86″' : ''} #${s.teachingDevices.filter(v => v.type === d.type).indexOf(d) + 1}`;
+            text.textContent = d.type === 'qnex' ? `Q-NEX ${d.model}${eCount(d.type) > 1 ? ' #' + (s.teachingDevices.filter(v => v.type === d.type).indexOf(d) + 1) : ''}` : `${d.model}${d.size ? ' '+d.size+'″' : ''} #${s.teachingDevices.filter(v => v.type === d.type).indexOf(d) + 1}`;
             g.append(rect, text); layer.append(g);
         }
     };

@@ -6,6 +6,10 @@
 
     function applyScenario(scenario) {
         const request = App.appliedAudioRequest(state), draft = state.audioDraft;
+        const size={medium:[8,10,3],standard:[10,10,3],large:[10,14,3.4],step:[10,20,3.6],small:[5,6,2.8]}[scenario];
+        if(size && !App.admitDisplayRoom({width:size[0],depth:size[1],height:size[2]})){
+            document.getElementById('presetSelect').value='custom';return false;
+        }
         if (scenario === 'medium') {
             state.roomLength = 8.0;
             state.roomWidth = 10.0;
@@ -92,8 +96,7 @@
         if (scenario !== 'custom') {
             applyScenario(scenario);
         } else {
-            applyScenario('medium');
-            document.getElementById('presetSelect').value = 'medium';
+            if(applyScenario('medium')!==false)document.getElementById('presetSelect').value = 'medium';
         }
     }
 

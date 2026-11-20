@@ -7,8 +7,11 @@
 
     function validateSnapshot(input) {
         if (!input || typeof input !== 'object') fail();
-        if (![1, 2, 3, 4].includes(input.version)) fail('snapshotVersion');
+        if (![1, 2, 3, 4, 5].includes(input.version)) fail('snapshotVersion');
         const { length, width, height } = input;
+        const displayPlan = input.version === 5 ? input.displayPlan : null;
+        if (input.version===5 && !DisplayFit.valid(displayPlan)) fail();
+        const panels=new Map((displayPlan?.screens || []).map(p=>[p.id,p]));
         if (!number(length, 2, 40) || !number(width, 2, 40) || !number(height, 2, 4)) fail();
         if (!Array.isArray(input.devices) || !Array.isArray(input.displays)) fail();
         const ids = new Set();
@@ -28,9 +31,11 @@
         });
         const displays = input.displays.map(display => {
             const base = entry(display);
-            if (!['left', 'right'].includes(display.side) || ![55, 65, 75].includes(display.size) ||
+            const panel=panels.get(base.id);
+            if (displayPlan && (!panel || panel.zone!==display.side || panel.size!==display.size || panel.x!==base.x || panel.y!==base.y)) fail();
+            if (!['left', 'right'].includes(display.side) || (!panel && ![55, 65, 75].includes(display.size)) ||
                 !number(display.maxDistance, 0, 40) || !number(display.coverageEnd, display.y, width)) fail();
-            return { ...base, side: display.side, size: display.size, maxDistance: display.maxDistance, coverageEnd: display.coverageEnd };
+            return { ...base, ...(panel?{panel}:{}), side: display.side, size: display.size, maxDistance: display.maxDistance, coverageEnd: display.coverageEnd };
         });
         if (!input.radii || radiusKeys.some(key => !number(input.radii[key], 0, Number.MAX_VALUE))) fail();
         if (!input.show || showKeys.some(key => typeof input.show[key] !== 'boolean') || typeof input.showModels !== 'boolean') fail();
@@ -47,7 +52,7 @@
                 drop: p.drop, manualPickup: p.manualPickup, manualPA: p.manualPA };
         }
         let equipment, teachingDevices;
-        if (input.version === 3 || (input.version === 4 && input.equipment)) {
+        if (input.version === 3 || (input.version >= 4 && input.equipment)) {
             const e = input.equipment;
             const qty = n => Number.isInteger(n) && number(n, 0, 99);
             if (!e || !App.qnexModels.includes(e.qnexModel) || !['DP44','DP88'].includes(e.processorModel) ||
@@ -57,23 +62,26 @@
             teachingDevices = input.teachingDevices.map(d => {
                 const base = entry(d);
                 if (!['qnex','ifp','station','camera'].includes(d.type)) fail();
-                const expected = d.type === 'qnex' ? e.qnexModel : d.type === 'ifp' ? 'QA1400 Pro' : d.type === 'camera' ? 'CV870' : 'LCS810 GEN2';
-                if (d.model !== expected || (d.type === 'ifp' && d.size !== 86) || (d.type === 'camera' && !['teacher','student'].includes(d.role))) fail();
-                return { ...base, type:d.type, model:expected, ...(d.type === 'ifp' ? {size:86} : {}), ...(d.type === 'camera' ? {role:d.role} : {}) };
+                const panel=panels.get(base.id);
+                if (displayPlan && d.type==='ifp' && (!panel || panel.zone!=='front' || panel.x!==d.x || panel.y!==d.y || d.size!==panel.size)) fail();
+                const expected = d.type === 'qnex' ? e.qnexModel : d.type === 'ifp' ? (panel?.name || 'QA1400 Pro') : d.type === 'camera' ? 'CV870' : 'LCS810 GEN2';
+                if (d.model !== expected || (d.type === 'ifp' && !panel && d.size !== 86) || (d.type === 'camera' && !['teacher','student'].includes(d.role))) fail();
+                return { ...base, type:d.type, model:expected, ...(d.type === 'ifp' ? {size:d.size,...(panel?{panel}:{})} : {}), ...(d.type === 'camera' ? {role:d.role} : {}) };
             });
             for (const [type, count] of [['qnex',e.qnexCount],['ifp',e.ifpCount],['station',e.lcsEnabled ? e.lcsCount : 0],['camera',e.lcsEnabled ? e.cameraCount : 0]]) {
                 if (teachingDevices.filter(d => d.type === type).length !== count) fail();
             }
         }
         let audioLayout;
-        if (input.version === 4) {
+        if (input.version >= 4) {
             const a = input.audioLayout, actual = App.audioCounts(devices);
             if (!a || !['auto','fixed'].includes(a.mode) || !a.counts ||
                 App.audioTypes.some(type => !Number.isInteger(a.counts[type]) || a.counts[type] !== actual[type])) fail();
             if (!equipment && input.teachingDevices?.length) fail();
             audioLayout = { mode:a.mode, counts:actual };
         }
-        return { version: input.version, length, width, height, devices, displays,
+        if (displayPlan && (!equipment || panels.size!==displays.length+teachingDevices.filter(d=>d.type==='ifp').length)) fail();
+        return { ...(displayPlan?{displayPlan,screenVisibility:{front:input.screenVisibility?.front!==false,side:input.screenVisibility?.side!==false}}:{}), version: input.version, length, width, height, devices, displays,
             radii: Object.fromEntries(radiusKeys.map(key => [key, input.radii[key]])),
             show: Object.fromEntries(showKeys.map(key => [key, input.show[key]])),
             language: input.language, showModels: input.showModels, ...(heightProfile ? { heightProfile } : {}),
@@ -81,10 +89,14 @@
     }
     function snapshotFromState(state, language) {
         if (state === App.state && state.equipment) App.syncTeachingDevices();
-        return validateSnapshot({ version: 4, audioLayout:App.appliedAudioRequest(state), length: state.roomLength, width: state.roomWidth, height: state.height,
-            devices: state.devices, displays: state.showAuxDisplays === false ? [] : state.auxDisplays, radii: state.radii, show: state.show,
+        if(state.displayPlan && state===App.state){
+            const fit=DisplayFit.fit(state.displayPlan,App.displayContext().room,{fixed:true});
+            if(fit.status==='blocked') fail('screenSpace');
+        }
+        return validateSnapshot({ version: state.displayPlan?5:4, displayPlan:state.displayPlan,screenVisibility:{front:state.showIFP,side:state.showAuxDisplays}, audioLayout:App.appliedAudioRequest(state), length: state.roomLength, width: state.roomWidth, height: state.height,
+            devices: state.devices, displays: !state.displayPlan && state.showAuxDisplays === false ? [] : state.auxDisplays, radii: state.radii, show: state.show,
             language, showModels: state.showModels === true, heightProfile: state.heightProfile || {mode:"uniform",front:state.height,rear:state.height,split:state.roomWidth/2,drop:0,manualPickup:null,manualPA:null},
-            equipment: state.equipment ? {...state.equipment, ifpCount:state.showIFP === false ? 0 : state.equipment.ifpCount} : undefined,
+            equipment: state.equipment ? {...state.equipment, ifpCount:!state.displayPlan && state.showIFP === false ? 0 : state.equipment.ifpCount} : undefined,
             teachingDevices: state.teachingDevices });
     }
     function encodeSnapshot(snapshot) { return '#plan=' + encodeURIComponent(JSON.stringify(validateSnapshot(snapshot))); }

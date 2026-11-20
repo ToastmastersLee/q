@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="styles.css?v=20261030-planning-reset">
   <link rel="stylesheet" href="styles-presentation.css?v=classroom-controls">
   <link rel="stylesheet" href="styles-camera-field.css">
-  <script defer src="dist/app.js?v=20261113-merged-simulation-audio"></script>
+  <script defer src="dist/app.js?v=20261120-display-layout"></script>
 </head>
 <body>
   <div id="app" class="app-shell">
@@ -73,8 +73,8 @@
           <section class="sidebar-section selected-section">
             <div id="equipment-controls">
               <div class="subheading" data-i18n="equipment">Equipment configuration</div>
-              <label class="select-row"><span data-i18n="ifpSize">IFP size</span><select id="ifp-size"><option value="65">65&quot;</option><option value="75">75&quot;</option><option value="86" selected>86&quot;</option></select></label>
-              <label class="select-row"><span data-i18n="ifpCount">IFP panels</span><select id="ifp-count"><option value="1">1</option><option value="2" selected>2</option></select></label>
+              <label style="display:none"><span data-i18n="ifpSize">IFP size</span><select id="ifp-size"><option value="65">65&quot;</option><option value="75">75&quot;</option><option value="86" selected>86&quot;</option></select></label>
+              <label style="display:none"><span data-i18n="ifpCount">IFP panels</span><select id="ifp-count"><option value="1">1</option><option value="2" selected>2</option></select></label>
               <label class="select-row"><span data-i18n="displaySize">Auxiliary Display size</span><select id="display-size"><option value="55" selected>55&quot;</option><option value="65">65&quot;</option><option value="75">75&quot;</option></select></label>
               <label class="select-row"><span data-i18n="cameraPackage">Camera package</span><select id="camera-package"><option value="CV870">CV870 Pro</option><option value="CV210">CV210</option></select></label>
               <div id="long-camera-settings" hidden>
@@ -90,6 +90,7 @@
           </section>
         </div>
         <div class="sidebar-pane" id="sidebar-devices" role="tabpanel" aria-labelledby="sidebar-tab-devices" tabindex="0" hidden>
+          <div id="display-layout" class="sidebar-section"></div>
           <section class="sidebar-section selected-section" aria-live="polite"><div class="section-heading"><h3 data-i18n="selected">Selected device</h3></div><div id="device-detail" class="device-detail"></div><button id="adjust-camera-field" class="reset-button" type="button" data-sidebar-copy="adjustCamera" hidden>Adjust field of view</button><button id="adjust-s210-aim" class="reset-button" type="button" hidden>Aim S210</button><button id="open-av-matrix" class="reset-button" type="button" hidden>Open AV Matrix</button></section>
           <details class="settings-panel">
             <summary data-i18n="mountingHeights">Illustrative mounting heights</summary>

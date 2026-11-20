@@ -1,4 +1,702 @@
 (() => {
+  // ../shared-planning/display-fit.js
+  (function() {
+    const zones = ["front", "left", "right"];
+    const main = {
+      65: [1490, 920, 100],
+      75: [1710, 1050, 100],
+      86: [1960, 1190, 100],
+      98: [2220, 1340, 105],
+      110: [2500, 1450, 110]
+    };
+    const auxiliary = { 55: [1226, 699, 63], 65: [1447, 823, 63], 75: [1668, 948, 67] };
+    const mm = (metres) => Math.round(metres * 1e3);
+    const catalog = (zone) => zone === "front" ? main : auxiliary;
+    function standard(zone, size, id, x, y) {
+      const [widthMm, heightMm, depthMm] = catalog(zone)[size];
+      return {
+        id: String(id),
+        zone,
+        size: Number(size),
+        name: zone === "front" ? "QA1400 Pro" : "Auxiliary Display",
+        widthMm,
+        heightMm,
+        depthMm,
+        offsetMm: zone === "front" ? 0 : 180,
+        x,
+        y
+      };
+    }
+    function valid(plan) {
+      const dimension = (n) => Number.isSafeInteger(n) && n > 0 && n <= 1e5;
+      if (!plan || !dimension(plan.stageMm) || !Array.isArray(plan.screens) || plan.screens.length > 300)
+        return false;
+      const ids = /* @__PURE__ */ new Set();
+      return plan.screens.every((s) => {
+        if (!s || !zones.includes(s.zone) || typeof s.id !== "string" || !s.id || s.id.length > 100 || ids.has(s.id) || typeof s.name !== "string" || !s.name.trim() || s.name.length > 100 || ![s.widthMm, s.heightMm, s.depthMm].every(dimension) || !Number.isSafeInteger(s.offsetMm) || s.offsetMm < 0 || s.offsetMm > 1e5 || !Number.isFinite(s.x) || !Number.isFinite(s.y))
+          return false;
+        ids.add(s.id);
+        const dims = catalog(s.zone)[s.size];
+        return s.size === null || Array.isArray(dims) && dims.every((v, i) => v === [s.widthMm, s.heightMm, s.depthMm][i]);
+      });
+    }
+    function label(s) {
+      return s.size ? s.name + " " + s.size + "\u2033" : s.name;
+    }
+    function quotationName(screen) {
+      if (screen.size === null) return screen.name;
+      const model = screen.zone === "front" ? screen.name : "Auxiliary Display / TV";
+      return model + " " + screen.size + "-inch";
+    }
+    function viewingGuide(depth) {
+      return depth <= 5 ? [[1, 65]] : depth <= 6 ? [[1, 75]] : depth <= 8 ? [[1, 86]] : depth <= 10 ? [
+        [1, 98],
+        [2, 75]
+      ] : [
+        [1, 110],
+        [2, 86]
+      ];
+    }
+    const viewingHeight = { 65: 0.8, 75: 0.93, 86: 1.07, 98: 1.22, 110: 1.37 };
+    function groups(screens) {
+      const grouped = /* @__PURE__ */ new Map();
+      for (const screen of screens) {
+        const key = JSON.stringify([
+          screen.zone === "front",
+          screen.name,
+          screen.size,
+          screen.widthMm,
+          screen.heightMm,
+          screen.depthMm
+        ]);
+        if (!grouped.has(key)) grouped.set(key, { screen, count: 0 });
+        grouped.get(key).count++;
+      }
+      return [...grouped.values()];
+    }
+    function doorSpans(depth) {
+      const width = Math.min(1.16, (depth - 0.36) / 2);
+      const inset = Math.max(width / 2 + 0.08, Math.min(1.45, depth * 0.2));
+      return [inset, depth - inset].map((c) => [mm(c - width / 2), mm(c + width / 2)]);
+    }
+    function freeSpans(start, end, blocked) {
+      const free = [];
+      let cursor = start;
+      for (const [a, b] of blocked.sort((p, q) => p[0] - q[0])) {
+        if (b <= cursor || a >= end) continue;
+        if (a > cursor) free.push([cursor, a]);
+        cursor = Math.max(cursor, b);
+      }
+      if (cursor < end) free.push([cursor, end]);
+      return free;
+    }
+    function arrange(items, spans, front, margin, gap, fixed) {
+      const axis = front ? "x" : "y";
+      const extent = (s) => front ? s.widthMm : s.depthMm;
+      const placed = /* @__PURE__ */ new Map();
+      const sorted = [...items].sort((a, b) => a[axis] - b[axis]);
+      let previousEnd = -Infinity;
+      if (sorted.every((s) => {
+        const center = s[axis] * 1e3, start = center - extent(s) / 2, end = center + extent(s) / 2;
+        const fits = start >= previousEnd + gap - 1e-3 && spans.some(([a, b]) => start >= a + margin - 1e-3 && end <= b - margin + 1e-3);
+        previousEnd = end;
+        placed.set(s.id, center);
+        return fits;
+      }))
+        return placed;
+      if (fixed) return null;
+      const bins = spans.map(([a, b]) => ({ a, b, left: b - a - margin * 2, items: [] }));
+      const ordered = [...items].sort((a, b) => extent(b) - extent(a));
+      const required = ordered.reduce((total, s) => total + extent(s), 0) + Math.max(0, ordered.length - bins.length) * gap;
+      if (required > bins.reduce((total, b) => total + Math.max(0, b.left), 0)) return null;
+      function fill(i) {
+        if (i === ordered.length) return true;
+        const seen = /* @__PURE__ */ new Set(), s = ordered[i];
+        for (const bin of bins) {
+          const available = bin.left - (bin.items.length ? gap : 0);
+          if (seen.has(available) || extent(s) > available) continue;
+          seen.add(available);
+          const left = bin.left;
+          bin.items.push(s);
+          bin.left = available - extent(s);
+          if (fill(i + 1)) return true;
+          bin.items.pop();
+          bin.left = left;
+        }
+        return false;
+      }
+      if (!fill(0)) return null;
+      for (const bin of bins) {
+        let cursor = bin.a + margin + bin.left / 2;
+        bin.items.sort((a, b) => a[axis] - b[axis]);
+        for (const s of bin.items) {
+          placed.set(s.id, cursor + extent(s) / 2);
+          cursor += extent(s) + gap;
+        }
+      }
+      return placed;
+    }
+    function fit(plan, room, { fixed = false } = {}) {
+      const fail = (zone, reason, missing = 0) => ({ status: "blocked", zone, reason, missing });
+      if (!valid(plan) || ![room.width, room.depth, room.height].every((n) => Number.isFinite(n) && n > 0))
+        return fail("front", "dimensions");
+      if (plan.stageMm > mm(room.width)) return fail("front", "stage", plan.stageMm - mm(room.width));
+      const ceiling = (y) => room.profile?.mode === "split" && y >= room.profile.split ? room.profile.rear : room.height;
+      const screens = plan.screens.map((s) => ({ ...s })), results = [];
+      for (const zone of zones) {
+        const front = zone === "front", items = screens.filter((s) => s.zone === zone);
+        const start = front ? (mm(room.width) - plan.stageMm) / 2 : 0;
+        const blocked = front ? (room.stations || []).filter((d) => d.y < 0.8).map((d) => [mm(d.x) - 360, mm(d.x) + 360]) : zone === (room.doorSide || "right") ? doorSpans(room.depth) : [];
+        const spans = freeSpans(start, front ? start + plan.stageMm : mm(room.depth), blocked);
+        const free = spans.reduce((sum, [a, b]) => sum + b - a, 0);
+        const slack = free - items.reduce((sum, s) => sum + (front ? s.widthMm : s.depthMm), 0);
+        if (slack < 0) return fail(zone, "width", -slack);
+        for (const s of items) {
+          const height = mm(front ? ceiling(s.y) : Math.max(room.height, room.profile?.rear || 0));
+          if (front && (s.y < 0 || Math.max(s.depthMm, s.y * 1e3 + s.depthMm / 2) > mm(room.depth)))
+            return fail(zone, "projection");
+          const mount = room.mainHeight;
+          if (s.heightMm > height) return fail(zone, "height", s.heightMm - height);
+          if (front && mount != null && (s.heightMm / 2 > mm(mount) || s.heightMm / 2 + mm(mount) > height))
+            return fail(
+              zone,
+              "height",
+              Math.ceil(Math.max(s.heightMm / 2 - mm(mount), s.heightMm / 2 + mm(mount) - height))
+            );
+          if (!front && s.offsetMm + s.widthMm > mm(room.width))
+            return fail(zone, "projection", s.offsetMm + s.widthMm - mm(room.width));
+        }
+        const roomy = arrange(items, spans, front, 300, 150, fixed);
+        const positions = roomy || arrange(items, spans, front, 0, 0, fixed);
+        if (!positions) return fail(zone, "obstacle");
+        for (const s of items) {
+          if (front) s.x = positions.get(s.id) / 1e3;
+          else {
+            s.y = positions.get(s.id) / 1e3;
+            const center = (s.offsetMm + s.widthMm / 2) / 1e3;
+            s.x = zone === "left" ? center : room.width - center;
+          }
+        }
+        results.push({
+          zone,
+          slack,
+          tight: items.length > 0 && (!roomy || slack <= 600 + (items.length - 1) * 150)
+        });
+      }
+      const leftPanels = screens.filter((s) => s.zone === "left");
+      const rightPanels = screens.filter((s) => s.zone === "right");
+      const projectsAcross = (a, b) => a.offsetMm + a.widthMm + b.offsetMm + b.widthMm > mm(room.width);
+      for (const b of rightPanels) {
+        const across = leftPanels.filter((a) => projectsAcross(a, b));
+        if (!across.some((a) => Math.abs(a.y - b.y) * 1e3 < (a.depthMm + b.depthMm) / 2)) continue;
+        if (fixed) return fail("right", "opposite");
+        const others = [...across, ...rightPanels.filter((p) => p !== b)];
+        const blocked = others.map((p) => [p.y * 1e3 - p.depthMm / 2, p.y * 1e3 + p.depthMm / 2]);
+        if ((room.doorSide || "right") === "right") blocked.push(...doorSpans(room.depth));
+        const spans = freeSpans(0, mm(room.depth), blocked);
+        const comfortable = arrange([b], spans, false, 300, 150, false);
+        const placement = comfortable || arrange([b], spans, false, 0, 0, false);
+        if (!placement) return fail("right", "opposite");
+        b.y = placement.get(b.id) / 1e3;
+        if (!comfortable) results.find((r) => r.zone === "right").tight = true;
+      }
+      for (const a of screens.filter((s) => s.zone === "left")) {
+        for (const b of screens.filter((s) => s.zone === "right")) {
+          if (Math.abs(a.y - b.y) * 1e3 < (a.depthMm + b.depthMm) / 2 && a.offsetMm + a.widthMm + b.offsetMm + b.widthMm > mm(room.width))
+            return fail("right", "opposite");
+        }
+      }
+      for (const s of screens) {
+        if (s.heightMm > mm(ceiling(s.y))) return fail(s.zone, "height", s.heightMm - mm(ceiling(s.y)));
+      }
+      return {
+        status: results.some((r) => r.tight) ? "tight" : "ok",
+        plan: { stageMm: plan.stageMm, screens },
+        results
+      };
+    }
+    function nextId(screens) {
+      let i = 1;
+      while (screens.some((s) => s.id === "lcd-" + i)) i++;
+      return "lcd-" + i;
+    }
+    function counts(plan, zone, count, room, size) {
+      if (!Number.isInteger(count) || count < 0 || count > 99) return null;
+      const current = plan.screens.filter((s) => s.zone === zone);
+      const screens = plan.screens.filter((s) => s.zone !== zone || current.indexOf(s) < count);
+      for (let i = current.length; i < count; i++)
+        screens.push(
+          standard(
+            zone,
+            size || (zone === "front" ? 86 : 55),
+            nextId(screens),
+            room.width / 2,
+            zone === "front" ? 0.15 : room.depth / 2
+          )
+        );
+      return { ...plan, screens };
+    }
+    globalThis.DisplayFit = {
+      catalog,
+      standard,
+      valid,
+      label,
+      quotationName,
+      viewingGuide,
+      viewingHeight,
+      groups,
+      doorSpans,
+      fit,
+      counts,
+      nextId
+    };
+  })();
+
+  // ../shared-planning/display-editor.js
+  (function() {
+    const F2 = globalThis.DisplayFit;
+    const words = {
+      en: [
+        "Display layout",
+        "Stage width (m)",
+        "Confirm width",
+        "Stage",
+        "Left wall",
+        "Right wall",
+        "Installation area",
+        "Screen count",
+        "Custom dimensions",
+        "Device name",
+        "Width (mm)",
+        "Height (mm)",
+        "Thickness (mm)",
+        "Bracket offset (mm)",
+        "Apply",
+        "Cancel",
+        "Remove",
+        "Remaining",
+        "Tight \xB7 not recommended",
+        "Cannot install",
+        "Stage exceeds room width",
+        "Insufficient width",
+        "Insufficient mounting height",
+        "Insufficient inward space",
+        "No continuous space at this position",
+        "Opposite side panels overlap",
+        "Enter valid dimensions",
+        "Confirm the measured stage width to configure screens",
+        "Add custom screen",
+        "Change dimensions",
+        "Locked for this plan",
+        "Available",
+        "Select fewer or smaller screens"
+      ],
+      zh: [
+        "\u6DB2\u6676\u5C4F\u5E03\u5C40",
+        "\u821E\u53F0\u603B\u5BBD\uFF08\u7C73\uFF09",
+        "\u786E\u8BA4\u5BBD\u5EA6",
+        "\u821E\u53F0",
+        "\u5DE6\u4FA7\u5899",
+        "\u53F3\u4FA7\u5899",
+        "\u5B89\u88C5\u533A\u57DF",
+        "\u5C4F\u5E55\u6570\u91CF",
+        "\u81EA\u5B9A\u4E49\u5C3A\u5BF8",
+        "\u8BBE\u5907\u540D\u79F0",
+        "\u6574\u673A\u5BBD\uFF08\u6BEB\u7C73\uFF09",
+        "\u6574\u673A\u9AD8\uFF08\u6BEB\u7C73\uFF09",
+        "\u6574\u673A\u539A\uFF08\u6BEB\u7C73\uFF09",
+        "\u652F\u67B6\u79BB\u5899\u8DDD\u79BB\uFF08\u6BEB\u7C73\uFF09",
+        "\u5E94\u7528",
+        "\u53D6\u6D88",
+        "\u79FB\u9664",
+        "\u5269\u4F59",
+        "\u7D27\u51D1 \xB7 \u4E0D\u63A8\u8350",
+        "\u65E0\u6CD5\u5B89\u88C5",
+        "\u821E\u53F0\u6BD4\u623F\u95F4\u5BBD",
+        "\u53EF\u5B89\u88C5\u5BBD\u5EA6\u4E0D\u8DB3",
+        "\u53EF\u5B89\u88C5\u9AD8\u5EA6\u4E0D\u8DB3",
+        "\u5411\u5BA4\u5185\u4F38\u51FA\u7A7A\u95F4\u4E0D\u8DB3",
+        "\u5F53\u524D\u4F4D\u7F6E\u6CA1\u6709\u8FDE\u7EED\u5B89\u88C5\u7A7A\u95F4",
+        "\u4E24\u4FA7\u5C4F\u4F53\u76F8\u4EA4",
+        "\u8BF7\u8F93\u5165\u6709\u6548\u5C3A\u5BF8",
+        "\u8BF7\u5148\u786E\u8BA4\u5B9E\u6D4B\u821E\u53F0\u5BBD\u5EA6\uFF0C\u518D\u914D\u7F6E\u5C4F\u5E55",
+        "\u6DFB\u52A0\u81EA\u5B9A\u4E49\u5C4F",
+        "\u4FEE\u6539\u5C3A\u5BF8",
+        "\u672C\u65B9\u6848\u5DF2\u9501\u5B9A",
+        "\u53EF\u5B89\u88C5",
+        "\u5EFA\u8BAE\u51CF\u5C0F\u5C3A\u5BF8\u6216\u51CF\u5C11\u53F0\u6570"
+      ]
+    };
+    const zoneIndex = { front: 3, left: 4, right: 5 }, reasons = {
+      stage: 20,
+      width: 21,
+      height: 22,
+      projection: 23,
+      obstacle: 24,
+      opposite: 25,
+      dimensions: 26
+    };
+    function message(result, lang, zone = "front") {
+      const w = words[lang] || words.en;
+      if (result.status === "blocked")
+        return [
+          w[19],
+          w[zoneIndex[result.zone]],
+          w[reasons[result.reason]],
+          result.missing ? Math.ceil(result.missing) + " mm" : ""
+        ].filter(Boolean).join(" \xB7 ");
+      const row = result.results.find((r) => r.zone === zone);
+      return [w[row.tight ? 18 : 31], w[17] + " " + Math.round(row.slack) + " mm", row.tight ? w[32] : ""].filter(Boolean).join(" \xB7 ");
+    }
+    function bind(host, read, save) {
+      const root = host.shadowRoot || host.attachShadow({ mode: "open" });
+      const addSizes = { front: 86, left: 55, right: 55 };
+      let zone = "front", editing = null, notice = "", previous = "", draftWidth = null, repairPlan = null;
+      const node = (tag, txt) => {
+        const n = document.createElement(tag);
+        if (txt != null) n.textContent = txt;
+        return n;
+      };
+      function refresh(force = false) {
+        const { plan, locked, room, lang } = read(), w = words[lang] || words.en;
+        const key = JSON.stringify([plan, locked, room, lang, zone, editing, notice]);
+        if (!force && previous === key) return;
+        previous = key;
+        const inputWidth = locked ? plan.stageMm / 1e3 : draftWidth ?? plan.stageMm / 1e3;
+        const base = { ...repairPlan || plan, stageMm: Math.round(Number(inputWidth) * 1e3) };
+        const result = F2.fit(base, room);
+        const current = base.screens.filter((s) => s.zone === zone);
+        root.replaceChildren();
+        const style = node("style");
+        style.textContent = ":host{display:block;min-width:0;color:inherit;font:inherit}section{padding:12px;border:1px solid #8295a755;border-radius:8px;display:grid;gap:9px}h3,p{margin:0}h3{font-size:14px}label,.row{display:flex;gap:6px;align-items:center;justify-content:space-between;flex-wrap:wrap;font-size:12px}input,select,button{font:inherit;color:inherit;background:transparent;border:1px solid #8295a788;border-radius:5px;padding:5px;max-width:100%;box-sizing:border-box}input[type=number]{width:85px}option{background:Canvas;color:CanvasText}button{cursor:pointer}button:disabled,select:disabled{opacity:.55}output{font-size:12px;line-height:1.45}output[data-state=tight]{color:#b6790c}output[data-state=blocked]{color:#dc5549}fieldset{margin:0;padding:9px;display:grid;gap:6px;border:1px solid #8295a755}";
+        root.append(style);
+        const box = node("section");
+        root.append(box);
+        box.append(node("h3", w[0]));
+        function field(title, control, parent = box) {
+          const label = node("label");
+          control.setAttribute("aria-label", title);
+          label.append(node("span", title), control);
+          parent.append(label);
+          return control;
+        }
+        function button(title, fn, parent = box) {
+          const b = node("button", title);
+          b.type = "button";
+          b.onclick = fn;
+          parent.append(b);
+          return b;
+        }
+        function select(options, value, fn, label, parent = box) {
+          const s = node("select");
+          for (const [v, t, disabled, hint] of options) {
+            const o = new Option(t, v);
+            o.disabled = Boolean(disabled);
+            if (hint) o.title = hint;
+            s.add(o);
+          }
+          s.value = String(value);
+          s.onchange = () => fn(s.value);
+          return field(label, s, parent);
+        }
+        function commit(candidate2) {
+          const next = F2.fit(candidate2, room);
+          if (next.status === "blocked") {
+            if (result.status === "blocked" && F2.valid(candidate2)) {
+              repairPlan = candidate2;
+              editing = null;
+            }
+            notice = message(next, lang);
+            refresh(true);
+            return;
+          }
+          notice = "";
+          editing = null;
+          draftWidth = null;
+          repairPlan = null;
+          save(next.plan);
+          refresh(true);
+        }
+        const width = node("input");
+        width.type = "number";
+        width.step = "0.001";
+        width.min = "0.001";
+        width.max = room.width;
+        width.value = inputWidth;
+        width.disabled = locked;
+        const widthRow = node("div");
+        widthRow.className = "row";
+        box.append(widthRow);
+        field(w[1], width, widthRow);
+        width.oninput = () => {
+          draftWidth = width.value;
+          notice = "";
+        };
+        if (!locked)
+          button(
+            w[2],
+            () => {
+              const candidate2 = { ...base, stageMm: Math.round(Number(width.value) * 1e3) };
+              if (!width.reportValidity() || !F2.valid(candidate2)) return;
+              const fit = F2.fit(candidate2, room);
+              if (fit.status === "blocked" && fit.reason !== "stage") {
+                notice = message(fit, lang);
+                draftWidth = width.value;
+                refresh(true);
+                return;
+              }
+              commit(candidate2);
+            },
+            widthRow
+          );
+        else widthRow.append(node("small", w[30]));
+        select(
+          Object.entries(zoneIndex).map(([k, i]) => [k, w[i]]),
+          zone,
+          (v) => {
+            zone = v;
+            editing = null;
+            notice = "";
+            refresh(true);
+          },
+          w[6]
+        );
+        const zoneSizes = Object.keys(F2.catalog(zone)).map(Number);
+        const seedSize = addSizes[zone];
+        const addingSize = select(
+          zoneSizes.map((size) => [size, size + "\u2033"]),
+          seedSize,
+          (v) => {
+            addSizes[zone] = Number(v);
+            refresh(true);
+          },
+          lang === "zh" ? "\u65B0\u589E\u5C4F\u5E55\u5C3A\u5BF8" : "Size for additional screens"
+        );
+        addingSize.disabled = !locked;
+        const max = Math.min(
+          99,
+          Math.max(
+            current.length + 1,
+            Math.floor(
+              (zone === "front" ? base.stageMm : room.depth * 1e3) / Math.min(
+                ...Object.values(F2.catalog(zone)).map(
+                  (d) => zone === "front" ? d[0] : d[2]
+                )
+              )
+            ) + 1
+          )
+        );
+        const countOptions = [];
+        let firstBlocked;
+        for (let n = 0; n <= max; n++) {
+          const candidate2 = F2.counts(base, zone, n, room, seedSize);
+          const trial = n > current.length ? F2.fit(candidate2, room) : null;
+          const disabled = trial?.status === "blocked";
+          if (disabled && !firstBlocked) firstBlocked = { n, trial };
+          countOptions.push([n, String(n), disabled, disabled ? message(trial, lang, zone) : ""]);
+        }
+        const count = select(
+          countOptions,
+          current.length,
+          (v) => commit(F2.counts(base, zone, Number(v), room, seedSize)),
+          w[7]
+        );
+        const canEdit = locked || draftWidth !== null && result.status === "blocked" && result.reason !== "stage";
+        count.disabled = !canEdit;
+        for (const [index, s] of current.entries()) {
+          const row = node("div");
+          row.className = "row";
+          box.append(row);
+          const change = (size) => ({
+            ...base,
+            screens: base.screens.map(
+              (p) => p.id === s.id ? F2.standard(zone, size, s.id, s.x, s.y) : p
+            )
+          });
+          const options = zoneSizes.map((size) => {
+            const test = F2.fit(change(size), room);
+            return [
+              size,
+              size + "\u2033",
+              test.status === "blocked" && result.status !== "blocked",
+              message(test, lang, zone)
+            ];
+          });
+          options.push(["custom", s.size === null ? s.name : w[8]]);
+          const choice = select(
+            options,
+            s.size ?? "custom",
+            (v) => {
+              if (v === "custom") {
+                editing = s.id;
+                notice = "";
+                refresh(true);
+              } else commit(change(Number(v)));
+            },
+            "#" + (index + 1),
+            row
+          );
+          choice.disabled = !canEdit;
+          if (s.size === null)
+            button(
+              w[29],
+              () => {
+                editing = s.id;
+                refresh(true);
+              },
+              row
+            ).disabled = !canEdit;
+          button(
+            w[16],
+            () => commit({ ...base, screens: base.screens.filter((p) => p.id !== s.id) }),
+            row
+          ).disabled = !canEdit;
+        }
+        button(w[28], () => {
+          editing = "new";
+          notice = "";
+          refresh(true);
+        }).disabled = !canEdit;
+        const output = node("output");
+        output.setAttribute("role", "status");
+        box.append(output);
+        output.dataset.state = notice ? "blocked" : result.status;
+        output.textContent = notice || (!locked && result.status !== "blocked" ? w[27] : message(result, lang, zone));
+        if (firstBlocked && locked && !editing) {
+          const hint = node(
+            "small",
+            w[7] + " " + firstBlocked.n + " (" + (lang === "zh" ? "\u65B0\u589E" : "add") + " " + seedSize + "\u2033) \xB7 " + message(firstBlocked.trial, lang, zone)
+          );
+          box.append(hint);
+        }
+        if (zone === "front" && room.depth > 0 && !editing) {
+          const zh = lang === "zh";
+          const recommended = F2.viewingGuide(room.depth);
+          const guide = recommended.map(([n, size]) => n + " \xD7 " + size + "\u2033").join(zh ? " \u6216 " : " or ");
+          const distances = [
+            ...new Set(current.map((s) => s.size).filter((size) => F2.viewingHeight[size]))
+          ].map((size) => size + "\u2033 \u2264 " + (6 * F2.viewingHeight[size]).toFixed(2) + " m").join(" \xB7 ");
+          box.append(
+            node(
+              "small",
+              (zh ? "\u6309\u6559\u5BA4\u6DF1\u5EA6\u9009\u578B" : "Room-depth guide") + " (" + room.depth + " m) \xB7 " + guide + (distances ? " \xB7 " + (zh ? "\u6587\u5B57\u89C2\u770B\u8DDD\u79BB\uFF086H\uFF09" : "Text viewing distance (6H)") + " " + distances : "")
+            )
+          );
+          if (current.length && current.every((s) => s.size !== null) && current.some(
+            (s) => recommended.some(
+              ([n, size]) => s.size === size && current.filter((p) => p.size === size).length > n
+            )
+          )) {
+            box.append(
+              node(
+                "small",
+                zh ? "\u667A\u6167\u63A8\u8350\uFF1A\u53EF\u6309\u4E0A\u65B9\u5EFA\u8BAE\u8C03\u6574\u5C3A\u5BF8\u6216\u51CF\u5C11\u53F0\u6570\u3002" : "Consider the recommended screen sizes and counts above."
+              )
+            );
+          }
+        }
+        if (!editing) return;
+        const old = current.find((s) => s.id === editing);
+        const form = node("fieldset");
+        form.append(node("legend", w[8]));
+        box.insertBefore(form, output);
+        const inputs = {};
+        for (const [key2, i, defaultValue] of [
+          ["name", 9, ""],
+          ["widthMm", 10, ""],
+          ["heightMm", 11, ""],
+          ["depthMm", 12, zone === "front" ? 70 : ""],
+          ["offsetMm", 13, zone === "front" ? null : 180]
+        ]) {
+          if (defaultValue === null) continue;
+          const input = node("input");
+          input.type = key2 === "name" ? "text" : "number";
+          input.required = true;
+          input.maxLength = 100;
+          if (input.type === "number") {
+            input.min = key2 === "offsetMm" ? "0" : "1";
+            input.max = 1e5;
+            input.step = "1";
+          }
+          input.value = old?.[key2] ?? defaultValue;
+          inputs[key2] = field(w[i], input, form);
+        }
+        function candidate() {
+          const screen = {
+            id: old?.id || F2.nextId(base.screens),
+            zone,
+            size: null,
+            name: inputs.name.value.trim(),
+            widthMm: Number(inputs.widthMm.value),
+            heightMm: Number(inputs.heightMm.value),
+            depthMm: Number(inputs.depthMm?.value ?? old?.depthMm ?? 70),
+            offsetMm: Number(inputs.offsetMm?.value ?? 0),
+            x: old?.x ?? room.width / 2,
+            y: old?.y ?? (zone === "front" ? 0.15 : room.depth / 2)
+          };
+          return {
+            ...base,
+            screens: old ? base.screens.map((s) => s.id === old.id ? screen : s) : [...base.screens, screen]
+          };
+        }
+        const apply = button(w[14], () => commit(candidate()), form);
+        function preview() {
+          const r = F2.fit(candidate(), room);
+          apply.disabled = r.status === "blocked" && !(result.status === "blocked" && F2.valid(candidate()));
+          output.dataset.state = r.status;
+          output.textContent = message(r, lang, zone);
+        }
+        form.oninput = preview;
+        preview();
+        button(
+          w[15],
+          () => {
+            editing = null;
+            notice = "";
+            refresh(true);
+          },
+          form
+        );
+      }
+      refresh();
+      return {
+        refresh,
+        report(msg) {
+          notice = msg;
+          refresh(true);
+        }
+      };
+    }
+    globalThis.DisplayEditor = { bind, message };
+  })();
+
+  // src/domain/display-layout.js
+  var F = globalThis.DisplayFit;
+  function lcsRoom(width, depth, height, hub, doorSide = "right") {
+    return { width, depth, height, stations: hub ? [hub] : [], doorSide };
+  }
+  function legacyDisplays(width, panel, enabled, displays, size) {
+    const screens = [];
+    if (enabled && panel) {
+      const screen = F.standard("front", 86, "ifp-1", panel.x, panel.y);
+      const nominal = 86 * 0.0254 * 16 / Math.sqrt(337);
+      if (Math.abs(panel.width - nominal) > 0.015) {
+        Object.assign(screen, {
+          size: null,
+          name: "IFP",
+          widthMm: Math.round(panel.width * 1e3),
+          heightMm: Math.round(panel.width * 9e3 / 16)
+        });
+      }
+      screens.push(screen);
+    }
+    for (const d of displays) {
+      const zone = String(d.id).startsWith("L") ? "left" : "right";
+      screens.push(F.standard(zone, Number(size), "display-" + d.id, d.x, d.y));
+    }
+    return { stageMm: Math.round(width * 1e3), screens };
+  }
+
   // src/i18n.js
   var i18n = {
     en: {
@@ -1130,8 +1828,8 @@
       students: studentModel === "CV870" ? [{ id: 0, x: center, y: 0 }] : students
     };
   }
-  function coversWholeStage(camera, hfov, roomWidth, roomDepth) {
-    const halfStageWidth = roomWidth * 0.35;
+  function coversWholeStage(camera, hfov, roomWidth, roomDepth, stageWidth = roomWidth * 0.7) {
+    const halfStageWidth = stageWidth / 2;
     const center = roomWidth / 2;
     const halfAngleTangent = Math.tan(hfov * Math.PI / 360);
     const stageRear = Math.min(2.2, roomDepth);
@@ -1253,8 +1951,8 @@
     }
   };
   var pointIsValid = (point, room) => point && Number.isFinite(point.x) && Number.isFinite(point.y) && point.x >= 0 && point.x <= room.width && point.y >= 0 && point.y <= room.depth;
-  function validatePlanSnapshot(snapshot) {
-    if (!snapshot || snapshot.version !== PLAN_SNAPSHOT_VERSION) return "snapshotVersion";
+  function validatePlanSnapshot(snapshot, { geometry = true } = {}) {
+    if (!snapshot || ![1, 2].includes(snapshot.version)) return "snapshotVersion";
     const { room, layout, cameraPlan, visibility } = snapshot;
     if (!room || ![room.width, room.depth, room.height].every(Number.isFinite) || room.width < 4 || room.width > 30 || room.depth < 5 || room.depth > 50 || room.height < 2.4 || room.height > 6) return "roomSize";
     if (!layout || !cameraPlan || !Object.hasOwn(cameraModels, cameraPlan.teacher) || !Object.hasOwn(cameraModels, cameraPlan.student) || !visibility || ["teacher", "student", "s210", "speaker", "display", "ifp"].some((key) => typeof visibility[key] !== "boolean") || typeof snapshot.projectTitle !== "string" || typeof snapshot.lang !== "string" || typeof snapshot.hubName !== "string" || typeof snapshot.displayName !== "string" || !["55", "65", "75"].includes(String(snapshot.displaySize))) return "snapshotInvalid";
@@ -1270,11 +1968,18 @@
         if (!item || typeof item !== "object" || Array.isArray(item) || item.confirmed !== void 0 && typeof item.confirmed !== "boolean" || item.model !== void 0 && (typeof item.model !== "string" || item.model.length > 120) || item.notes !== void 0 && (typeof item.notes !== "string" || item.notes.length > 1e3) || item.capacity !== void 0 && (!Number.isFinite(item.capacity) || item.capacity < 0 || item.capacity > 100)) return "snapshotInvalid";
       }
     }
-    if (visibility.ifp) {
-      const { x, width } = layout.largeScreen;
-      if (width + 1.3 > room.width || x - width / 2 < 0 || x + width / 2 > room.width) return "screenSpace";
-      const halfHeight = width * 9 / 32;
-      if (Math.max(1.2, halfHeight + 0.08) > room.height - halfHeight - 0.08) return "screenHeight";
+    if (snapshot.version === 2) {
+      if (!DisplayFit.valid(snapshot.displayPlan)) return "snapshotInvalid";
+      if (geometry) {
+        const fit = DisplayFit.fit(snapshot.displayPlan, lcsRoom(room.width, room.depth, room.height, layout.hub), { fixed: true });
+        if (fit.status === "blocked") return fit.reason === "height" ? "screenHeight" : "screenSpace";
+      }
+      return null;
+    }
+    if (geometry && visibility.ifp) {
+      const seed = legacyDisplays(room.width, layout.largeScreen, true, [], snapshot.displaySize);
+      const fit = DisplayFit.fit(seed, lcsRoom(room.width, room.depth, room.height, layout.hub), { fixed: true });
+      if (fit.status === "blocked") return fit.reason === "height" ? "screenHeight" : "screenSpace";
     }
     return null;
   }
@@ -1302,12 +2007,14 @@
     showSpeakers,
     showDisplays,
     showLargeScreen,
+    displayPlan,
     qnexModel = "NDP600",
     audioConfig = emptyAudioConfig(),
     s210Request = { mode: "fixed", count: s210s.length }
   }) {
     return JSON.parse(JSON.stringify({
-      version: PLAN_SNAPSHOT_VERSION,
+      version: displayPlan ? 2 : PLAN_SNAPSHOT_VERSION,
+      ...displayPlan ? { displayPlan } : {},
       projectTitle,
       lang,
       room: { width: roomWidth, depth: roomLength, height: roomHeight },
@@ -1348,8 +2055,9 @@
     if (v.needsCameraPoEExpansion) lines.push(line("External PoE switch", 1, "Camera network expansion; select model, PoE budget, VLAN and control path."));
     if (v.audioPlan.purchaseFeedback) lines.push(line("FE-224N", v.audioPlan.purchaseFeedback, "Required feedback suppressor on the microphone reinforcement path; coordinate with A3006 DSP. Confirm generation and routing."));
     if (v.audioPlan.purchaseAmplifiers) lines.push(line("EKA-415", v.audioPlan.purchaseAmplifiers, `Required external amplifier. Q-NEX serves ${v.audioPlan.builtInSpeakers} PS610; external amplifier(s) serve ${v.audioPlan.externalSpeakers}. One speaker per channel; confirm limiter/gain commissioning and AC220V/50Hz supply.`));
-    if (v.showLargeScreen) lines.push(line("QA1400 Pro 86-inch", 1, "86-inch interactive flat panel for teaching presentations, touch interaction and hybrid learning."));
-    if (v.showDisplays) lines.push(line(`Auxiliary Display / TV ${v.displaySize}-inch`, v.displays.length, "Auxiliary display coverage; model, mounting and signal distribution require selection."));
+    if (v.displayPlan) for (const { screen, count } of DisplayFit.groups(v.displayPlan.screens)) lines.push(line(DisplayFit.quotationName(screen), count, `${screen.widthMm} \xD7 ${screen.heightMm} \xD7 ${screen.depthMm} mm`));
+    else if (v.showLargeScreen) lines.push(line("QA1400 Pro 86-inch", 1, "86-inch interactive flat panel for teaching presentations, touch interaction and hybrid learning."));
+    if (!v.displayPlan && v.showDisplays) lines.push(line(`Auxiliary Display / TV ${v.displaySize}-inch`, v.displays.length, "Auxiliary display coverage; model, mounting and signal distribution require selection."));
     return {
       sceneKind: "lcs",
       qnexModel: v.qnexModel,
@@ -1419,6 +2127,7 @@
     roomLength,
     revX,
     revY,
+    moveDisplay,
     setTeacherCam,
     setStudentCams,
     s210s,
@@ -1446,7 +2155,8 @@
     const ny = Math.max(0.1, Math.min(roomLength - 0.1, revY(py)));
     const cameraX = Math.max(0, Math.min(roomWidth, revX(px)));
     const cameraY = Math.max(0, Math.min(roomLength, revY(py)));
-    if (isDragging === "teacher") setTeacherCam({ x: cameraX, y: cameraY });
+    if (isDragging.startsWith("lcd:")) moveDisplay(isDragging.slice(4), nx, ny);
+    else if (isDragging === "teacher") setTeacherCam({ x: cameraX, y: cameraY });
     else if (isDragging.startsWith("student-")) {
       const cameraId = parseInt(isDragging.split("-")[1]);
       setStudentCams((cameras) => cameras.map(
@@ -1589,6 +2299,27 @@
     }), /* @__PURE__ */ React.createElement("p", null, zh ? "\u672A\u5B8C\u6574\u786E\u8BA4\u578B\u53F7\u3001\u5BB9\u91CF\u53CA\u517C\u5BB9\u6027\u65F6\uFF0C\u5FC5\u914D\u8BBE\u5907\u4ECD\u8BA1\u5165\u91C7\u8D2D\u3002" : "Required purchases remain until model, capacity and compatibility are fully confirmed."), /* @__PURE__ */ React.createElement("ul", null, audioPlanNotes(audioPlan, audioConfig, lang).map((note, i) => /* @__PURE__ */ React.createElement("li", { key: i }, note))));
   }
 
+  // src/components/DisplayLayout.jsx
+  function DisplayLayout() {
+    const { screenContext, applyDisplayPlan } = useApp();
+    const host = React.useRef(null), editor = React.useRef(null), current = React.useRef(null);
+    current.current = { screenContext, applyDisplayPlan };
+    React.useLayoutEffect(() => {
+      editor.current = globalThis.DisplayEditor.bind(
+        host.current,
+        () => current.current.screenContext,
+        (plan) => current.current.applyDisplayPlan(plan)
+      );
+      return () => {
+        editor.current = null;
+      };
+    }, []);
+    React.useLayoutEffect(() => {
+      editor.current?.refresh();
+    });
+    return /* @__PURE__ */ React.createElement("div", { id: "display-layout", ref: host });
+  }
+
   // src/components/Controls.jsx
   function Controls() {
     const {
@@ -1631,9 +2362,7 @@
       setLang,
       setPreset,
       setProjectTitle,
-      setRoomHeight,
-      setRoomLength,
-      setRoomWidth,
+      changeRoomDimension,
       setShowDisplays,
       setShowLargeScreen,
       setShowS210,
@@ -1663,6 +2392,8 @@
       teacherMaxDistance,
       teacherStageCoverageWarning,
       th,
+      screenError,
+      displayPlan,
       themeKey,
       handleOpen3D,
       threeDCopy,
@@ -1670,13 +2401,19 @@
       handleReset
     } = useApp();
     const [optionsOpen, setOptionsOpen] = React.useState(false);
-    return /* @__PURE__ */ React.createElement("header", { className: "lcs-toolbar" }, /* @__PURE__ */ React.createElement("div", { className: "lcs-toolbar-main" }, /* @__PURE__ */ React.createElement("a", { href: new URLSearchParams(location.search).get("home") || "../../index.html" }, window.Quotation.words(lang)[3]), /* @__PURE__ */ React.createElement("div", { className: "lcs-brand" }, /* @__PURE__ */ React.createElement("h1", { className: `font-black uppercase tracking-tighter italic ${th.headerText}` }, projectTitle), /* @__PURE__ */ React.createElement("p", { className: `font-mono tracking-widest uppercase ${th.subText}` }, t.subtitle)), /* @__PURE__ */ React.createElement("div", { className: "lcs-room-controls" }, /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.preset, /* @__PURE__ */ React.createElement("select", { value: preset, onChange: (e) => handlePresetChange(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded border` }, /* @__PURE__ */ React.createElement("option", { value: "custom" }, t.presetCustom), /* @__PURE__ */ React.createElement("option", { value: "standard" }, t.presetStandard), /* @__PURE__ */ React.createElement("option", { value: "large" }, t.presetLarge), /* @__PURE__ */ React.createElement("option", { value: "lecture" }, t.presetLecture), /* @__PURE__ */ React.createElement("option", { value: "ultra" }, t.presetUltra))), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.width, /* @__PURE__ */ React.createElement("input", { type: "number", value: roomWidth, min: "0.1", onChange: (e) => {
-      setRoomWidth(Number(e.target.value));
-      setPreset("custom");
-    }, className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded w-16 border`, step: "0.1" })), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.length, /* @__PURE__ */ React.createElement("input", { type: "number", value: roomLength, min: "0.1", onChange: (e) => {
-      setRoomLength(Number(e.target.value));
-      setPreset("custom");
-    }, className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded w-16 border`, step: "0.1" })), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80", title: t.heightNote }, t.height, /* @__PURE__ */ React.createElement("input", { type: "number", value: roomHeight, min: "0.1", onChange: (e) => setRoomHeight(Number(e.target.value)), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded w-16 border`, step: "0.1" })), /* @__PURE__ */ React.createElement(
+    return /* @__PURE__ */ React.createElement("header", { className: "lcs-toolbar" }, /* @__PURE__ */ React.createElement("div", { className: "lcs-toolbar-main" }, /* @__PURE__ */ React.createElement("a", { href: new URLSearchParams(location.search).get("home") || "../../index.html" }, window.Quotation.words(lang)[3]), /* @__PURE__ */ React.createElement("div", { className: "lcs-brand" }, /* @__PURE__ */ React.createElement("h1", { className: `font-black uppercase tracking-tighter italic ${th.headerText}` }, projectTitle), /* @__PURE__ */ React.createElement("p", { className: `font-mono tracking-widest uppercase ${th.subText}` }, t.subtitle)), /* @__PURE__ */ React.createElement("div", { className: "lcs-room-controls" }, /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.preset, /* @__PURE__ */ React.createElement("select", { value: preset, onChange: (e) => handlePresetChange(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded border` }, /* @__PURE__ */ React.createElement("option", { value: "custom" }, t.presetCustom), /* @__PURE__ */ React.createElement("option", { value: "standard" }, t.presetStandard), /* @__PURE__ */ React.createElement("option", { value: "large" }, t.presetLarge), /* @__PURE__ */ React.createElement("option", { value: "lecture" }, t.presetLecture), /* @__PURE__ */ React.createElement("option", { value: "ultra" }, t.presetUltra))), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.width, /* @__PURE__ */ React.createElement("input", { type: "number", key: roomWidth, defaultValue: roomWidth, min: "0.1", onBlur: (e) => {
+      if (!changeRoomDimension("width", Number(e.target.value))) e.target.value = roomWidth;
+    }, onKeyDown: (e) => {
+      if (e.key === "Enter") e.currentTarget.blur();
+    }, className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded w-16 border`, step: "0.1" })), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.length, /* @__PURE__ */ React.createElement("input", { type: "number", key: roomLength, defaultValue: roomLength, min: "0.1", onBlur: (e) => {
+      if (!changeRoomDimension("depth", Number(e.target.value))) e.target.value = roomLength;
+    }, onKeyDown: (e) => {
+      if (e.key === "Enter") e.currentTarget.blur();
+    }, className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded w-16 border`, step: "0.1" })), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80", title: t.heightNote }, t.height, /* @__PURE__ */ React.createElement("input", { type: "number", key: roomHeight, defaultValue: roomHeight, min: "0.1", onBlur: (e) => {
+      if (!changeRoomDimension("height", Number(e.target.value))) e.target.value = roomHeight;
+    }, onKeyDown: (e) => {
+      if (e.key === "Enter") e.currentTarget.blur();
+    }, className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded w-16 border`, step: "0.1" })), /* @__PURE__ */ React.createElement(
       "button",
       {
         onClick: handleRecalculate,
@@ -1693,7 +2430,7 @@
         className: "font-bold text-[10px] px-3 py-1 rounded h-[28px] bg-blue-600 hover:bg-blue-700 text-white border border-blue-400"
       },
       threeDCopy.open3D
-    )), /* @__PURE__ */ React.createElement("button", { type: "button", className: `lcs-panel-trigger ${th.inputBg} ${th.inputText} ${th.inputBorder}`, "aria-expanded": optionsOpen, "aria-controls": "lcs-options", onClick: () => setOptionsOpen(!optionsOpen) }, t.moreOptions, " ", /* @__PURE__ */ React.createElement("span", { "aria-hidden": "true" }, optionsOpen ? "\u25B4" : "\u25BE"))), /* @__PURE__ */ React.createElement(PickupSuggestion, null), !roomIsValid && /* @__PURE__ */ React.createElement("p", { className: "text-[10px] font-bold text-red-500" }, t.invalidDimensions), threeDError && /* @__PURE__ */ React.createElement("p", { id: "open-3d-error", role: "alert", className: "text-[10px] font-bold text-red-500" }, threeDError), roomHeight >= 3.5 && /* @__PURE__ */ React.createElement("p", { className: "lcs-height-warning text-[10px] font-bold text-amber-500" }, "\u26A0 ", t.heightWarning), optionsOpen && /* @__PURE__ */ React.createElement("aside", { id: "lcs-options", className: `lcs-options-panel ${th.panelBg} ${th.panelBorder}` }, /* @__PURE__ */ React.createElement("button", { id: "export-quotation", className: "p-2 rounded bg-blue-600 text-white", onClick: (e) => window.Quotation.download(e.currentTarget, quote) }, window.Quotation.words(lang)[0]), /* @__PURE__ */ React.createElement(AudioEquipmentControls, null), /* @__PURE__ */ React.createElement("div", { className: "lcs-options-grid" }, /* @__PURE__ */ React.createElement("label", { className: "text-xs flex flex-col" }, "Q-NEX ", lang === "zh" ? "\u7CFB\u7EDF" : "System", /* @__PURE__ */ React.createElement("select", { id: "qnex-model", value: qnexModel, onChange: (e) => setQnexModel(e.target.value), className: `${th.inputBg} ${th.inputText} p-1 rounded border` }, window.Quotation.qnexModels.map((model) => /* @__PURE__ */ React.createElement("option", { key: model, value: model }, model)))), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.cameraPackage, /* @__PURE__ */ React.createElement("select", { value: cameraPackage, onChange: (e) => handleCameraPackageChange(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded border` }, /* @__PURE__ */ React.createElement("option", { value: "CV870" }, t.cv870Package), /* @__PURE__ */ React.createElement("option", { value: "CV210" }, t.cv210Package))), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.s210Count, /* @__PURE__ */ React.createElement("select", { id: "s210-count", value: s210s.length, onChange: (e) => handleS210CountChange(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded border` }, Array.from({ length: S210_MAX_COUNT + 1 }, (_, n) => n).map((n) => /* @__PURE__ */ React.createElement("option", { key: n, value: n }, n)))), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.dispSize, /* @__PURE__ */ React.createElement("select", { value: displaySize, onChange: (e) => setDisplaySize(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded border` }, /* @__PURE__ */ React.createElement("option", { value: "55" }, '55" (', t.maximumShort, " 4.1m)"), /* @__PURE__ */ React.createElement("option", { value: "65" }, '65" (', t.maximumShort, " 5.0m)"), /* @__PURE__ */ React.createElement("option", { value: "75" }, '75" (', t.maximumShort, " 5.6m)"))), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.dispRename, /* @__PURE__ */ React.createElement("input", { type: "text", value: displayName, onChange: (e) => setDisplayName(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded w-24 border` })), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.titleRename, /* @__PURE__ */ React.createElement("input", { type: "text", value: projectTitle, onChange: (e) => setProjectTitle(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded w-48 border` })), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.hubRename, /* @__PURE__ */ React.createElement("input", { type: "text", value: hubName, onChange: (e) => setHubName(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded w-20 border` })), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.theme, /* @__PURE__ */ React.createElement("select", { value: themeKey, onChange: (e) => setThemeKey(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded border` }, /* @__PURE__ */ React.createElement("option", { value: "dark" }, t.themeDark), /* @__PURE__ */ React.createElement("option", { value: "light" }, t.themeLight), /* @__PURE__ */ React.createElement("option", { value: "highContrast" }, t.themeHighContrast))), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.language, /* @__PURE__ */ React.createElement("select", { value: lang, onChange: (e) => setLang(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded border` }, /* @__PURE__ */ React.createElement("option", { value: "en" }, "English"), /* @__PURE__ */ React.createElement("option", { value: "zh" }, "\u7B80\u4F53\u4E2D\u6587"), /* @__PURE__ */ React.createElement("option", { value: "fr" }, "Fran\xE7ais"), /* @__PURE__ */ React.createElement("option", { value: "es" }, "Espa\xF1ol"), /* @__PURE__ */ React.createElement("option", { value: "ja" }, "\u65E5\u672C\u8A9E"), /* @__PURE__ */ React.createElement("option", { value: "ko" }, "\uD55C\uAD6D\uC5B4"), /* @__PURE__ */ React.createElement("option", { value: "it" }, "Italiano"), /* @__PURE__ */ React.createElement("option", { value: "hu" }, "Magyar"), /* @__PURE__ */ React.createElement("option", { value: "ar" }, "\u0627\u0644\u0639\u0631\u0628\u064A\u0629"))), /* @__PURE__ */ React.createElement(
+    )), /* @__PURE__ */ React.createElement("button", { type: "button", className: `lcs-panel-trigger ${th.inputBg} ${th.inputText} ${th.inputBorder}`, "aria-expanded": optionsOpen, "aria-controls": "lcs-options", onClick: () => setOptionsOpen(!optionsOpen) }, t.moreOptions, " ", /* @__PURE__ */ React.createElement("span", { "aria-hidden": "true" }, optionsOpen ? "\u25B4" : "\u25BE"))), /* @__PURE__ */ React.createElement(PickupSuggestion, null), !roomIsValid && /* @__PURE__ */ React.createElement("p", { className: "text-[10px] font-bold text-red-500" }, t.invalidDimensions), (threeDError || screenError) && /* @__PURE__ */ React.createElement("p", { id: "open-3d-error", role: "alert", className: "text-[10px] font-bold text-red-500" }, threeDError || screenError), roomHeight >= 3.5 && /* @__PURE__ */ React.createElement("p", { className: "lcs-height-warning text-[10px] font-bold text-amber-500" }, "\u26A0 ", t.heightWarning), optionsOpen && /* @__PURE__ */ React.createElement("aside", { id: "lcs-options", className: `lcs-options-panel ${th.panelBg} ${th.panelBorder}` }, /* @__PURE__ */ React.createElement("button", { disabled: Boolean(screenError), id: "export-quotation", className: "p-2 rounded bg-blue-600 text-white", onClick: (e) => window.Quotation.download(e.currentTarget, quote) }, window.Quotation.words(lang)[0]), /* @__PURE__ */ React.createElement(DisplayLayout, null), /* @__PURE__ */ React.createElement(AudioEquipmentControls, null), /* @__PURE__ */ React.createElement("div", { className: "lcs-options-grid" }, /* @__PURE__ */ React.createElement("label", { className: "text-xs flex flex-col" }, "Q-NEX ", lang === "zh" ? "\u7CFB\u7EDF" : "System", /* @__PURE__ */ React.createElement("select", { id: "qnex-model", value: qnexModel, onChange: (e) => setQnexModel(e.target.value), className: `${th.inputBg} ${th.inputText} p-1 rounded border` }, window.Quotation.qnexModels.map((model) => /* @__PURE__ */ React.createElement("option", { key: model, value: model }, model)))), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.cameraPackage, /* @__PURE__ */ React.createElement("select", { value: cameraPackage, onChange: (e) => handleCameraPackageChange(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded border` }, /* @__PURE__ */ React.createElement("option", { value: "CV870" }, t.cv870Package), /* @__PURE__ */ React.createElement("option", { value: "CV210" }, t.cv210Package))), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.s210Count, /* @__PURE__ */ React.createElement("select", { id: "s210-count", value: s210s.length, onChange: (e) => handleS210CountChange(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded border` }, Array.from({ length: S210_MAX_COUNT + 1 }, (_, n) => n).map((n) => /* @__PURE__ */ React.createElement("option", { key: n, value: n }, n)))), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.dispSize, /* @__PURE__ */ React.createElement("select", { disabled: Boolean(displayPlan), value: displaySize, onChange: (e) => setDisplaySize(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded border` }, /* @__PURE__ */ React.createElement("option", { value: "55" }, '55" (', t.maximumShort, " 4.1m)"), /* @__PURE__ */ React.createElement("option", { value: "65" }, '65" (', t.maximumShort, " 5.0m)"), /* @__PURE__ */ React.createElement("option", { value: "75" }, '75" (', t.maximumShort, " 5.6m)"))), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.dispRename, /* @__PURE__ */ React.createElement("input", { type: "text", value: displayName, onChange: (e) => setDisplayName(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded w-24 border` })), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.titleRename, /* @__PURE__ */ React.createElement("input", { type: "text", value: projectTitle, onChange: (e) => setProjectTitle(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded w-48 border` })), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.hubRename, /* @__PURE__ */ React.createElement("input", { type: "text", value: hubName, onChange: (e) => setHubName(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded w-20 border` })), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.theme, /* @__PURE__ */ React.createElement("select", { value: themeKey, onChange: (e) => setThemeKey(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded border` }, /* @__PURE__ */ React.createElement("option", { value: "dark" }, t.themeDark), /* @__PURE__ */ React.createElement("option", { value: "light" }, t.themeLight), /* @__PURE__ */ React.createElement("option", { value: "highContrast" }, t.themeHighContrast))), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.language, /* @__PURE__ */ React.createElement("select", { value: lang, onChange: (e) => setLang(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded border` }, /* @__PURE__ */ React.createElement("option", { value: "en" }, "English"), /* @__PURE__ */ React.createElement("option", { value: "zh" }, "\u7B80\u4F53\u4E2D\u6587"), /* @__PURE__ */ React.createElement("option", { value: "fr" }, "Fran\xE7ais"), /* @__PURE__ */ React.createElement("option", { value: "es" }, "Espa\xF1ol"), /* @__PURE__ */ React.createElement("option", { value: "ja" }, "\u65E5\u672C\u8A9E"), /* @__PURE__ */ React.createElement("option", { value: "ko" }, "\uD55C\uAD6D\uC5B4"), /* @__PURE__ */ React.createElement("option", { value: "it" }, "Italiano"), /* @__PURE__ */ React.createElement("option", { value: "hu" }, "Magyar"), /* @__PURE__ */ React.createElement("option", { value: "ar" }, "\u0627\u0644\u0639\u0631\u0628\u064A\u0629"))), /* @__PURE__ */ React.createElement(
       "button",
       {
         onClick: () => setIsRotated(!isRotated),
@@ -1704,12 +2441,13 @@
     ), /* @__PURE__ */ React.createElement(
       "button",
       {
+        disabled: Boolean(screenError),
         onClick: handleExportPNG,
         className: "bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold text-[10px] px-2.5 py-1 rounded transition h-[28px] flex items-center justify-center gap-1 shadow-md border border-emerald-500"
       },
       "\u{1F4BE} ",
       t.exportPng
-    )), cameraPackage === "CV210" && /* @__PURE__ */ React.createElement("p", { className: "mt-2 text-[9px] font-bold text-amber-500" }, t.cv210PackageNote), /* @__PURE__ */ React.createElement("div", { id: "device-visibility", className: `mt-3 p-2 rounded border ${th.panelBorder} ${th.panelBg} inline-block` }, /* @__PURE__ */ React.createElement("p", { className: `text-[10px] font-bold uppercase mb-1 ${th.subText}` }, t.toggleVis), /* @__PURE__ */ React.createElement("div", { className: "flex flex-wrap gap-4" }, /* @__PURE__ */ React.createElement("label", { className: "text-[10px] flex items-center gap-1 cursor-pointer" }, /* @__PURE__ */ React.createElement("input", { type: "checkbox", checked: showTeacherCam, onChange: (e) => setShowTeacherCam(e.target.checked) }), t.tCamLbl), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] flex items-center gap-1 cursor-pointer" }, /* @__PURE__ */ React.createElement("input", { type: "checkbox", checked: showStudentCam, onChange: (e) => setShowStudentCam(e.target.checked) }), t.sCamLbl), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] flex items-center gap-1 cursor-pointer" }, /* @__PURE__ */ React.createElement("input", { type: "checkbox", checked: showS210, onChange: (e) => setShowS210(e.target.checked) }), t.s210Lbl), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] flex items-center gap-1 cursor-pointer" }, /* @__PURE__ */ React.createElement("input", { type: "checkbox", checked: showSpeakers, onChange: (e) => setShowSpeakers(e.target.checked) }), t.ps610Speaker), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] flex items-center gap-1 cursor-pointer" }, /* @__PURE__ */ React.createElement("input", { type: "checkbox", checked: showDisplays, onChange: (e) => setShowDisplays(e.target.checked) }), displayName), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] flex items-center gap-1 cursor-pointer" }, /* @__PURE__ */ React.createElement("input", { type: "checkbox", checked: showLargeScreen, onChange: (e) => setShowLargeScreen(e.target.checked) }), "QA1400 Pro 86\u2033 IFP"))), longRoomEnabled && /* @__PURE__ */ React.createElement(
+    )), cameraPackage === "CV210" && /* @__PURE__ */ React.createElement("p", { className: "mt-2 text-[9px] font-bold text-amber-500" }, t.cv210PackageNote), /* @__PURE__ */ React.createElement("div", { id: "device-visibility", className: `mt-3 p-2 rounded border ${th.panelBorder} ${th.panelBg} inline-block` }, /* @__PURE__ */ React.createElement("p", { className: `text-[10px] font-bold uppercase mb-1 ${th.subText}` }, t.toggleVis), /* @__PURE__ */ React.createElement("div", { className: "flex flex-wrap gap-4" }, /* @__PURE__ */ React.createElement("label", { className: "text-[10px] flex items-center gap-1 cursor-pointer" }, /* @__PURE__ */ React.createElement("input", { type: "checkbox", checked: showTeacherCam, onChange: (e) => setShowTeacherCam(e.target.checked) }), t.tCamLbl), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] flex items-center gap-1 cursor-pointer" }, /* @__PURE__ */ React.createElement("input", { type: "checkbox", checked: showStudentCam, onChange: (e) => setShowStudentCam(e.target.checked) }), t.sCamLbl), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] flex items-center gap-1 cursor-pointer" }, /* @__PURE__ */ React.createElement("input", { type: "checkbox", checked: showS210, onChange: (e) => setShowS210(e.target.checked) }), t.s210Lbl), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] flex items-center gap-1 cursor-pointer" }, /* @__PURE__ */ React.createElement("input", { type: "checkbox", checked: showSpeakers, onChange: (e) => setShowSpeakers(e.target.checked) }), t.ps610Speaker), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] flex items-center gap-1 cursor-pointer" }, /* @__PURE__ */ React.createElement("input", { type: "checkbox", checked: showDisplays, onChange: (e) => setShowDisplays(e.target.checked) }), displayName), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] flex items-center gap-1 cursor-pointer" }, /* @__PURE__ */ React.createElement("input", { type: "checkbox", checked: showLargeScreen, onChange: (e) => setShowLargeScreen(e.target.checked) }), lang === "zh" ? "\u4E3B\u5C4F / IFP" : "Main screen / IFP"))), longRoomEnabled && /* @__PURE__ */ React.createElement(
       "button",
       {
         onClick: () => setIsLongDistancePanelOpen(true),
@@ -1863,6 +2601,8 @@
   function RoomCanvas() {
     const [detailsOpen, setDetailsOpen] = React.useState(false);
     const {
+      displayPlan,
+      stageWidth,
       displayName,
       displaySize,
       displays,
@@ -1936,7 +2676,7 @@
         /* @__PURE__ */ React.createElement("defs", null, /* @__PURE__ */ React.createElement("clipPath", { id: "room-clip" }, /* @__PURE__ */ React.createElement("rect", { x: padding, y: padding, width: roomWidth * scale, height: roomLength * scale })), /* @__PURE__ */ React.createElement("pattern", { id: "grid-pattern", width: "25", height: "25", patternUnits: "userSpaceOnUse" }, /* @__PURE__ */ React.createElement("circle", { cx: "1.5", cy: "1.5", r: "1", fill: th.gridLines }))),
         /* @__PURE__ */ React.createElement("rect", { width: "100%", height: "100%", fill: th.svgBg }),
         /* @__PURE__ */ React.createElement("rect", { width: "100%", height: "100%", fill: "url(#grid-pattern)" }),
-        /* @__PURE__ */ React.createElement("g", { id: "rotated-group", transform: isRotated ? `translate(0, ${vbW}) rotate(-90)` : "" }, /* @__PURE__ */ React.createElement("rect", { x: padding, y: padding, width: roomWidth * scale, height: roomLength * scale, stroke: th.roomBorder, strokeWidth: themeKey === "highContrast" ? 6 : 4, fill: th.roomFill }), /* @__PURE__ */ React.createElement("rect", { x: tx(roomWidth * 0.15), y: ty(0), width: roomWidth * 0.7 * scale, height: 2.2 * scale, fill: th.stageFill, stroke: th.pillarStroke, strokeWidth: "1" }), /* @__PURE__ */ React.createElement("text", { x: tx(roomWidth / 2), y: ty(1.1), textAnchor: "middle", fill: themeKey === "light" ? "#475569" : "#94a3b8", className: "text-sm font-bold opacity-60", style: { fontFamily: "sans-serif", fontWeight: "bold" } }, t.stage), /* @__PURE__ */ React.createElement("g", { transform: `translate(${tx(roomWidth * 0.25)}, ${ty(1.6)})` }, /* @__PURE__ */ React.createElement("rect", { x: -0.4 * scale, y: -0.2 * scale, width: 0.8 * scale, height: 0.4 * scale, fill: "transparent", stroke: th.pillarStroke, strokeWidth: "2" }), /* @__PURE__ */ React.createElement("line", { x1: "0", y1: -0.2 * scale, x2: "0", y2: -0.4 * scale, stroke: th.pillarStroke, strokeWidth: "2" })), /* @__PURE__ */ React.createElement("text", { x: tx(roomWidth / 2), y: ty(roomLength / 2 + 2), textAnchor: "middle", fill: themeKey === "light" ? "#cbd5e1" : "#1e293b", className: "text-2xl font-black opacity-20 uppercase", style: { fontFamily: "sans-serif", fontWeight: "bold" } }, t.audience), showS210 && s210s.map((mic) => /* @__PURE__ */ React.createElement("g", { key: `s210-range-${mic.id}`, clipPath: "url(#room-clip)" }, /* @__PURE__ */ React.createElement(
+        /* @__PURE__ */ React.createElement("g", { id: "rotated-group", transform: isRotated ? `translate(0, ${vbW}) rotate(-90)` : "" }, /* @__PURE__ */ React.createElement("rect", { x: padding, y: padding, width: roomWidth * scale, height: roomLength * scale, stroke: th.roomBorder, strokeWidth: themeKey === "highContrast" ? 6 : 4, fill: th.roomFill }), displayPlan && DisplayFit.doorSpans(roomLength).map(([a, b]) => /* @__PURE__ */ React.createElement("path", { key: a, d: `M ${tx(roomWidth)} ${ty(a / 1e3)} v ${(b - a) * scale / 1e3}`, stroke: "#f39950", strokeWidth: "4" })), /* @__PURE__ */ React.createElement("rect", { x: tx((roomWidth - stageWidth) / 2), y: ty(0), width: stageWidth * scale, height: 2.2 * scale, fill: th.stageFill, stroke: th.pillarStroke, strokeWidth: "1" }), /* @__PURE__ */ React.createElement("text", { x: tx(roomWidth / 2), y: ty(1.1), textAnchor: "middle", fill: themeKey === "light" ? "#475569" : "#94a3b8", className: "text-sm font-bold opacity-60", style: { fontFamily: "sans-serif", fontWeight: "bold" } }, t.stage), /* @__PURE__ */ React.createElement("g", { transform: `translate(${tx(roomWidth * 0.25)}, ${ty(1.6)})` }, /* @__PURE__ */ React.createElement("rect", { x: -0.4 * scale, y: -0.2 * scale, width: 0.8 * scale, height: 0.4 * scale, fill: "transparent", stroke: th.pillarStroke, strokeWidth: "2" }), /* @__PURE__ */ React.createElement("line", { x1: "0", y1: -0.2 * scale, x2: "0", y2: -0.4 * scale, stroke: th.pillarStroke, strokeWidth: "2" })), /* @__PURE__ */ React.createElement("text", { x: tx(roomWidth / 2), y: ty(roomLength / 2 + 2), textAnchor: "middle", fill: themeKey === "light" ? "#cbd5e1" : "#1e293b", className: "text-2xl font-black opacity-20 uppercase", style: { fontFamily: "sans-serif", fontWeight: "bold" } }, t.audience), showS210 && s210s.map((mic) => /* @__PURE__ */ React.createElement("g", { key: `s210-range-${mic.id}`, clipPath: "url(#room-clip)" }, /* @__PURE__ */ React.createElement(
           "path",
           {
             d: getCardioidPath2(mic.x, mic.y, s210LimitRange2, mic.facing),
@@ -2044,7 +2784,7 @@
               clipPath: "url(#room-clip)"
             }
           );
-        }), showLargeScreen && /* @__PURE__ */ React.createElement("g", { className: "draggable", onMouseDown: () => setIsDragging("largeScreen"), transform: `translate(${tx(largeScreen.x)}, ${ty(largeScreen.y)})` }, /* @__PURE__ */ React.createElement(
+        }), displayPlan?.screens.filter((p) => p.zone === "front" ? showLargeScreen : showDisplays).map((p) => /* @__PURE__ */ React.createElement("g", { key: p.id, "data-screen-id": p.id, className: "draggable", onMouseDown: () => setIsDragging("lcd:" + p.id), transform: `translate(${tx(p.x)},${ty(p.y)})` }, /* @__PURE__ */ React.createElement("rect", { x: -p.widthMm * scale / 2e3, y: -p.depthMm * scale / 2e3, width: p.widthMm * scale / 1e3, height: p.depthMm * scale / 1e3, rx: "2", fill: p.zone === "front" ? "#0072ce" : "#387fb8" }), /* @__PURE__ */ React.createElement("text", { textAnchor: "middle", y: "-8", fill: "#38bdf8", fontSize: "10" }, DisplayFit.label(p)))), !displayPlan && showLargeScreen && /* @__PURE__ */ React.createElement("g", { className: "draggable", onMouseDown: () => setIsDragging("largeScreen"), transform: `translate(${tx(largeScreen.x)}, ${ty(largeScreen.y)})` }, /* @__PURE__ */ React.createElement(
           "rect",
           {
             x: -(largeScreen.width * scale) / 2,
@@ -2067,7 +2807,7 @@
             stroke: "none",
             rx: "2"
           }
-        ), /* @__PURE__ */ React.createElement("text", { y: "-10", textAnchor: "middle", fill: "#38bdf8", className: "font-black text-[9px]", style: { fontFamily: "sans-serif", fontWeight: "bold" } }, "QA1400 Pro 86\u2033 IFP")), showDisplays && displays.map((disp) => /* @__PURE__ */ React.createElement("g", { key: `disp-${disp.id}`, className: "draggable", onMouseDown: () => setIsDragging(`disp-${disp.id}`), transform: `translate(${tx(disp.x)}, ${ty(disp.y)})` }, /* @__PURE__ */ React.createElement("rect", { x: -0.8 * scale, y: -0.1 * scale, width: 1.6 * scale, height: 0.2 * scale, fill: "#3b82f6", stroke: "#1d4ed8", strokeWidth: "1", rx: "2" }), /* @__PURE__ */ React.createElement("text", { y: "-8", textAnchor: "middle", fill: "#2563eb", className: "font-black text-[9px]", style: { fontFamily: "sans-serif", fontWeight: "bold" } }, displayName, " (", displaySize, '")'))), showSpeakers && speakers.map((spk) => /* @__PURE__ */ React.createElement("g", { key: `spk-${spk.id}`, className: "draggable", onMouseDown: () => setIsDragging(`spk-${spk.id}`), transform: `translate(${tx(spk.x)}, ${ty(spk.y)})` }, /* @__PURE__ */ React.createElement("rect", { x: -0.4 * scale, y: -0.4 * scale, width: 0.8 * scale, height: 0.8 * scale, fill: "#1e293b", stroke: "#64748b", strokeWidth: "2", rx: "2" }), /* @__PURE__ */ React.createElement("circle", { cx: "0", cy: "0", r: "4", fill: "#94a3b8" }), /* @__PURE__ */ React.createElement("text", { y: "18", textAnchor: "middle", fill: themeKey === "light" ? "#475569" : "#94a3b8", className: "text-[8px] font-bold", style: { fontFamily: "sans-serif", fontWeight: "bold" } }, "PS610 ", spk.id + 1))), /* @__PURE__ */ React.createElement("g", { transform: `translate(${tx(roomWidth - 1.4)}, ${ty(0.65)})`, pointerEvents: "none" }, /* @__PURE__ */ React.createElement("rect", { x: -1.2 * scale, y: -0.22 * scale, width: 2.4 * scale, height: 0.44 * scale, rx: "3", fill: "#0072ce" }), /* @__PURE__ */ React.createElement("text", { textAnchor: "middle", y: "4", fill: "white", fontSize: "10" }, "Q-NEX ", qnexModel)), /* @__PURE__ */ React.createElement("g", { className: "draggable", onMouseDown: () => setIsDragging("hub"), transform: `translate(${tx(hub.x)}, ${ty(hub.y)})` }, /* @__PURE__ */ React.createElement("rect", { x: -1.2 * scale, y: -0.5 * scale, width: 2.4 * scale, height: 1 * scale, fill: "#0f172a", stroke: "#3b82f6", strokeWidth: "2", rx: "4" }), /* @__PURE__ */ React.createElement("text", { textAnchor: "middle", y: "4", fill: "#ffffff", className: "text-[10px] font-black", style: { fontFamily: "sans-serif", fontWeight: "bold" } }, hubName)), showTeacherCam && /* @__PURE__ */ React.createElement("g", { className: "draggable", onMouseDown: () => setIsDragging("teacher"), transform: `translate(${tx(teacherCam.x)}, ${ty(teacherCam.y)})` }, /* @__PURE__ */ React.createElement("circle", { r: 0.5 * scale, fill: "rgba(250, 204, 21, 0.3)" }), /* @__PURE__ */ React.createElement("circle", { r: 0.25 * scale, fill: "#facc15", stroke: teacherDistanceWarning || teacherBelowTypicalRange ? "#ef4444" : "#000000", strokeWidth: "2" }), /* @__PURE__ */ React.createElement("text", { y: "-16", textAnchor: "middle", fill: "#d97706", className: "font-black text-[10px] drop-shadow-md", style: { fontFamily: "sans-serif", fontWeight: "bold" } }, t.tCamLbl, " \xB7 ", teacherCameraModel.label)), showStudentCam && studentCameraMetrics.map((camera) => /* @__PURE__ */ React.createElement("g", { key: `student-camera-${camera.id}`, className: "draggable", onMouseDown: () => setIsDragging(`student-${camera.id}`), transform: `translate(${tx(camera.x)}, ${ty(camera.y)})` }, /* @__PURE__ */ React.createElement("circle", { r: 0.5 * scale, fill: "rgba(239, 68, 68, 0.3)" }), /* @__PURE__ */ React.createElement("circle", { r: 0.25 * scale, fill: "#ef4444", stroke: camera.overDistance || camera.belowTypicalRange ? "#ffffff" : "#000000", strokeWidth: "2" }), /* @__PURE__ */ React.createElement("text", { y: "24", textAnchor: "middle", fill: "#dc2626", className: "font-black text-[10px] drop-shadow-md", style: { fontFamily: "sans-serif", fontWeight: "bold" } }, t.sCamLbl, " ", camera.id + 1, " \xB7 ", studentCameraModel.label))), showS210 && s210s.map((mic) => /* @__PURE__ */ React.createElement("g", { key: `s210-${mic.id}`, className: "draggable group", transform: `translate(${tx(mic.x)}, ${ty(mic.y)})` }, /* @__PURE__ */ React.createElement("circle", { r: 0.4 * scale, fill: "rgba(52, 211, 153, 0.3)", stroke: "#10b981", strokeWidth: "2", strokeDasharray: "2 2", onMouseDown: () => setIsDragging(`s210-${mic.id}`) }), /* @__PURE__ */ React.createElement("circle", { r: 0.25 * scale, fill: "#10b981", onMouseDown: () => setIsDragging(`s210-${mic.id}`) }), /* @__PURE__ */ React.createElement(
+        ), /* @__PURE__ */ React.createElement("text", { y: "-10", textAnchor: "middle", fill: "#38bdf8", className: "font-black text-[9px]", style: { fontFamily: "sans-serif", fontWeight: "bold" } }, "QA1400 Pro 86\u2033 IFP")), !displayPlan && showDisplays && displays.map((disp) => /* @__PURE__ */ React.createElement("g", { key: `disp-${disp.id}`, className: "draggable", onMouseDown: () => setIsDragging(`disp-${disp.id}`), transform: `translate(${tx(disp.x)}, ${ty(disp.y)})` }, /* @__PURE__ */ React.createElement("rect", { x: -0.8 * scale, y: -0.1 * scale, width: 1.6 * scale, height: 0.2 * scale, fill: "#3b82f6", stroke: "#1d4ed8", strokeWidth: "1", rx: "2" }), /* @__PURE__ */ React.createElement("text", { y: "-8", textAnchor: "middle", fill: "#2563eb", className: "font-black text-[9px]", style: { fontFamily: "sans-serif", fontWeight: "bold" } }, displayName, " (", displaySize, '")'))), showSpeakers && speakers.map((spk) => /* @__PURE__ */ React.createElement("g", { key: `spk-${spk.id}`, className: "draggable", onMouseDown: () => setIsDragging(`spk-${spk.id}`), transform: `translate(${tx(spk.x)}, ${ty(spk.y)})` }, /* @__PURE__ */ React.createElement("rect", { x: -0.4 * scale, y: -0.4 * scale, width: 0.8 * scale, height: 0.8 * scale, fill: "#1e293b", stroke: "#64748b", strokeWidth: "2", rx: "2" }), /* @__PURE__ */ React.createElement("circle", { cx: "0", cy: "0", r: "4", fill: "#94a3b8" }), /* @__PURE__ */ React.createElement("text", { y: "18", textAnchor: "middle", fill: themeKey === "light" ? "#475569" : "#94a3b8", className: "text-[8px] font-bold", style: { fontFamily: "sans-serif", fontWeight: "bold" } }, "PS610 ", spk.id + 1))), /* @__PURE__ */ React.createElement("g", { transform: `translate(${tx(roomWidth - 1.4)}, ${ty(0.65)})`, pointerEvents: "none" }, /* @__PURE__ */ React.createElement("rect", { x: -1.2 * scale, y: -0.22 * scale, width: 2.4 * scale, height: 0.44 * scale, rx: "3", fill: "#0072ce" }), /* @__PURE__ */ React.createElement("text", { textAnchor: "middle", y: "4", fill: "white", fontSize: "10" }, "Q-NEX ", qnexModel)), /* @__PURE__ */ React.createElement("g", { className: "draggable", onMouseDown: () => setIsDragging("hub"), transform: `translate(${tx(hub.x)}, ${ty(hub.y)})` }, /* @__PURE__ */ React.createElement("rect", { x: -1.2 * scale, y: -0.5 * scale, width: 2.4 * scale, height: 1 * scale, fill: "#0f172a", stroke: "#3b82f6", strokeWidth: "2", rx: "4" }), /* @__PURE__ */ React.createElement("text", { textAnchor: "middle", y: "4", fill: "#ffffff", className: "text-[10px] font-black", style: { fontFamily: "sans-serif", fontWeight: "bold" } }, hubName)), showTeacherCam && /* @__PURE__ */ React.createElement("g", { className: "draggable", onMouseDown: () => setIsDragging("teacher"), transform: `translate(${tx(teacherCam.x)}, ${ty(teacherCam.y)})` }, /* @__PURE__ */ React.createElement("circle", { r: 0.5 * scale, fill: "rgba(250, 204, 21, 0.3)" }), /* @__PURE__ */ React.createElement("circle", { r: 0.25 * scale, fill: "#facc15", stroke: teacherDistanceWarning || teacherBelowTypicalRange ? "#ef4444" : "#000000", strokeWidth: "2" }), /* @__PURE__ */ React.createElement("text", { y: "-16", textAnchor: "middle", fill: "#d97706", className: "font-black text-[10px] drop-shadow-md", style: { fontFamily: "sans-serif", fontWeight: "bold" } }, t.tCamLbl, " \xB7 ", teacherCameraModel.label)), showStudentCam && studentCameraMetrics.map((camera) => /* @__PURE__ */ React.createElement("g", { key: `student-camera-${camera.id}`, className: "draggable", onMouseDown: () => setIsDragging(`student-${camera.id}`), transform: `translate(${tx(camera.x)}, ${ty(camera.y)})` }, /* @__PURE__ */ React.createElement("circle", { r: 0.5 * scale, fill: "rgba(239, 68, 68, 0.3)" }), /* @__PURE__ */ React.createElement("circle", { r: 0.25 * scale, fill: "#ef4444", stroke: camera.overDistance || camera.belowTypicalRange ? "#ffffff" : "#000000", strokeWidth: "2" }), /* @__PURE__ */ React.createElement("text", { y: "24", textAnchor: "middle", fill: "#dc2626", className: "font-black text-[10px] drop-shadow-md", style: { fontFamily: "sans-serif", fontWeight: "bold" } }, t.sCamLbl, " ", camera.id + 1, " \xB7 ", studentCameraModel.label))), showS210 && s210s.map((mic) => /* @__PURE__ */ React.createElement("g", { key: `s210-${mic.id}`, className: "draggable group", transform: `translate(${tx(mic.x)}, ${ty(mic.y)})` }, /* @__PURE__ */ React.createElement("circle", { r: 0.4 * scale, fill: "rgba(52, 211, 153, 0.3)", stroke: "#10b981", strokeWidth: "2", strokeDasharray: "2 2", onMouseDown: () => setIsDragging(`s210-${mic.id}`) }), /* @__PURE__ */ React.createElement("circle", { r: 0.25 * scale, fill: "#10b981", onMouseDown: () => setIsDragging(`s210-${mic.id}`) }), /* @__PURE__ */ React.createElement(
           "path",
           {
             d: mic.facing === "down" ? "M -4,-2 L 0,3 L 4,-2 Z" : "M -4,2 L 0,-3 L 4,2 Z",
@@ -2180,6 +2920,53 @@
     const [speakers, setSpeakers] = useState(initialLayout.speakers);
     const [displays, setDisplays] = useState(initialLayout.displays);
     const [largeScreen, setLargeScreen] = useState(initialLayout.largeScreen);
+    const [displayPlan, setDisplayPlan] = useState(null);
+    const stageWidth = displayPlan ? displayPlan.stageMm / 1e3 : roomWidth;
+    const screenContext = {
+      room: lcsRoom(roomWidth, roomLength, roomHeight, hub),
+      lang,
+      locked: Boolean(displayPlan),
+      plan: displayPlan || legacyDisplays(roomWidth, largeScreen, true, displays, displaySize)
+    };
+    const screenResult = displayPlan ? DisplayFit.fit(displayPlan, screenContext.room, { fixed: true }) : null;
+    const screenError = screenResult?.status === "blocked" ? DisplayEditor.message(screenResult, lang) : "";
+    const applyDisplayPlan = (next) => {
+      setDisplayPlan(next);
+      setThreeDError("");
+    };
+    function admitRoom(room) {
+      if (!displayPlan) return true;
+      const fit = DisplayFit.fit(displayPlan, room);
+      if (fit.status === "blocked") {
+        setThreeDError(DisplayEditor.message(fit, lang));
+        return false;
+      }
+      applyDisplayPlan(fit.plan);
+      return true;
+    }
+    function changeRoomDimension(key, value) {
+      if (!admitRoom({ ...screenContext.room, [key]: value })) return false;
+      ({ width: setRoomWidth, depth: setRoomLength, height: setRoomHeight })[key](value);
+      setPreset("custom");
+      return true;
+    }
+    function moveDisplay(id, x, y) {
+      const candidate = { ...displayPlan, screens: displayPlan.screens.map((s) => s.id === id ? { ...s, x, y } : s) };
+      const result = DisplayFit.fit(candidate, screenContext.room, { fixed: true });
+      if (result.status === "blocked") setThreeDError(DisplayEditor.message(result, lang));
+      else applyDisplayPlan(result.plan);
+    }
+    function moveHub(position) {
+      if (displayPlan) {
+        const result = DisplayFit.fit(displayPlan, { ...screenContext.room, stations: [position] }, { fixed: true });
+        if (result.status === "blocked") {
+          setThreeDError(DisplayEditor.message(result, lang));
+          return;
+        }
+      }
+      setHub(position);
+      setThreeDError("");
+    }
     const clamp2 = (value, min, max) => Math.max(min, Math.min(max, value));
     const roomArea = roomIsValid ? roomWidth * roomLength : 0;
     const longRoomEnabled = isLongRoomEnabled(roomLength, roomIsValid, cameraPackage);
@@ -2388,7 +3175,7 @@
             };
             setS210s((mics) => mics.map((m) => ({ ...m, x: scaleX(m.x) })));
             setSpeakers((spks) => spks.map((s) => ({ ...s, x: scaleX(s.x) })));
-            setLargeScreen((screen) => ({ ...screen, x: scaleX(screen.x), width: clamp2(screen.width / oldW * roomWidth, 2, Math.max(2, roomWidth - 1)) }));
+            setLargeScreen((screen) => ({ ...screen, x: scaleX(screen.x) }));
           }
           if (oldL > 0 && roomLength > 0 && oldL !== roomLength) {
             const scaleY = (y) => {
@@ -2418,7 +3205,7 @@
     const tWideWidth = 2 * tDist * Math.tan(teacherWideHfov / 2 * (Math.PI / 180));
     const teacherDistanceWarning = teacherMaxDistance !== null && tDist > teacherMaxDistance;
     const teacherBelowTypicalRange = teacherMinDistance > 0 && tDist < teacherMinDistance;
-    const teacherStageCoverageWarning = roomIsValid && teacherCameraModel.label === "CV870 Pro" && !coversWholeStage(teacherCam, teacherHfov, roomWidth, roomLength);
+    const teacherStageCoverageWarning = roomIsValid && teacherCameraModel.label === "CV870 Pro" && !coversWholeStage(teacherCam, teacherHfov, roomWidth, roomLength, stageWidth);
     const studentCameraMetrics = studentCams.map((camera) => {
       const distance = roomLength - camera.y;
       return {
@@ -2442,9 +3229,13 @@
     };
     const formatDistanceLimitWarning = (distance) => t.distanceLimitWarn.replace("{distance}", Number(distance).toFixed(0));
     const handlePresetChange = (p) => {
-      setPreset(p);
       const layout = getPresetLayout(p);
-      if (!layout) return;
+      if (!layout) {
+        setPreset(p);
+        return;
+      }
+      if (!admitRoom(lcsRoom(layout.width, layout.length, roomHeight, layout.hub))) return;
+      setPreset(p);
       setS210Request({ mode: "auto" });
       setRoomWidth(layout.width);
       setRoomLength(layout.length);
@@ -2563,6 +3354,10 @@
     const handleExportPNG = () => exportSvgPng({ svgRef, isRotated, vbW, vbH, projectTitle });
     const threeDCopy = snapshotMessages[lang] || snapshotMessages.en;
     const handleOpen3D = () => {
+      if (screenError) {
+        setThreeDError(screenError);
+        return;
+      }
       try {
         const snapshot = createPlanSnapshot({
           projectTitle,
@@ -2590,7 +3385,8 @@
           showLargeScreen,
           qnexModel,
           audioConfig,
-          s210Request
+          s210Request,
+          displayPlan
         });
         const url = new URL("../../demos/lcs/index.html", window.location.href);
         url.hash = encodePlanSnapshot(snapshot);
@@ -2611,7 +3407,8 @@
       setStudentCams,
       s210s,
       setS210s,
-      setHub,
+      setHub: moveHub,
+      moveDisplay,
       setLargeScreen,
       speakers,
       setSpeakers,
@@ -2625,6 +3422,11 @@
       return () => window.removeEventListener("mouseup", handleMouseUp);
     }, []);
     const view = {
+      displayPlan,
+      stageWidth,
+      screenContext,
+      screenError,
+      applyDisplayPlan,
       audioPlan,
       audioConfig,
       setAudioConfig,
@@ -2702,9 +3504,7 @@
       setLongDistanceCameras,
       setPreset,
       setProjectTitle,
-      setRoomHeight,
-      setRoomLength,
-      setRoomWidth,
+      changeRoomDimension,
       setShowDisplays,
       setShowLargeScreen,
       setShowS210,

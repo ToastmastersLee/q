@@ -33,7 +33,8 @@
     }
 
     function renderAuxiliaryDisplays() {
-        if (!state.manualAux) state.auxDisplays = recommendAuxiliaryDisplays();
+        if (state.displayPlan) App.applyScreenEntries();
+        else if (!state.manualAux) state.auxDisplays = recommendAuxiliaryDisplays();
         App.fitConfiguration();
         updateAuxiliaryDisplaySummary();
 
@@ -50,8 +51,8 @@
             const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
             if (device) { group.setAttribute('class','device'); group.dataset.auxId = device.id; }
             const pxY = y * PPM;
-            const pxX = auxiliary ? x * PPM - 5 : screenX;
-            const rectWidth = auxiliary ? 10 : screenWidth;
+            const rectWidth = device?.panel ? device.panel.widthMm*PPM/1000 : auxiliary ? 10 : screenWidth;
+            const pxX = auxiliary ? x * PPM - rectWidth/2 : screenX;
             const coverage = document.createElementNS('http://www.w3.org/2000/svg', 'line');
             coverage.setAttribute('x1', pxX + rectWidth / 2);
             coverage.setAttribute('x2', pxX + rectWidth / 2);
@@ -65,9 +66,9 @@
 
             const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
             rect.setAttribute('x', pxX);
-            rect.setAttribute('y', pxY);
+            rect.setAttribute('y', device?.panel ? pxY-device.panel.depthMm*PPM/2000 : pxY);
             rect.setAttribute('width', rectWidth);
-            rect.setAttribute('height', screenHeight);
+            rect.setAttribute('height', device?.panel ? device.panel.depthMm*PPM/1000 : screenHeight);
             rect.setAttribute('rx', '3');
             rect.setAttribute('fill', 'rgba(245, 158, 11, 0.28)');
             rect.setAttribute('stroke', accent);
@@ -88,7 +89,7 @@
 
         // Main screens are actual teaching-device instances.
         (state.showAuxDisplays === false ? [] : state.auxDisplays).forEach((display, index) => {
-            makeScreen(display.x, display.y, `${copy.canvas} ${index + 1} · ${display.size}″`, '#fb923c', display.coverageEnd, true, display);
+            makeScreen(display.x, display.y, `${copy.canvas} ${index + 1} · ${display.panel ? DisplayFit.label(display.panel) : display.size+'″'}`, '#fb923c', display.coverageEnd, true, display);
         });
     }
 

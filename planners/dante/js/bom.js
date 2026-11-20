@@ -30,14 +30,18 @@
         const set = (key, value) => { e[key] = value; App.renderRoom(); };
         row('qnex', e.qnexModel, e.qnexCount, App.qnexModels, v => set('qnexModel', v), v => set('qnexCount', v));
         if (e.qnexModel === 'NDP600') row('stand', 'NDP600 Height-Adjustable Stand', e.qnexCount, null, null, null, copy.linked);
-        row('ifp', 'QA1400 Pro 86-inch', e.ifpCount, null, null, v => { s.showIFP = v > 0; set('ifpCount', v); });
+        const zh=lang==='zh';
+        const podiumQuantity=list.querySelector('[data-bom-key="qnex"] input');
+        const caption=document.createElement('label'); caption.textContent=zh?'讲台数量':'Podium count'; podiumQuantity.before(caption); caption.append(podiumQuantity);
+        for (const {screen,count} of DisplayFit.groups(App.displayContext().plan.screens)) row('screen-'+screen.id,
+            (screen.zone==='front' ? (zh?'主屏':'Main screen') : display.title)+' · '+DisplayFit.label(screen),count);
         for (const type of ['m100', 'm40', 'dc20']) {
             row(type, App.audioName(type, document.getElementById('langSelect').value, s.showModels) +
                 (type === 'm100' ? ' · A' : type === 'm40' ? ' · B' : ''), b.counts[type], null, null, null);
         }
         row('du11', 'DU11', b.du11, null, null, v => set('du11Count', v));
         row('processor', e.processorModel, b.processor?.count || 0, ['DP88', 'DP44'], v => set('processorModel', v), v => set('processorCount', v));
-        for (const size of [55, 65, 75]) row(`aux-${size}`, size, b.counts[size],
+        if (!App.displayEditor && !s.displayPlan) for (const size of [55, 65, 75]) row(`aux-${size}`, size, b.counts[size],
             [55,65,75], value => {
                 const nextSize = Number(value);
                 const rule = App.DISPLAY_RULES.find(r => r.size === nextSize);
@@ -48,7 +52,7 @@
                 }); App.renderRoom();
             }, v => App.setAuxCount(size, v), null, n => `${display.title} · ${n}″`, display.size);
         if (e.lcsEnabled) {
-            row('lcs', 'LCS810 GEN2', e.lcsCount, null, null, v => set('lcsCount', v));
+            row('lcs', 'LCS810 GEN2', e.lcsCount, null, null, v => {App.setStationOption('lcsCount', v);App.renderRoom();});
             row('camera', 'CV870', e.cameraCount, null, null, v => set('cameraCount', v));
         }
         const warning = document.getElementById('processor-warning');

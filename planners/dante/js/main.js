@@ -46,10 +46,12 @@
         if (!Number.isFinite(value)) return;
         if (id === 'front' || id === 'rear') {
             if (value < 2 || value > 4) return;
+            if (!App.admitDisplayRoom({height:id==='front'?value:p.front,profile:{...p,[id]:value}})) {refreshHeightUI();return;}
             p[id] = value;
             if (p.mode === 'uniform') p.rear = p.front;
         } else if (id === 'split') {
             if (value <= 0 || value >= state.roomWidth) return;
+            if(!App.admitDisplayRoom({profile:{...p,split:value}})){refreshHeightUI();return;}
             p.split = value;
         } else if (id === 'drop') {
             if (value < 0 || value > 0.7) return;
@@ -96,6 +98,7 @@
 
         // Dimensions sliders input listeners
         document.getElementById('lengthSlider').addEventListener('input', (e) => {
+            if (!App.admitDisplayRoom({width:Number(e.target.value)})) { e.target.value=state.roomLength;return; }
             state.roomLength = parseFloat(e.target.value);
             document.getElementById('lengthVal').textContent = state.roomLength.toFixed(1) + 'm';
             document.getElementById('presetSelect').value = 'custom';
@@ -103,6 +106,7 @@
         });
 
         document.getElementById('widthSlider').addEventListener('input', (e) => {
+            if (!App.admitDisplayRoom({depth:Number(e.target.value)})) { e.target.value=state.roomWidth;return; }
             state.roomWidth = parseFloat(e.target.value);
             document.getElementById('widthVal').textContent = state.roomWidth.toFixed(1) + 'm';
             document.getElementById('presetSelect').value = 'custom';
@@ -120,6 +124,7 @@
         document.getElementById('heightSplit').addEventListener('change', e => applyHeightInput('split', Number(e.target.value)));
         document.getElementById('micDrop').addEventListener('change', e => applyHeightInput('drop', Number(e.target.value)));
         document.getElementById('heightMode').addEventListener('change', e => {
+            if(!App.admitDisplayRoom({profile:{...state.heightProfile,mode:e.target.value}})){e.target.value=state.heightProfile.mode;return;}
             state.heightProfile.mode = e.target.value;
             if (e.target.value === 'uniform') state.heightProfile.rear = state.heightProfile.front;
             state.height = Math.max(state.heightProfile.front, state.heightProfile.rear);

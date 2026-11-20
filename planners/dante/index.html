@@ -11,7 +11,7 @@
 <script src="../shared-quotation/images.js?v=20261120-right-wall-doors"></script>
 <script src="../shared-quotation/quotation.js?v=20261120-right-wall-doors"></script>
 <link rel="stylesheet" href="css/configuration.css?v=20261026-quantities">
-<link rel="stylesheet" href="css/workspace.css?v=20261120-settings-groups">
+<link rel="stylesheet" href="css/workspace.css?v=20261120-coverage-legend">
 </head>
 <body>
 
@@ -152,35 +152,35 @@
             <label id="t_dataLabel" class="group-title">📊 Live Radii (Editable)</label>
             <div class="data-row">
                 <label class="visibility-label">
-                    <input type="checkbox" checked data-visibility="m100_pickup">
+                    <input type="checkbox" data-overlay-family="remote" data-visibility="m100_pickup">
                     <span class="color-box color-m100-pickup"></span><span id="t_m100Pickup">M100 Remote Pickup</span>
                 </label>
                 <div><input type="number" id="m100PickupInput" class="radius-input" step="0.1" value="8.00">m</div>
             </div>
             <div class="data-row">
                 <label class="visibility-label">
-                    <input type="checkbox" checked data-visibility="m100_pa">
+                    <input type="checkbox" data-overlay-family="local" data-visibility="m100_pa">
                     <span class="color-box color-m100-pa"></span><span id="t_m100PA">M100 Local PA Pickup</span>
                 </label>
                 <div><input type="number" id="m100PAInput" class="radius-input" step="0.1" value="5.00">m</div>
             </div>
             <div class="data-row">
                 <label class="visibility-label">
-                    <input type="checkbox" checked data-visibility="m40_pickup">
+                    <input type="checkbox" data-overlay-family="remote" data-visibility="m40_pickup">
                     <span class="color-box color-m40-pickup"></span><span id="t_m40Pickup">M40 Remote Pickup</span>
                 </label>
                 <div><input type="number" id="m40PickupInput" class="radius-input" step="0.1" value="5.00">m</div>
             </div>
             <div class="data-row">
                 <label class="visibility-label">
-                    <input type="checkbox" checked data-visibility="m40_pa">
+                    <input type="checkbox" data-overlay-family="local" data-visibility="m40_pa">
                     <span class="color-box color-m40-pa"></span><span id="t_m40PA">M40 Local PA Pickup</span>
                 </label>
                 <div><input type="number" id="m40PAInput" class="radius-input" step="0.1" value="3.00">m</div>
             </div>
             <div class="data-row data-row-last">
                 <label class="visibility-label">
-                    <input type="checkbox" checked data-visibility="dc20">
+                    <input type="checkbox" data-overlay-family="speaker" data-visibility="dc20">
                     <span class="color-box color-dc20"></span><span id="t_dc20Cover">DC20 Speaker Coverage</span>
                 </label>
                 <div><input type="number" id="dc20Input" class="radius-input" step="0.1" value="3.12">m</div>
@@ -199,6 +199,13 @@
     </div>
 
     <div class="main-area">
+        <fieldset class="coverage-legend">
+            <legend data-legend-text="title">Coverage legend</legend>
+            <label><input type="checkbox" data-legend="all"><span data-legend-text="all">All</span></label>
+            <label><input type="checkbox" data-legend="remote"><span class="legend-key" aria-hidden="true"><i class="color-box color-m100-pickup"></i><i class="color-box color-m40-pickup"></i></span><span data-legend-text="remote">Remote pickup</span></label>
+            <label><input type="checkbox" data-legend="local"><span class="legend-key" aria-hidden="true"><i class="color-box color-m100-pa"></i><i class="color-box color-m40-pa"></i></span><span data-legend-text="local">Local PA pickup</span></label>
+            <label><input type="checkbox" data-legend="speaker"><span class="legend-key" aria-hidden="true"><i class="color-box color-dc20"></i></span><span data-legend-text="speaker">Speaker coverage</span></label>
+        </fieldset>
         <svg id="canvas" aria-label="Classroom plan">
             <defs>
                 <pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse">
@@ -218,6 +225,14 @@
             <!-- Room Bounds Rectangle -->
             <rect id="roomBounds" x="0" y="0" width="500" height="400" fill="var(--room-fill)" stroke="var(--room-stroke)" stroke-width="3" />
             <line id="heightSplitLine" x1="0" x2="500" y1="250" y2="250" stroke="#f59e0b" stroke-width="2" stroke-dasharray="8 5" hidden />
+
+            <g id="audioCoverageLayer" pointer-events="none" stroke-width="1.5">
+                <g id="overlay-m100_pickup" data-kind="m100" data-radius="m100Pickup" display="none" fill="#22c55e" fill-opacity=".15" stroke="#22c55e"></g>
+                <g id="overlay-m40_pickup" data-kind="m40" data-radius="m40Pickup" display="none" fill="#a855f7" fill-opacity=".15" stroke="#a855f7"></g>
+                <g id="overlay-dc20" data-kind="dc20" data-radius="dc20" display="none" fill="#93c5fd" fill-opacity=".3" stroke="#3b82f6"></g>
+                <g id="overlay-m100_pa" data-kind="m100" data-radius="m100PA" display="none" fill="none" stroke="#166534" stroke-dasharray="8 5"></g>
+                <g id="overlay-m40_pa" data-kind="m40" data-radius="m40PA" display="none" fill="none" stroke="#7e22ce" stroke-dasharray="6 4"></g>
+            </g>
 
             <!-- Dimension Lines -->
             <!-- Top Length Dimension -->
@@ -277,10 +292,10 @@
     <script defer src="js/locales-hu-it.js?v=20261026-quantities"></script>
     <script defer src="js/locales-es-ja.js?v=20261026-quantities"></script>
     <script defer src="js/locales-ko-ar.js?v=20261026-quantities"></script>
-    <script defer src="js/i18n.js?v=20261120-right-wall-doors"></script>
+    <script defer src="js/i18n.js?v=20261120-coverage-legend"></script>
     <script defer src="js/displays.js?v=20261026-quantities"></script>
     <script defer src="js/room.js?v=20261120-right-wall-doors"></script>
-    <script defer src="js/devices.js?v=20261026-quantities"></script>
+    <script defer src="js/devices.js?v=20261120-coverage-legend"></script>
     <script defer src="js/coverage.js?v=20261026-quantities"></script>
     <script defer src="js/recommend-mics.js?v=20261026-quantities"></script>
     <script defer src="js/recommend-speakers.js?v=20261026-quantities"></script>
@@ -288,7 +303,7 @@
     <script defer src="js/presets.js?v=20261026-quantities"></script>
     <script defer src="js/bom.js?v=20261120-display-size"></script>
     <script defer src="js/interactions.js?v=20261026-quantities"></script>
-    <script defer src="js/main.js?v=20261120-right-wall-doors"></script>
+    <script defer src="js/main.js?v=20261120-coverage-legend"></script>
 <script defer src="js/quotation.js?v=20261120-settings-groups"></script>
 <script defer src="js/workspace.js?v=20261120-settings-groups"></script>
 </body>

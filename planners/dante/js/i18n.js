@@ -26,9 +26,24 @@
         return displayI18n[lang] || displayI18n.en;
     }
 
+    const legendCopy = {
+        en: ['Coverage legend', 'All', 'Remote pickup', 'Local PA pickup', 'Speaker coverage'],
+        zh: ['覆盖图例', '全部', '远程拾音', '本地扩声拾音', '扬声器覆盖'],
+        es: ['Leyenda de cobertura', 'Todo', 'Captación remota', 'Captación para megafonía', 'Cobertura de altavoces'],
+        ja: ['カバー範囲の凡例', 'すべて', '遠隔用集音', '室内拡声用集音', 'スピーカー範囲'],
+        ko: ['커버리지 범례', '전체', '원격 수음', '로컬 확성용 수음', '스피커 범위'],
+        it: ['Legenda copertura', 'Tutto', 'Ripresa remota', 'Ripresa per amplificazione', 'Copertura diffusori'],
+        hu: ['Lefedettségi jelmagyarázat', 'Mind', 'Távoli hangfelvétel', 'Helyi hangosítás', 'Hangszórók lefedettsége'],
+        ar: ['مفتاح التغطية', 'الكل', 'التقاط الصوت عن بُعد', 'التقاط الصوت للتضخيم المحلي', 'تغطية مكبرات الصوت']
+    };
+
     function changeLanguage(lang) {
         const i18n = { [lang]: App.presentCopy(App.i18n[lang], lang, App.state.showModels) };
         document.documentElement.lang = lang;
+        const legend = legendCopy[lang] || legendCopy.en;
+        ['title', 'all', 'remote', 'local', 'speaker'].forEach((key, i) => {
+            document.querySelector(`[data-legend-text="${key}"]`).textContent = legend[i];
+        });
         const presentation = App.presentationCopy(lang);
         document.getElementById('t_open3d').title = presentation.open3d;
         document.getElementById('t_open3d').setAttribute('aria-label', presentation.open3d);

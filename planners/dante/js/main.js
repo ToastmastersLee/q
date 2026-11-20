@@ -89,8 +89,9 @@
         document.getElementById('t_recalculate').addEventListener('click', () => App.recalculateProductPlan());
         document.getElementById('t_reset').addEventListener('click', () => App.resetPositions());
         document.getElementById('t_clearAll').addEventListener('click', () => App.clearAllDevices());
-        document.querySelectorAll('[data-visibility]').forEach((checkbox) => {
-            checkbox.addEventListener('change', () => App.toggleVisibility(checkbox.dataset.visibility, checkbox.checked));
+        App.toggleVisibility('all', false);
+        document.querySelectorAll('[data-visibility], [data-legend]').forEach((checkbox) => {
+            checkbox.addEventListener('change', () => App.toggleVisibility(checkbox.dataset.visibility || checkbox.dataset.legend, checkbox.checked));
         });
 
         // Dimensions sliders input listeners

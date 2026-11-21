@@ -39,6 +39,12 @@
         const list = V.zones(t.count), shot = V.shot(t), scale = App.PPM;
         const lang = el('langSelect').value, w = V.words(lang);
         const layer = svg('g',{transform:'scale('+scale+')'},root);
+        const f = V.teacherField(state.displayPlan.stageMm);
+        const guide = svg('g',{'data-guide':'teacher-field','pointer-events':'none'},layer);
+        svg('path',{d:`M${f.left} ${f.targetY} L${f.mount.x} ${f.mount.y} L${f.right} ${f.targetY}`,
+            stroke:'#168d88','stroke-width':.045,'stroke-dasharray':'.16 .10',fill:'none'},guide);
+        svg('line',{x1:f.stageLeft,x2:f.stageRight,y1:f.targetY,y2:f.targetY,stroke:'#708799','stroke-width':.045},guide);
+        if (f.visibleWidth > 0) svg('line',{x1:f.start,x2:f.end,y1:f.targetY,y2:f.targetY,stroke:'#12b4ac','stroke-width':.15},guide);
         for (const z of list) {
             const active = z.number === shot.zone?.number;
             svg('rect',{x:z.bank?7.7:0.52,y:V.firstRow+(z.start-0.46)*V.pitch,width:5.7,
@@ -72,7 +78,7 @@
     }
     App.drawVoicePlan = draw;
     window.addEventListener('DOMContentLoaded', () => {
-        controls = App.bindVoiceControls(el('voice-panel'),{read:()=>state.tracking,language:()=>el('langSelect').value,
+        controls = App.bindVoiceControls(el('voice-panel'),{read:()=>state.tracking,stageWidthMm:()=>state.displayPlan.stageMm,language:()=>el('langSelect').value,
             toggle,resize:n=>{state.tracking=V.create(n,state.tracking.seat);App.renderRoom();},
             speak:id=>{state.tracking.seat=id;draw();}});
         el('voice-layer').onclick = e => { const id = e.target.closest('[data-seat]')?.dataset.seat; if (id) controls.pick(id); };

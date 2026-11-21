@@ -75,7 +75,7 @@
         }
         let tracking;
         if (input.version === 6) {
-            if (!App.voice.valid(input.tracking) || length !== App.voice.length || width !== App.voice.width ||
+            if (!App.voice.valid(input.tracking, true) || length !== App.voice.length || width !== App.voice.width ||
                 !equipment?.lcsEnabled || equipment.lcsCount !== 1 || equipment.cameraCount !== 0) fail();
             tracking = App.voice.create(input.tracking.count, input.tracking.seat);
             if (tracking.devices.some(d => ids.has(d.id))) fail();

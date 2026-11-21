@@ -13,7 +13,7 @@
         if (e.lcsEnabled) {
             lines.push(line('LCS810 GEN2', e.lcsCount, 'K3200N1-D15 recording host for lecture capture and USB hybrid learning. Confirm Dante audio routing and ordered options.'));
             if (s.tracking) {
-                const descriptions = {student:'Zone close-up using the project tracking firmware.', teacher:'Independent teacher feed to LCS810 GEN 2.',
+                const descriptions = {student:'Zone close-up using the project tracking firmware.', teacher:'Independent teacher feed to LCS810 GEN 2. Ceiling mount 10 m from the front wall. Calibrate the lecturer area within the 43° fixed view.',
                     panorama:'Independent panoramic feed to LCS810 GEN 2.',tracker:'Microphone DOA and student camera selection. RTSP program feed to LCS810 GEN 2.'};
                 for (const d of App.voice.inventory(s.tracking)) lines.push(line(App.voice.label(d,'en'),d.quantity,descriptions[d.role]));
             } else lines.push(line('CV870', e.cameraCount, 'Teacher / student camera for lecture capture. Confirm recording and tracking configuration.'));

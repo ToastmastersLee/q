@@ -1,6 +1,20 @@
 // Project coordinates are metres from the front-left corner. +Y runs up the seating tiers.
 (function (App) {
     const length = 13.92, width = 20.52, height = 3.8;
+    // CV870 Pro Teacher fixed overview lens. The 10 m layout comes from the LCS planner.
+    const lectern = {x:1.3, y:1.45};
+    const teacherMount = {x:(lectern.x + length / 2) / 2, y:10};
+    const teacherHfov = 43;
+    function teacherField(stageMm) {
+        const stageWidth = stageMm / 1000;
+        const stageLeft = (length - stageWidth) / 2, stageRight = stageLeft + stageWidth;
+        const halfSpan = (teacherMount.y - lectern.y) * Math.tan(teacherHfov * Math.PI / 360);
+        const left = teacherMount.x - halfSpan, right = teacherMount.x + halfSpan;
+        const start = Math.max(left, stageLeft), end = Math.min(right, stageRight);
+        const visibleWidth = Math.max(0, end - start);
+        return {mount:teacherMount, targetY:lectern.y, hfov:teacherHfov, left, right, start, end,
+            stageLeft, stageRight, stageWidth, visibleWidth, percent:Math.round(100 * visibleWidth / stageWidth)};
+    }
     const rows = 10, columns = 10, firstRow = 4.3, pitch = 1.5;
     const seats = Array.from({length: rows * columns}, (_, i) => {
         const row = Math.floor(i / columns), col = i % columns, bank = Number(col >= columns / 2);
@@ -27,23 +41,29 @@
     function devices(count) {
         const camera = (role, number, model, x, y) => ({
             id:'voice-' + role + '-' + number, type:'camera', role, number, model, x, y,
-            mountHeight:role === 'student' ? 2.75 : 2.65, install:role === 'student' && y > 1 ? 'ceiling' : 'wall', voice:true
+            mountHeight:role === 'student' ? 2.75 : 2.65, install:role === 'teacher' || (role === 'student' && y > 1) ? 'ceiling' : 'wall', voice:true
         });
         return [...zones(count).map(z => camera('student', z.number, 'CV870', z.x, z.y)),
             camera('panorama', 1, 'CV210 Student', length / 2, 0.48),
-            camera('teacher', 1, 'CV870', length / 2, width - 0.4),
+            camera('teacher', 1, 'CV870', teacherMount.x, teacherMount.y),
             {id:'voice-mt200', type:'tracker', role:'tracker', number:1, model:'AIVIS-MT200',
              x:1.3, y:1.45, mountHeight:1.27, install:'floor', voice:true}];
     }
     function create(count = 4, seat = null) {
         return {count, seat, devices:devices(count)};
     }
-    function valid(t) {
+    function valid(t, acceptPreviousMount = false) {
         if (!t || !Number.isInteger(t.count) || t.count < 2 || t.count > 6 ||
             !(t.seat === null || seatById.has(t.seat)) || !Array.isArray(t.devices)) return false;
         const expected = devices(t.count);
-        return expected.length === t.devices.length && expected.every((d,i) =>
-            Object.entries(d).every(([key,value]) => t.devices[i]?.[key] === value));
+        return expected.length === t.devices.length && expected.every((device, i) => {
+            const actual = t.devices[i];
+            // Only the original v6 rear-wall mount is migrated during snapshot import.
+            if (acceptPreviousMount && device.role === 'teacher' && actual?.install === 'wall') {
+                device = {...device, x:length / 2, y:width - 0.4, install:'wall'};
+            }
+            return Object.entries(device).every(([key, value]) => actual?.[key] === value);
+        });
     }
     function zoneFor(seat, list) {
         return list.find(z => z.bank === seat.bank && seat.row >= z.start && seat.row < z.end);
@@ -73,7 +93,7 @@
         return {roomLength:length, roomWidth:width, height,
             heightProfile:{mode:'uniform',front:height,rear:height,split:width/2,drop:0,manualPickup:null,manualPA:null},
             equipment, devices, displayPlan, auxDisplays:[], showIFP:true, showAuxDisplays:true,
-            teachingDevices:[{id:'hall-podium', type:'qnex', model:'NDP200',x:1.3,y:1.45},
+            teachingDevices:[{id:'hall-podium', type:'qnex', model:'NDP200',...lectern},
                 {id:'hall-station',type:'station',model:'LCS810 GEN2',x:0.46,y:0.3}, ...App.screenEntries(displayPlan,width).teaching],
             radii:App.radiiForHeight(height,0), manualAudio:true, manualAux:true, audioDraft:null,
             audioLayout:{mode:'fixed',counts:App.audioCounts(devices)}, tracking:create()};
@@ -94,5 +114,5 @@
         return d.model + ' · ' + words(lang)[{student:7, teacher:8, panorama:9, tracker:10}[d.role]];
     }
     function hallName(lang) { return lang === 'zh' ? '埃航大型阶梯教室' : 'Ethiopian Airlines · Large Lecture Hall'; }
-    App.voice = {hallName,length,width,height,seats,seatById,colors,zones,zoneFor,shot,inventory,create,valid,hall,words,label,firstRow,pitch};
+    App.voice = {hallName,teacherField,length,width,height,seats,seatById,colors,zones,zoneFor,shot,inventory,create,valid,hall,words,label,firstRow,pitch};
 })(window.AISpeech);

@@ -52,8 +52,9 @@
                 }); App.renderRoom();
             }, v => App.setAuxCount(size, v), null, n => `${display.title} · ${n}″`, display.size);
         if (e.lcsEnabled) {
-            row('lcs', 'LCS810 GEN2', e.lcsCount, null, null, v => {App.setStationOption('lcsCount', v);App.renderRoom();});
-            row('camera', 'CV870', e.cameraCount, null, null, v => set('cameraCount', v));
+            row('lcs', 'LCS810 GEN2', e.lcsCount, null, null, s.tracking ? null : v => {App.setStationOption('lcsCount', v);App.renderRoom();});
+            if (s.tracking) for (const d of App.voice.inventory(s.tracking)) row('voice-'+d.role, App.voice.label(d,lang), d.quantity);
+            else row('camera', 'CV870', e.cameraCount, null, null, v => set('cameraCount', v));
         }
         const warning = document.getElementById('processor-warning');
         if (warning) { warning.textContent = copy.capacity; warning.hidden = b.channels <= (b.processor?.count || 0) * (e.processorModel === 'DP44' ? 4 : 8); }

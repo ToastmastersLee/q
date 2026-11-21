@@ -1,0 +1,98 @@
+// Project coordinates are metres from the front-left corner. +Y runs up the seating tiers.
+(function (App) {
+    const length = 13.92, width = 20.52, height = 3.8;
+    const rows = 10, columns = 10, firstRow = 4.3, pitch = 1.5;
+    const seats = Array.from({length: rows * columns}, (_, i) => {
+        const row = Math.floor(i / columns), col = i % columns, bank = Number(col >= columns / 2);
+        return {id: String.fromCharCode(65 + row) + (col + 1), row, bank,
+            x: 1.35 + (col % 5) * 1.03 + bank * 7.12, y: firstRow + row * pitch, rise: row * 0.115};
+    });
+    const seatById = new Map(seats.map(seat => [seat.id, seat]));
+    const colors = ['#4387bf','#c07948','#319988','#9a75b2','#a99643','#b76e88'];
+    function zones(count) {
+        if (!Number.isInteger(count) || count < 2 || count > 6) throw new RangeError('Student camera count must be 2–6');
+        const result = [];
+        for (let tier = 0; result.length < count; tier++) {
+            for (const bank of [0, 1]) {
+                const bands = bank ? Math.floor(count / 2) : Math.ceil(count / 2);
+                if (tier >= bands) continue;
+                const start = Math.ceil(rows * tier / bands), end = Math.ceil(rows * (tier + 1) / bands);
+                const number = result.length + 1;
+                result.push({number, bank, start, end, color:colors[number-1],
+                    x: bank ? length * 0.75 : length * 0.25, y: tier ? firstRow + (start - 0.75) * pitch : 0.55});
+            }
+        }
+        return result;
+    }
+    function devices(count) {
+        const camera = (role, number, model, x, y) => ({
+            id:'voice-' + role + '-' + number, type:'camera', role, number, model, x, y,
+            mountHeight:role === 'student' ? 2.75 : 2.65, install:role === 'student' && y > 1 ? 'ceiling' : 'wall', voice:true
+        });
+        return [...zones(count).map(z => camera('student', z.number, 'CV870', z.x, z.y)),
+            camera('panorama', 1, 'CV210 Student', length / 2, 0.48),
+            camera('teacher', 1, 'CV870', length / 2, width - 0.4),
+            {id:'voice-mt200', type:'tracker', role:'tracker', number:1, model:'AIVIS-MT200',
+             x:1.3, y:1.45, mountHeight:1.27, install:'floor', voice:true}];
+    }
+    function create(count = 4, seat = null) {
+        return {count, seat, devices:devices(count)};
+    }
+    function valid(t) {
+        if (!t || !Number.isInteger(t.count) || t.count < 2 || t.count > 6 ||
+            !(t.seat === null || seatById.has(t.seat)) || !Array.isArray(t.devices)) return false;
+        const expected = devices(t.count);
+        return expected.length === t.devices.length && expected.every((d,i) =>
+            Object.entries(d).every(([key,value]) => t.devices[i]?.[key] === value));
+    }
+    function zoneFor(seat, list) {
+        return list.find(z => z.bank === seat.bank && seat.row >= z.start && seat.row < z.end);
+    }
+    function shot(t) {
+        const seat = seatById.get(t.seat), zone = seat && zoneFor(seat, zones(t.count));
+        return {seat, zone, camera:t.devices.find(d => zone ? d.role === 'student' && d.number === zone.number : d.role === 'panorama')};
+    }
+    function inventory(t) {
+        return ['student','teacher','panorama','tracker'].map(role => {
+            const items = t.devices.filter(d => d.role === role);
+            return {...items[0], quantity:items.length};
+        });
+    }
+    function hall() {
+        const equipment = {...App.defaultEquipment(), qnexModel:'NDP200', lcsEnabled:true, ifpCount:3, cameraCount:0,
+            processorCount:2, du11Count:1};
+        const devices = [];
+        function grid(type, xs, ys) {
+            for (const y of ys) for (const x of xs) devices.push({id:devices.length+1, type, x, y});
+        }
+        grid('m100', [3.65,10.27], [6.6,15.4]);
+        grid('dc20', [1.15,6.96,12.77], [2.9,8.1,13.25,18.5]);
+        const displayPlan = {stageMm:13920, screens:[DisplayFit.standard('front',86,'hall-ifp',length/2,0.15),
+            ...[3.1,10.82].map((x,i) => ({id:'hall-led-'+i, zone:'front', size:null, name:'LE163MD 163″ LED',
+                widthMm:3610, heightMm:2030, depthMm:100, offsetMm:0, x, y:0.15}))]};
+        return {roomLength:length, roomWidth:width, height,
+            heightProfile:{mode:'uniform',front:height,rear:height,split:width/2,drop:0,manualPickup:null,manualPA:null},
+            equipment, devices, displayPlan, auxDisplays:[], showIFP:true, showAuxDisplays:true,
+            teachingDevices:[{id:'hall-podium', type:'qnex', model:'NDP200',x:1.3,y:1.45},
+                {id:'hall-station',type:'station',model:'LCS810 GEN2',x:0.46,y:0.3}, ...App.screenEntries(displayPlan,width).teaching],
+            radii:App.radiiForHeight(height,0), manualAudio:true, manualAux:true, audioDraft:null,
+            audioLayout:{mode:'fixed',counts:App.audioCounts(devices)}, tracking:create()};
+    }
+    const en = ['Student Voice Tracking','Student cameras','Speaking seat','Panorama','Cycle zones','Stop','End speech','Student close-up','Teacher','Student panorama','Tracking controller','Simulated output','Seat'];
+    const zh = ['学生语音跟踪','学生特写机','发言座位','全景','自动轮演','停止轮演','结束发言','学生特写','教师机','学生全景','跟踪主机','模拟输出','座位'];
+    const copy = {en, zh,
+        fr:['Suivi vocal des étudiants','Caméras étudiants','Siège actif','Panorama','Parcourir les zones','Arrêter','Fin de parole','Gros plan étudiant','Enseignant','Panorama étudiants','Contrôleur de suivi','Sortie simulée','Siège'],
+        es:['Seguimiento de voz del alumnado','Cámaras de estudiantes','Asiento activo','Panorámica','Recorrer zonas','Detener','Finalizar intervención','Primer plano','Docente','Panorámica del alumnado','Controlador','Salida simulada','Asiento'],
+        ja:['学生の音声追尾','学生用カメラ','発言席','全景','エリアを順に表示','停止','発言終了','学生アップ','教員','学生全景','追尾制御装置','模擬出力','座席'],
+        ko:['학생 음성 추적','학생 카메라','발언 좌석','전체 화면','구역 순회','중지','발언 종료','학생 클로즈업','교사','학생 전체 화면','추적 제어기','모의 출력','좌석'],
+        it:['Tracciamento vocale studenti','Videocamere studenti','Posto attivo','Panoramica','Scorri zone','Ferma','Fine intervento','Primo piano','Docente','Panoramica studenti','Controller','Uscita simulata','Posto'],
+        hu:['Hallgatói hangkövetés','Hallgatói kamerák','Felszólaló helye','Panoráma','Zónák bemutatása','Leállítás','Felszólalás vége','Hallgatói közelkép','Oktató','Hallgatói panoráma','Követésvezérlő','Szimulált kimenet','Ülőhely'],
+        mn:['Оюутны дуу хоолойг дагах','Оюутны камер','Ярьж буй суудал','Ерөнхий дүрс','Бүсүүдийг үзүүлэх','Зогсоох','Яриаг дуусгах','Оюутны ойрын дүрс','Багш','Оюутны ерөнхий дүрс','Хяналтын төхөөрөмж','Загварчилсан гаралт','Суудал'],
+        ar:['تتبع صوت الطلاب','كاميرات الطلاب','مقعد المتحدث','لقطة شاملة','عرض المناطق','إيقاف','إنهاء الحديث','لقطة طالب مقربة','المحاضر','لقطة شاملة للطلاب','وحدة التتبع','خرج محاكى','مقعد']};
+    function words(lang) { return copy[lang] || en; }
+    function label(d, lang) {
+        return d.model + ' · ' + words(lang)[{student:7, teacher:8, panorama:9, tracker:10}[d.role]];
+    }
+    function hallName(lang) { return lang === 'zh' ? '埃航大型阶梯教室' : 'Ethiopian Airlines · Large Lecture Hall'; }
+    App.voice = {hallName,length,width,height,seats,seatById,colors,zones,zoneFor,shot,inventory,create,valid,hall,words,label,firstRow,pitch};
+})(window.AISpeech);

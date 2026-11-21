@@ -269,5 +269,17 @@
 .audio-count-row select { width:100%;padding:8px;border:1px solid var(--border);border-radius:8px;background:var(--panel);color:var(--text); }
 .audio-count-status { font-size:12px;color:var(--teal); }
 .audio-count-card[data-pending="true"] .audio-count-status,.audio-layout-warning {color:#d97706;}
+.voice-controls {display:grid;gap:.55rem}
+.voice-controls [hidden],.voice-feed[hidden] {display:none!important}
+.voice-switch,.voice-options label {display:flex;align-items:center;gap:.5rem}
+.voice-switch input {width:auto;margin:0;accent-color:var(--teal)}
+.voice-options {display:grid;gap:.55rem;border-inline-start:2px solid var(--teal);padding-inline-start:.65rem}
+.voice-options label {justify-content:space-between}
+.voice-actions {display:flex;gap:.4rem;flex-wrap:wrap}
+.voice-actions button {padding:5px 8px}
+.voice-options output {font-size:.8rem}
+.voice-feed {position:absolute;z-index:3;right:12px;bottom:12px;width:clamp(128px,22%,260px);margin:0;overflow:hidden;border-radius:6px;background:#102332;border:1px solid #7895a1;pointer-events:none}
+.voice-feed canvas {width:100%;aspect-ratio:16/9;display:block}
+.voice-feed figcaption {padding:3px 7px;color:#f2f8fa;font:600 11px/1.4 system-ui}
 .audio-count-actions {display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
 .audio-count-actions button {padding:9px 12px;text-align:start;font-size:12px;}

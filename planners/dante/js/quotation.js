@@ -12,12 +12,16 @@
         if (!s.displayPlan) for (const size of [55, 65, 75]) lines.push(line(`Auxiliary Display / TV ${size}-inch`, b.counts[size], 'Auxiliary classroom display; mounting and signal distribution require selection.'));
         if (e.lcsEnabled) {
             lines.push(line('LCS810 GEN2', e.lcsCount, 'K3200N1-D15 recording host for lecture capture and USB hybrid learning. Confirm Dante audio routing and ordered options.'));
-            lines.push(line('CV870', e.cameraCount, 'Teacher / student camera for lecture capture. Confirm recording and tracking configuration.'));
+            if (s.tracking) {
+                const descriptions = {student:'Zone close-up using the project tracking firmware.', teacher:'Independent teacher feed to LCS810 GEN 2.',
+                    panorama:'Independent panoramic feed to LCS810 GEN 2.',tracker:'Microphone DOA and student camera selection. RTSP program feed to LCS810 GEN 2.'};
+                for (const d of App.voice.inventory(s.tracking)) lines.push(line(App.voice.label(d,'en'),d.quantity,descriptions[d.role]));
+            } else lines.push(line('CV870', e.cameraCount, 'Teacher / student camera for lecture capture. Confirm recording and tracking configuration.'));
         }
         const snapshot = App.snapshotFromState(s, 'en');
         return { sceneKind: 'dante', ifpCount: s.showIFP ? e.ifpCount : 0, qnexModel: e.qnexModel,
-            sceneHash: () => App.encodeSnapshot(snapshot), title: 'Dante Classroom', width: s.roomLength, depth: s.roomWidth,
-            lines: lines.filter(l => l.quantity > 0), summary: `Teaching, hybrid learning and unified classroom control with ${e.qnexModel} and Dante audio.`,
+            sceneHash: () => App.encodeSnapshot(snapshot), title: s.tracking ? 'Large Lecture Hall · Student Voice Tracking' : 'Dante Classroom', width: s.roomLength, depth: s.roomWidth,
+            lines: lines.filter(l => l.quantity > 0), summary: s.tracking ? `Student voice tracking with ${s.tracking.count} CV870 close-up cameras, one independent CV210 panorama and an AIVIS-MT200 controller.` : `Teaching, hybrid learning and unified classroom control with ${e.qnexModel} and Dante audio.`,
             detail: Quotation.scenarioDetail(e.qnexModel, e.lcsEnabled) };
     };
     window.addEventListener('DOMContentLoaded', () => {
@@ -50,7 +54,7 @@
         App.refreshConfigurationUI = () => {
             const lang = document.getElementById('langSelect').value, t = Quotation.words(lang), c = App.configurationCopy(lang);
             document.documentElement.lang = lang; exportButton.textContent = t[0]; back.textContent = t[3];
-            toggle.textContent = c.configuration; note.textContent = c.manual; restore.textContent = c.restore; lcs.title.textContent = c.includeLCS;
+            toggle.textContent = c.configuration; note.textContent = c.manual; restore.textContent = c.restore; lcs.title.textContent = s.tracking ? 'LCS810 GEN 2' : c.includeLCS;
             ifp.title.textContent = lang==='zh'?'主屏 / IFP':'Main screen / IFP';
             App.displayEditor?.refresh();
             aux.title.textContent = App.getDisplayCopy(lang).title; ifp.input.checked = s.showIFP; aux.input.checked = s.showAuxDisplays; lcs.input.checked = s.equipment.lcsEnabled;

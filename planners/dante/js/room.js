@@ -32,14 +32,14 @@
         lengthDimLine.setAttribute('x2', pxLen);
         const lengthDimText = document.getElementById('lengthDimText');
         lengthDimText.setAttribute('x', pxLen / 2);
-        lengthDimText.textContent = len.toFixed(1) + ' m';
+        lengthDimText.textContent = (state.tracking ? len.toFixed(2) : len.toFixed(1)) + ' m';
 
         // Width Dim Line (Left)
         const widthDimLine = document.getElementById('widthDimLine');
         widthDimLine.setAttribute('y2', pxWid);
         const widthDimText = document.getElementById('widthDimText');
         widthDimText.setAttribute('y', pxWid / 2);
-        widthDimText.textContent = wid.toFixed(1) + ' m';
+        widthDimText.textContent = (state.tracking ? wid.toFixed(2) : wid.toFixed(1)) + ' m';
         widthDimText.setAttribute('transform', `rotate(-90 -28 ${pxWid / 2})`);
 
         const doors = App.sideWallDoors(wid);
@@ -62,6 +62,7 @@
         renderAuxiliaryDisplays();
         renderDevices();
         calculateCoverage();
+        App.drawVoicePlan?.();
     }
 
     // --- Acoustic Calculations ---

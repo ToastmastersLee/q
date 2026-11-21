@@ -62,6 +62,7 @@
             }
             if (target.dataset.teachingId) {
                 const d = state.teachingDevices.find(v => v.id === target.dataset.teachingId);
+                if (state.tracking && d.type === 'station') return;
                 const key = {qnex:'qnexCount',ifp:'ifpCount',station:'lcsCount',camera:'cameraCount'}[d.type];
                 state.teachingDevices = state.teachingDevices.filter(v => v !== d);
                 state.equipment[key]--; App.renderRoom(); return;

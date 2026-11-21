@@ -61,6 +61,7 @@
             if (s.tracking) for (const d of App.voice.inventory(s.tracking)) row('voice-'+d.role, App.voice.label(d,lang), d.quantity);
             else row('camera', 'CV870', e.cameraCount, null, null, v => set('cameraCount', v));
         }
+        if(s.tracking && !App.voice.forTracking(s.tracking).small) row('cpl50','CPL50',1);
         const warning = document.getElementById('processor-warning');
         if (warning) { warning.textContent = copy.capacity; warning.hidden = b.channels <= (b.processor?.count || 0) * (e.processorModel === 'DP44' ? 4 : 8); }
         App.refreshConfigurationUI?.();

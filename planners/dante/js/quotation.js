@@ -11,6 +11,7 @@
         if (b.processor) lines.push(line(b.processor.type, b.processor.count, 'Dante audio processing for the configured channel count.', false, false));
         if (!s.displayPlan) for (const size of [55, 65, 75]) lines.push(line(`Auxiliary Display / TV ${size}-inch`, b.counts[size], 'Auxiliary classroom display; mounting and signal distribution require selection.'));
         const hall = s.tracking && App.voice.forTracking(s.tracking);
+        if (hall && !hall.small) lines.push(line('CPL50',1,'10.1-inch room scheduling panel at the main entrance.'));
         if (e.lcsEnabled) {
             lines.push(line('LCS810 GEN2', e.lcsCount, 'K3200N1-D15 recording host for lecture capture and USB hybrid learning. Confirm Dante audio routing and ordered options.'));
             if (s.tracking) {

@@ -43,7 +43,8 @@
                 typeof s.name !== 'string' ||
                 !s.name.trim() ||
                 s.name.length > 100 ||
-                ![s.widthMm, s.heightMm, s.depthMm].every(dimension) ||
+                ![s.widthMm, s.heightMm].every(dimension) ||
+                !(dimension(s.depthMm) || (s.name === 'LE163MD 163″ LED' && s.depthMm === 62.5)) ||
                 !Number.isSafeInteger(s.offsetMm) ||
                 s.offsetMm < 0 ||
                 s.offsetMm > 100000 ||
@@ -55,6 +56,8 @@
             const dims = catalog(s.zone)[s.size];
             return (
                 s.size === null ||
+                (s.zone === 'front' && s.name === 'QA1400 Pro' && s.size === 86 &&
+                    s.widthMm === 1968 && s.heightMm === 1194 && s.depthMm === 87) ||
                 (Array.isArray(dims) && dims.every((v, i) => v === [s.widthMm, s.heightMm, s.depthMm][i]))
             );
         });

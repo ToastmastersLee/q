@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="styles-base.css?v=20261030-planning-reset">
   <link rel="stylesheet" href="styles-sidebar.css?v=20261121-voice">
   <link rel="stylesheet" href="styles-responsive.css">
-  <link rel="stylesheet" href="styles-presentation.css?v=sidebar-tabs">
+  <link rel="stylesheet" href="styles-presentation.css?v=hall115">
   <link rel="stylesheet" href="styles-camera-field.css?v=20261026-camera-field">
 </head>
 <body>
@@ -33,7 +33,7 @@
         <div class="view-buttons" role="group" aria-label="Camera views">
         <button data-view="overview" data-i18n="overview">Overview</button><button data-view="top" data-i18n="top">Top</button><button data-view="stage" data-i18n="stage">Stage</button><button data-view="audience" data-i18n="audience">Audience</button>
       </div>
-        <div class="scene-tool-actions"><button id="theme-toggle" type="button">Theme</button><button id="sidebar-toggle" type="button" aria-expanded="true">Hide sidebar</button></div>
+        <div class="scene-tool-actions"><button id="high-fidelity" type="button" aria-pressed="false" hidden>High fidelity</button><button id="hall-gallery" type="button" hidden>Proposal images</button><button type="button" data-view="entrance" hidden>Entrance</button><button id="theme-toggle" type="button">Theme</button><button id="sidebar-toggle" type="button" aria-expanded="true">Hide sidebar</button></div>
       </div>
       <div id="scene-error" class="scene-error" hidden></div>
       <div class="scene-hint" data-i18n="sceneHint">Drag to rotate · wheel to zoom · right drag to pan</div>
@@ -141,6 +141,11 @@
       <div class="sidebar-footer"><button id="reset-demo" class="reset-demo" type="button" data-i18n="reset">Restore demo defaults</button></div>
     </aside>
   </main>
-  <script defer src="dist/aispeech-three.js?v=20261121-small121"></script>
+  <dialog id="hall-sheets" aria-labelledby="sheet-title"><div class="sheet-content">
+    <header><h2 id="sheet-title">Proposal images</h2><button type="button" class="sheet-close">Close</button></header>
+    <nav aria-label="Proposal views"><button type="button" data-sheet="stage">From stage</button><button type="button" data-sheet="audience">From rear</button><button type="button" data-sheet="entrance">Entrance</button></nav>
+    <img alt="Large Lecture Hall 115"><footer><a download>Download PNG</a></footer>
+  </div></dialog>
+  <script defer src="dist/aispeech-three.js?v=20261122-hall115-studio"></script>
 </body>
 </html>

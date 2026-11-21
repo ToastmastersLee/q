@@ -116,9 +116,9 @@
             return n;
         };
         function refresh(force = false) {
-            const { plan, room, lang } = read(),
+            const { plan, room, lang, frontWall } = read(),
                 w = words[lang] || words.en;
-            const key = JSON.stringify([plan, room, lang, zone, editing, notice, noticeState]);
+            const key = JSON.stringify([plan, room, lang, frontWall, zone, editing, notice, noticeState]);
             if (!force && previous === key) return;
             previous = key;
             const base = repairPlan || plan;
@@ -192,7 +192,7 @@
             width.min = '0.001';
             width.max = room.width;
             width.value = base.stageMm / 1000;
-            field(w[1], width);
+            field(frontWall ? (lang === 'zh' ? '前墙布屏宽度（米）' : 'Front display wall width (m)') : w[1], width);
             width.onkeydown = (event) => {
                 if (event.key === 'Enter') {
                     event.preventDefault();
@@ -234,7 +234,7 @@
                     const why = message(next.replacedBecause, lang);
                     feedback =
                         lang === 'zh'
-                            ? '舞台宽度已改为 ' +
+                            ? (frontWall ? '前墙布屏宽度已改为 ' : '舞台宽度已改为 ') +
                               metres +
                               ' 米。原配置 ' +
                               from +
@@ -244,7 +244,7 @@
                               (to
                                   ? '已自动改为推荐配置 ' + to + '。'
                                   : '没有可安装的标准主屏，主屏数量已设为 0。可输入自定义屏尺寸。')
-                            : 'Stage width changed to ' +
+                            : (frontWall ? 'Front display wall width changed to ' : 'Stage width changed to ') +
                               metres +
                               ' m. ' +
                               from +

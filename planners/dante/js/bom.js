@@ -7,6 +7,11 @@
         const copy = App.configurationCopy(lang);
         const display = App.getDisplayCopy(lang);
         list.replaceChildren();
+        if (s.tracking?.hall === 'small') {
+            const heading = document.createElement('strong');
+            heading.textContent = App.voice.forTracking(s.tracking).configurationName(s.tracking, lang);
+            list.append(heading);
+        }
         function row(key, model, count, choices, onModel, onCount, note, choiceText = String, fieldLabel = copy.model) {
             const wrap = document.createElement('div'); wrap.className = 'editable-bom-row'; wrap.dataset.bomKey = key;
             let name;

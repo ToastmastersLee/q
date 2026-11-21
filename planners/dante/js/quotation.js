@@ -10,10 +10,11 @@
         lines.push(line('DU11', b.du11, 'Dante audio interface linking the meeting computer / podium OPS and room audio.'));
         if (b.processor) lines.push(line(b.processor.type, b.processor.count, 'Dante audio processing for the configured channel count.', false, false));
         if (!s.displayPlan) for (const size of [55, 65, 75]) lines.push(line(`Auxiliary Display / TV ${size}-inch`, b.counts[size], 'Auxiliary classroom display; mounting and signal distribution require selection.'));
+        const hall = s.tracking && App.voice.forTracking(s.tracking);
         if (e.lcsEnabled) {
             lines.push(line('LCS810 GEN2', e.lcsCount, 'K3200N1-D15 recording host for lecture capture and USB hybrid learning. Confirm Dante audio routing and ordered options.'));
             if (s.tracking) {
-                const field = App.voice.teacherField(s.displayPlan.stageMm);
+                const field = hall.teacherField(s.displayPlan.stageMm);
                 const descriptions = {student:'Zone close-up using the project tracking firmware.', teacher:`Independent teacher feed to LCS810 GEN 2. Ceiling mount ${field.distance} m behind the lectern line, ${field.mount.y} m from the front wall. Calibrate the lecturer area within the ${field.hfov}° fixed view.`,
                     panorama:'Independent panoramic feed to LCS810 GEN 2.',tracker:'Microphone DOA and student camera selection. RTSP program feed to LCS810 GEN 2.'};
                 for (const d of App.voice.inventory(s.tracking)) lines.push(line(App.voice.label(d,'en'),d.quantity,descriptions[d.role]));
@@ -21,7 +22,7 @@
         }
         const snapshot = App.snapshotFromState(s, 'en');
         return { sceneKind: 'dante', ifpCount: s.showIFP ? e.ifpCount : 0, qnexModel: e.qnexModel,
-            sceneHash: () => App.encodeSnapshot(snapshot), title: s.tracking ? 'Large Lecture Hall · Student Voice Tracking' : 'Dante Classroom', width: s.roomLength, depth: s.roomWidth,
+            sceneHash: () => App.encodeSnapshot(snapshot), title: s.tracking ? (hall.small ? 'Small Lecture Hall' : 'Large Lecture Hall')+' · Student Voice Tracking'+(hall.small && s.tracking.count !== hall.defaultCount ? ' (Trial)' : '') : 'Dante Classroom', width: s.roomLength, depth: s.roomWidth,
             lines: lines.filter(l => l.quantity > 0), summary: s.tracking ? `Student voice tracking with ${s.tracking.count} CV870 close-up cameras, one independent CV210 panorama and an AIVIS-MT200 controller.` : `Teaching, hybrid learning and unified classroom control with ${e.qnexModel} and Dante audio.`,
             detail: Quotation.scenarioDetail(e.qnexModel, e.lcsEnabled) };
     };

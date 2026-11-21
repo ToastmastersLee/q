@@ -75,9 +75,10 @@
         }
         let tracking;
         if (input.version === 6) {
-            if (!App.voice.valid(input.tracking, true) || length !== App.voice.length || width !== App.voice.width ||
+            const hall = App.voice.forTracking(input.tracking);
+            if (!hall?.valid(input.tracking, true) || length !== hall.length || width !== hall.width ||
                 !equipment?.lcsEnabled || equipment.lcsCount !== 1 || equipment.cameraCount !== 0) fail();
-            tracking = App.voice.create(input.tracking.count, input.tracking.seat);
+            tracking = hall.create(input.tracking.count, input.tracking.seat);
             if (tracking.devices.some(d => ids.has(d.id))) fail();
         }
         let audioLayout;

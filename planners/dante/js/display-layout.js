@@ -101,6 +101,7 @@
             }
         }
         return {
+            frontWall: s.tracking?.hall === 'small',
             plan: s.displayPlan || App.seedScreens(s.roomLength, teaching, s.auxDisplays),
             room: App.displayRoom(
                 s.roomLength,

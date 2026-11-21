@@ -1,18 +1,19 @@
 // Project coordinates are metres from the front-left corner. +Y runs up the seating tiers.
 (function (App) {
     const length = 13.92, width = 20.52, height = 3.8;
-    // CV870 Pro Teacher fixed overview lens. The 10 m layout comes from the LCS planner.
+    // In this hall, measure the 10 m planning distance along the room from the lectern line.
     const lectern = {x:1.3, y:1.45};
-    const teacherMount = {x:(lectern.x + length / 2) / 2, y:10};
+    const teacherDistance = 10;
+    const teacherMount = {x:(lectern.x + length / 2) / 2, y:lectern.y + teacherDistance};
     const teacherHfov = 43;
     function teacherField(stageMm) {
         const stageWidth = stageMm / 1000;
         const stageLeft = (length - stageWidth) / 2, stageRight = stageLeft + stageWidth;
-        const halfSpan = (teacherMount.y - lectern.y) * Math.tan(teacherHfov * Math.PI / 360);
+        const halfSpan = teacherDistance * Math.tan(teacherHfov * Math.PI / 360);
         const left = teacherMount.x - halfSpan, right = teacherMount.x + halfSpan;
         const start = Math.max(left, stageLeft), end = Math.min(right, stageRight);
         const visibleWidth = Math.max(0, end - start);
-        return {mount:teacherMount, targetY:lectern.y, hfov:teacherHfov, left, right, start, end,
+        return {mount:teacherMount, distance:teacherDistance, targetY:lectern.y, hfov:teacherHfov, left, right, start, end,
             stageLeft, stageRight, stageWidth, visibleWidth, percent:Math.round(100 * visibleWidth / stageWidth)};
     }
     const rows = 10, columns = 10, firstRow = 4.3, pitch = 1.5;
@@ -58,9 +59,10 @@
         const expected = devices(t.count);
         return expected.length === t.devices.length && expected.every((device, i) => {
             const actual = t.devices[i];
-            // Only the original v6 rear-wall mount is migrated during snapshot import.
-            if (acceptPreviousMount && device.role === 'teacher' && actual?.install === 'wall') {
-                device = {...device, x:length / 2, y:width - 0.4, install:'wall'};
+            // Recognise only the two previously shipped v6 layouts; all other device fields must match.
+            if (acceptPreviousMount && device.role === 'teacher') {
+                if (actual?.install === 'wall') device = {...device, x:length / 2, y:width - 0.4, install:'wall'};
+                else if (actual?.y === 10) device = {...device, y:10};
             }
             return Object.entries(device).every(([key, value]) => actual?.[key] === value);
         });

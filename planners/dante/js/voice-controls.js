@@ -4,16 +4,16 @@
     function teacherNote(lang, f) {
         const widths = f.visibleWidth.toFixed(2) + ' / ' + f.stageWidth.toFixed(2) + ' m (' + f.percent + '%)';
         const notes = {
-            zh: `教师机距前墙 ${f.mount.y} m 吊装。青色线为讲桌所在横线的可视宽度：${widths}。固定镜头 ${f.hfov}°，实际跟踪区需现场标定。`,
-            en: `Teacher camera ceiling-mounted ${f.mount.y} m from front wall. Teal line: visible stage width at lectern depth, ${widths}. Fixed lens ${f.hfov}°. Calibrate tracking on site.`,
-            fr: `Caméra enseignant au plafond à 10 m du mur avant. Trait turquoise à hauteur du pupitre : ${widths}. Champ fixe 43°. Calibrer le suivi sur place.`,
-            es: `Cámara docente en techo a 10 m de la pared frontal. Línea turquesa a la altura del atril: ${widths}. Campo fijo de 43°. Calibrar el seguimiento in situ.`,
-            ja: `教員カメラは前壁から10 mの天井に設置。青緑の線は演台位置での可視幅 ${widths}。固定画角43°。追尾範囲は現地で設定。`,
-            ko: `교사 카메라는 전면 벽에서 10 m 떨어진 천장에 설치합니다. 청록색 선은 강의대 위치의 가시 폭 ${widths}입니다. 고정 화각 43°. 현장에서 추적 영역을 설정하세요.`,
-            it: `Telecamera docente a soffitto, a 10 m dalla parete frontale. Linea turchese alla profondità del leggio: ${widths}. Campo fisso 43°. Calibrare in loco.`,
-            hu: `Oktatói kamera a mennyezeten, az elülső faltól 10 m-re. Türkiz vonal a pulpitusnál: ${widths}. Fix látószög 43°. Helyszíni kalibrálás szükséges.`,
-            mn: `Багшийн камер урд хананаас 10 м зайд таазанд байрлана. Индрийн түвшинд харагдах өргөн (оюу шугам): ${widths}. Тогтмол өнцөг 43°. Дагалтын бүсийг газар дээр нь тохируулна.`,
-            ar: `كاميرا المحاضر مثبتة في السقف على بعد 10 م من الجدار الأمامي. الخط الفيروزي يوضح العرض المرئي عند عمق المنصة: ${widths}. زاوية ثابتة 43°. تُعايَر منطقة التتبع ميدانياً.`
+            zh: `教师机距讲桌横线 ${f.distance} m，吊点距前墙 ${f.mount.y} m。青色线为讲桌所在横线的可视宽度：${widths}。固定镜头 ${f.hfov}°，实际跟踪区需现场标定。`,
+            en: `Teacher ceiling mount: ${f.distance} m behind the lectern line, ${f.mount.y} m from the front wall. Teal line: visible stage width at lectern depth, ${widths}. Fixed lens ${f.hfov}°. Calibrate tracking on site.`,
+            fr: `Caméra au plafond à ${f.distance} m en retrait de la ligne du pupitre, à ${f.mount.y} m du mur avant. Trait turquoise à hauteur du pupitre : ${widths}. Champ fixe 43°. Calibrer le suivi sur place.`,
+            es: `Cámara docente en el techo a ${f.distance} m de la línea del atril y ${f.mount.y} m de la pared frontal. Línea turquesa a la altura del atril: ${widths}. Campo fijo de 43°. Calibrar el seguimiento in situ.`,
+            ja: `教員カメラは演台の横線から後方${f.distance} m、前壁から${f.mount.y} mの天井に設置。青緑の線は演台位置での可視幅 ${widths}。固定画角43°。追尾範囲は現地で設定。`,
+            ko: `교사 카메라는 강의대 기준선 뒤 ${f.distance} m, 전면 벽에서 ${f.mount.y} m 지점의 천장에 설치합니다. 청록색 선은 강의대 위치의 가시 폭 ${widths}입니다. 고정 화각 43°. 현장에서 추적 영역을 설정하세요.`,
+            it: `Telecamera a soffitto a ${f.distance} m dalla linea del leggio e a ${f.mount.y} m dalla parete frontale. Linea turchese alla profondità del leggio: ${widths}. Campo fisso 43°. Calibrare in loco.`,
+            hu: `Oktatói kamera a mennyezeten, a pulpitus vonala mögött ${f.distance} m-re, az elülső faltól ${f.mount.y} m-re. Türkiz vonal a pulpitusnál: ${widths}. Fix látószög 43°. Helyszíni kalibrálás szükséges.`,
+            mn: `Багшийн камер индрийн шугамаас хойш ${f.distance} м, урд хананаас ${f.mount.y} м зайд таазанд байрлана. Индрийн түвшинд харагдах өргөн (оюу шугам): ${widths}. Тогтмол өнцөг 43°. Дагалтын бүсийг газар дээр нь тохируулна.`,
+            ar: `كاميرا المحاضر مثبتة في السقف على بُعد ${f.distance} م خلف خط المنصة و${f.mount.y} م من الجدار الأمامي. الخط الفيروزي يوضح العرض المرئي عند عمق المنصة: ${widths}. زاوية ثابتة 43°. تُعايَر منطقة التتبع ميدانياً.`
         };
         return notes[lang] || notes.en;
     }

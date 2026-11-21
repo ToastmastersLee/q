@@ -70,7 +70,7 @@
             svg('circle',{cx:shot.seat.x,cy:shot.seat.y,r:.49,fill:'none',stroke:'#efb345','stroke-width':.08,'pointer-events':'none'},layer);
         }
         for (const d of t.devices) {
-            const name = d.role === 'student' ? 'CV870 #'+d.number : V.label(d,lang);
+            const name = d.role === 'student' ? 'CV870 #'+d.number : V.label(d,lang) + (d.install==='cabinet' ? (lang==='zh'?'（NDP200 柜内）':' (in NDP200)') : '');
             const active = d.id === shot.camera.id;
             const g = svg('g',{transform:'translate('+d.x+' '+d.y+')','pointer-events':'none'},layer);
             const rotation = d.role === 'teacher' ? 180 : active && shot.seat ? -Math.atan2(shot.seat.x-cx,shot.seat.y-cy)*180/Math.PI : 0;

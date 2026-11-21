@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="styles-base.css?v=20261030-planning-reset">
   <link rel="stylesheet" href="styles-sidebar.css?v=20261121-voice">
   <link rel="stylesheet" href="styles-responsive.css">
-  <link rel="stylesheet" href="styles-presentation.css?v=hall115">
+  <link rel="stylesheet" href="styles-presentation.css?v=115cabinet">
   <link rel="stylesheet" href="styles-camera-field.css?v=20261026-camera-field">
 </head>
 <body>
@@ -26,6 +26,10 @@
   <main class="workspace">
     <section class="scene-panel" aria-label="3D room">
       <canvas id="scene-canvas"></canvas>
+      <div id="cabinet-note" hidden>
+        <svg aria-hidden="true"><line pathLength="1"/><circle r="3.5"/></svg>
+        <section aria-labelledby="cabinet-heading"><header><strong id="cabinet-heading"></strong><button type="button" aria-label="Close">×</button></header><ul></ul></section>
+      </div>
       <figure class="voice-feed" hidden><canvas width="384" height="216"></canvas><figcaption></figcaption></figure>
       <div id="device-labels" class="device-labels" aria-label="Device names"></div>
       <div class="scene-caption"><span class="live-dot"></span><span data-i18n="sceneCaption">Interactive room view</span><strong id="room-metric">10 × 8 × 3 m</strong></div>
@@ -133,6 +137,7 @@
           <div class="check-grid"><label><input type="checkbox" data-kind="ifp" checked><span data-i18n="main">IFP</span></label><label><input type="checkbox" data-kind="podium" checked><span data-i18n="podium">Podium</span></label><label><input type="checkbox" data-kind="station" checked><span data-i18n="station">Recording Station</span></label></div>
           <label class="model-toggle"><input type="checkbox" id="show-recording-cameras" data-kind="camera" checked><span id="recording-camera-label">Recording cameras</span></label>
           <h3 data-i18n="visibility">Visibility</h3><div id="visibility-controls" class="check-grid">
+          <label id="feed-option" hidden><input type="checkbox" id="show-student-feed"><span>Student camera preview</span></label>
           <label><input type="checkbox" id="show-labels" checked><span data-i18n="showLabels">Device names</span></label>
           <label><input type="checkbox" data-kind="m100" checked><span data-audio-name="m100"></span></label><label><input type="checkbox" data-kind="m40" checked><span data-audio-name="m40"></span></label><label><input type="checkbox" data-kind="dc20" checked><span data-audio-name="dc20"></span></label><label data-i18n-label="aux"><input type="checkbox" data-kind="display" checked>Auxiliary Displays</label>
         </div>
@@ -146,6 +151,6 @@
     <nav aria-label="Proposal views"><button type="button" data-sheet="stage">From stage</button><button type="button" data-sheet="audience">From rear</button><button type="button" data-sheet="entrance">Entrance</button></nav>
     <img alt="Large Lecture Hall 115"><footer><a download>Download PNG</a></footer>
   </div></dialog>
-  <script defer src="dist/aispeech-three.js?v=20261122-hall115-studio"></script>
+  <script defer src="dist/aispeech-three.js?v=115cabinet"></script>
 </body>
 </html>

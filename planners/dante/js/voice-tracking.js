@@ -79,7 +79,7 @@
                 camera('panorama', 1, 'CV210 Student', length / 2, 0.48),
                 camera('teacher', 1, 'CV870', teacherMount.x, teacherMount.y),
                 {id:'voice-mt200', type:'tracker', role:'tracker', number:1, model:'AIVIS-MT200',
-                 ...lectern, mountHeight:1.27, install:'floor', voice:true}];
+                 ...lectern, mountHeight:config.small ? 1.27 : .55, install:config.small ? 'floor' : 'cabinet', voice:true}];
         }
         function create(count = config.defaultCount, seat = null) {
             return {...(config.small ? {hall:'small'} : {}), count, seat, devices:devices(count)};
@@ -95,6 +95,8 @@
                     if (actual?.install === 'wall') device = {...device, x:length / 2, y:width - 0.4, install:'wall'};
                     else if (actual?.y === 10) device = {...device, y:10};
                 }
+                if (acceptPreviousMount && device.install === 'cabinet' && actual?.install === 'floor')
+                    device = {...device, mountHeight:1.27, install:'floor'};
                 return Object.entries(device).every(([key, value]) => actual?.[key] === value);
             });
         }

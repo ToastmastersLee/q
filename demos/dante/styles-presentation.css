@@ -168,3 +168,18 @@ input[type="number"]{direction:ltr}
   .sidebar-dante .sidebar-tabs { position:sticky; top:0 }
   .sidebar-dante .sidebar-pane { flex:auto; overflow:visible }
 }
+
+#feed-option[hidden], #cabinet-note[hidden] { display:none }
+#cabinet-note { position:absolute; inset:0; z-index:5; pointer-events:none }
+#cabinet-note svg { position:absolute; inset:0; width:100%; height:100%; overflow:visible }
+#cabinet-note line { stroke:#e4fcf3; stroke-width:2; filter:drop-shadow(0 1px 2px #193a40) }
+#cabinet-note circle { fill:#2fb2a1; stroke:white; stroke-width:1.5 }
+#cabinet-note section { position:absolute; top:0; left:0; max-width:calc(100% - 16px); box-sizing:border-box; width:max-content; border:1px solid #769d9b; border-radius:8px; overflow:hidden; background:#fbfcfa; color:#193b3d; box-shadow:0 4px 16px #162c3036; pointer-events:auto; font-size:13px }
+#cabinet-note header { display:flex; align-items:center; justify-content:space-between; gap:12px; background:#234b4c; color:white; padding:4px 6px 4px 12px }
+#cabinet-note button { border:0; background:transparent; color:white; font-size:21px; line-height:1; min-width:32px; min-height:32px; cursor:pointer }
+#cabinet-note ul { margin:8px 12px 10px 28px; padding:0; line-height:1.65 }
+
+@media (prefers-reduced-motion:no-preference) {
+  #cabinet-note:not([hidden]) line { stroke-dasharray:1; animation:draw-cabinet-line .22s ease-out both }
+  @keyframes draw-cabinet-line { from { stroke-dashoffset:1 } to { stroke-dashoffset:0 } }
+}

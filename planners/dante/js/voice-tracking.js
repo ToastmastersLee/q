@@ -134,6 +134,10 @@
                 radii:App.radiiForHeight(height,0), manualAudio:true, manualAux:true, audioDraft:null,
                 audioLayout:{mode:'fixed',counts:App.audioCounts(devices)}, tracking:create()};
         }
+        function menuName(lang) {
+            if (lang === 'zh') return '某航空培训大楼 · ' + (config.small ? '小型阶梯教室' : '大型阶梯教室');
+            return 'Aviation Training Building · ' + (config.small ? 'Small' : 'Large') + ' Lecture Hall';
+        }
         function hallName(lang) {
             if (lang === 'zh') return config.small ? '埃航小型阶梯教室' : '埃航大型阶梯教室';
             return 'Ethiopian Airlines · ' + (config.small ? 'Small' : 'Large') + ' Lecture Hall';
@@ -142,7 +146,13 @@
             const trial = config.small && tracking.count !== config.defaultCount;
             return hallName(lang) + (trial ? (lang === 'zh' ? ' · 试配' : ' · Trial') : '');
         }
-        return {...config, id, hallName, configurationName, teacherField, seats, seatById, colors, zones, zoneFor, shot, inventory, create, valid, hall, words, label};
+        function tier(row) {
+            const center = firstRow + row * config.pitch;
+            const start = center - config.pitch / 2;
+            const end = !config.small && row === rows-1 ? width : center + config.pitch / 2;
+            return {start, end, top: .03 + row * config.riser};
+        }
+        return {...config, tier, id, menuName, hallName, configurationName, teacherField, seats, seatById, colors, zones, zoneFor, shot, inventory, create, valid, hall, words, label};
     }
     const halls = {large:makeHall('large', configs.large), small:makeHall('small', configs.small)};
     // v6 snapshots without a hall identifier belong to the original large hall.

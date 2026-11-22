@@ -4,6 +4,7 @@
         if (!list || !window.Quotation) return;
         const s = App.state, e = s.equipment, b = App.configuredBOM();
         const lang = document.getElementById('langSelect').value;
+        if (s.smart) { App.renderSmartBOM(list,lang); return; }
         const copy = App.configurationCopy(lang);
         const display = App.getDisplayCopy(lang);
         list.replaceChildren();

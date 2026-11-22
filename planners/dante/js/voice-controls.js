@@ -29,6 +29,7 @@
             preset.add(option);
             return [hall.id, option];
         }));
+        const smartOption = new Option('',App.smartRoom.key); preset.add(smartOption);
         let lastOrdinaryPreset = preset.value, seatHall, previousTitle, timer = null;
         for (let n = 2; n <= 6; n++) count.add(new Option(n,n));
         seat.add(new Option('', ''));
@@ -37,7 +38,8 @@
         function pick(id) { stop(); speak(id); refresh(); }
         function refresh() {
             const t = read(), lang = language(), w = words(lang);
-            for (const [id, option] of options) option.text = halls[id].hallName(lang);
+            for (const [id, option] of options) option.text = halls[id].menuName(lang);
+            smartOption.text=App.smartRoom.roomName(lang);
             enable.checked = Boolean(t);
             get('strong').textContent = w[0];
             get('.voice-options').hidden = !t;
@@ -75,6 +77,9 @@
         // Route project presets before the existing ordinary-room change handler.
         preset.addEventListener('change', event => {
             const choice = preset.value;
+            if(choice===App.smartRoom.key || App.smartRoom.active()){
+                event.stopImmediatePropagation(); stop(); App.smartRoom.route(choice,language()); return;
+            }
             for (const [id, option] of options) {
                 if (choice === option.value) {
                     event.stopImmediatePropagation();

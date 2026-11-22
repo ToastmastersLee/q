@@ -183,3 +183,9 @@ input[type="number"]{direction:ltr}
   #cabinet-note:not([hidden]) line { stroke-dasharray:1; animation:draw-cabinet-line .22s ease-out both }
   @keyframes draw-cabinet-line { from { stroke-dashoffset:1 } to { stroke-dashoffset:0 } }
 }
+
+body[data-room="smart-classroom"] :is(#recalculate,#reset-plan,#reset-demo,#audio-count-controls,.height-profile-card,#sidebar-config details.settings,.equipment-controls,#voice-panel,#sidebar-config .card:has(#door-side)) { display:none; }
+
+/* Give the selected project room enough width for its distinguishing name. */
+.room-controls select:has(option[value^="voice-hall"]:checked),
+.room-controls select:has(option[value="smart-classroom"]:checked) { width:min(19rem,calc(100vw - 3rem)); }

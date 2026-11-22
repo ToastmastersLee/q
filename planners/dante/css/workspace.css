@@ -58,3 +58,6 @@ body .main-area svg {flex:1 1 0;width:100%;height:100%;max-width:none;max-height
     .coverage-legend {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 8px;padding-inline:8px;}
     .coverage-legend label {font-size:12px;}
 }
+
+body[data-room="smart-classroom"] :is(#settings-audio-button,#settings-display-button,#settings-coverage-button,#t_recalculate,#display-layout,#processor-warning,#resetM100Radii,.height-note) { display:none; }
+#smart-floor-plan { pointer-events:none; }

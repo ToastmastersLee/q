@@ -1,6 +1,10 @@
 (function (App) {
     App.quotationForPlan = function () {
         const s = App.state, e = s.equipment, b = App.configuredBOM(), { line } = Quotation;
+        if(s.smart) return {sceneKind:'dante', sceneHash:()=>'room='+App.smartRoom.key,
+            title:'Smart Classroom',width:s.roomLength,depth:s.roomWidth,ifpCount:1,qnexModel:'NDP200',
+            lines:App.smartRoom.schedule.map(row=>line(App.smartRoom.label(row,'en'),row.quantity,row.devices.map(d=>d.id).join(' / '))),
+            summary:'Single classroom · 24 seats · teacher and student recording cameras',detail:'NDP200 / LCS810 GEN 2 / Dante'};
         const lines = Quotation.qnexLines(e.qnexModel).map(l => ({ ...l, quantity: l.quantity * e.qnexCount }));
         if (s.displayPlan) for (const {screen,count} of DisplayFit.groups(s.displayPlan.screens)) {
             lines.push(line(DisplayFit.quotationName(screen),count,`${screen.widthMm} × ${screen.heightMm} × ${screen.depthMm} mm`));

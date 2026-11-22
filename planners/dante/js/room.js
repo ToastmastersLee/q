@@ -8,6 +8,7 @@
     const calculateCoverage = (...args) => App.calculateCoverage(...args);
 
     function renderRoom() {
+        if (state.smart) { App.renderSmartPlan(); return; }
         App.fitConfiguration();
         const len = state.roomLength;
         const wid = state.roomWidth;

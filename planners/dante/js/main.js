@@ -78,9 +78,10 @@
             const language = document.getElementById('langSelect').value;
             const message = document.getElementById('handoff-error');
             try {
-                const snapshot = App.snapshotFromState(state, language);
+                const snapshot = state.smart ? null : App.snapshotFromState(state, language);
                 const target = new URL('../../demos/dante/index.html', window.location.href);
-                target.hash = App.encodeSnapshot(snapshot);
+                if (state.smart) { target.searchParams.set('room',App.smartRoom.key); target.searchParams.set('lang',language); }
+                else target.hash = App.encodeSnapshot(snapshot);
                 message.hidden = true;
                 window.open(target.href, '_blank', 'noopener');
             } catch (failure) {
@@ -157,7 +158,10 @@
 
         // Initialize teaching positions after the actual default room dimensions are selected.
         state.teachingDevices = [];
-        applyScenario('medium');
+        const initial = new URLSearchParams(location.search).get('preset');
+        const preset=document.getElementById('presetSelect');
+        preset.value=[...preset.options].some(o=>o.value===initial)?initial:'medium';
+        applyScenario(preset.value);
     });
 
     // --- Theme Controller ---

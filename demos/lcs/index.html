@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="styles.css?v=20261030-planning-reset">
   <link rel="stylesheet" href="styles-presentation.css?v=20261122-studio">
   <link rel="stylesheet" href="styles-camera-field.css">
-  <script defer src="dist/app.js?v=20261122-studio"></script>
+  <script defer src="dist/app.js?v=20261122-navigation"></script>
 </head>
 <body>
   <div id="app" class="app-shell">
@@ -52,7 +52,7 @@
           <button type="button" data-view="stage" class="view-button" data-i18n="stageView">Stage</button>
           <button type="button" data-view="audience" class="view-button" data-i18n="audienceView">Audience</button>
         </div>
-        <div class="scene-tool-actions"><button id="theme-toggle" type="button">Theme</button><button id="sidebar-toggle" type="button" aria-expanded="true">Hide sidebar</button></div>
+        <div class="scene-tool-actions"><button id="fidelity-toggle" type="button" aria-pressed="false" disabled>High fidelity</button><button id="theme-toggle" type="button">Theme</button><button id="sidebar-toggle" type="button" aria-expanded="true">Hide sidebar</button></div>
       </div>
         <div class="scene-bottomline"><span data-i18n="gestureHint">Drag to orbit · Scroll to zoom · Right drag to pan · Click a device</span><span id="frame-status">3D</span></div>
         <div id="scene-error" class="scene-error" role="alert" hidden></div>

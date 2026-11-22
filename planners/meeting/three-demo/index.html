@@ -9,7 +9,7 @@
     <script defer src="../coverage-ui.js?v=20261118-pickup"></script>
     <script defer src="../common.js?v=20261118-tabs"></script>
     <script defer src="ifp-image.js"></script>
-    <script defer src="app.js?v=20261122-studio"></script>
+    <script defer src="app.js?v=20261122-navigation"></script>
     <script defer src="../sidebar.js?v=20261118-tabs"></script>
   </head>
   <body class="meeting-3d">
@@ -55,6 +55,7 @@
           <button data-view="top" data-t="top"></button>
           <button data-view="front" data-t="front"></button>
           <button data-view="audience" data-t="audience"></button>
+          <button id="fidelity-toggle" type="button" data-t="highQuality" aria-pressed="false" disabled></button>
           <button id="collapse" data-t="hideSidebar"></button>
         </div>
         <canvas id="canvas3d"> </canvas>

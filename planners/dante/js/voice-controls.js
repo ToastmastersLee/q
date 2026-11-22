@@ -18,7 +18,7 @@
         return notes[lang] || notes.en;
     }
     App.teacherFieldNote = teacherNote;
-    App.bindVoiceControls = function (host, {read, stageWidthMm, language, toggle, resize, speak}) {
+    App.bindVoiceControls = function (host, {read, area, stageWidthMm, language, toggle, resize, speak}) {
         const {halls, forTracking, words} = App.voice;
         host.innerHTML = '<label class="voice-switch"><input type="checkbox" class="voice-enable"><strong></strong></label><div class="voice-options" hidden><label><span></span><select class="voice-count"></select></label><label><span></span><select class="voice-seat"></select></label><div class="voice-actions"><button type="button" class="voice-play"></button><button type="button" class="voice-idle"></button></div><output aria-live="polite"></output><small class="teacher-field-note"></small></div>';
         const preset = document.querySelector('#presetSelect, #preset');
@@ -40,6 +40,8 @@
             const t = read(), lang = language(), w = words(lang);
             for (const [id, option] of options) option.text = halls[id].menuName(lang);
             smartOption.text=App.smartRoom.roomName(lang);
+            const currentArea = typeof area === 'function' ? area() : (App.state && !App.state.smart ? App.state.roomLength * App.state.roomWidth : 0);
+            host.hidden = !t && (Boolean(App.smartRoom?.active()) || !(currentArea >= 200));
             enable.checked = Boolean(t);
             get('strong').textContent = w[0];
             get('.voice-options').hidden = !t;

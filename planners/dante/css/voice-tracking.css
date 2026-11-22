@@ -1,5 +1,5 @@
 .voice-controls {display:grid;gap:.55rem;color:inherit}
-.voice-controls [hidden], .voice-feed[hidden] {display:none!important}
+.voice-controls[hidden], .voice-controls [hidden], .voice-feed[hidden] {display:none!important}
 .voice-switch,.voice-options label {display:flex;align-items:center;gap:.55rem}
 .voice-switch input {width:auto;margin:0;accent-color:#159c92}
 .voice-options {display:grid;gap:.55rem;border-inline-start:2px solid #418c9a;padding-inline-start:.7rem}

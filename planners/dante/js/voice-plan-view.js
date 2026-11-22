@@ -84,7 +84,7 @@
     }
     App.drawVoicePlan = draw;
     window.addEventListener('DOMContentLoaded', () => {
-        controls = App.bindVoiceControls(el('voice-panel'),{read:()=>state.tracking,stageWidthMm:()=>state.displayPlan.stageMm,language:()=>el('langSelect').value,
+        controls = App.bindVoiceControls(el('voice-panel'),{read:()=>state.tracking,area:()=>state.smart?0:state.roomLength*state.roomWidth,stageWidthMm:()=>state.displayPlan.stageMm,language:()=>el('langSelect').value,
             toggle,resize:n=>{state.tracking=App.voice.forTracking(state.tracking).create(n,state.tracking.seat);App.renderRoom();},
             speak:id=>{state.tracking.seat=id;draw();}});
         el('voice-layer').onclick = e => { const id = e.target.closest('[data-seat]')?.dataset.seat; if (id) controls.pick(id); };

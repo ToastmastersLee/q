@@ -7,9 +7,9 @@
   <meta name="theme-color" content="#eaf0f7">
   <title>LCS 810 · 3D Room Demo</title>
   <link rel="stylesheet" href="styles.css?v=20261030-planning-reset">
-  <link rel="stylesheet" href="styles-presentation.css?v=classroom-controls">
+  <link rel="stylesheet" href="styles-presentation.css?v=20261122-studio">
   <link rel="stylesheet" href="styles-camera-field.css">
-  <script defer src="dist/app.js?v=20261120-editable-stage"></script>
+  <script defer src="dist/app.js?v=20261122-studio"></script>
 </head>
 <body>
   <div id="app" class="app-shell">
@@ -33,7 +33,8 @@
           <button type="button" data-classroom-mode="simulation" aria-pressed="false">Simulation</button>
         </div>
         <select id="language-button" class="language-select" aria-label="Language"><option value="en">English</option></select>
-        <button id="export-button" class="primary-button" type="button" data-i18n="export">Export PNG</button>
+        <button id="sample-images" type="button" hidden>Sample images</button>
+      <button id="export-button" class="primary-button" type="button" data-i18n="export">Export PNG</button>
       </div>
     </header>
     <div id="imported-plan-banner" class="room-toolbar" hidden></div>
@@ -133,6 +134,7 @@
         </div>
         <div class="sidebar-pane" id="sidebar-display" role="tabpanel" aria-labelledby="sidebar-tab-display" tabindex="0" hidden>
           <section class="sidebar-section">
+            <select id="interior-view" hidden><option value=""></option><option value="front"></option><option value="reverse"></option><option value="entrance"></option></select>
             <label class="select-row" for="render-quality"><span id="quality-label">Render quality</span>
               <select id="render-quality" disabled><option value="standard">Standard</option><option value="high">High fidelity</option></select>
             </label>
@@ -151,5 +153,8 @@
       </aside>
     </main>
   </div>
-</body>
+<dialog id="sample-dialog" aria-labelledby="sample-title"><h2 id="sample-title"></h2><img alt=""><nav>
+          <button type="button" data-sample="front"></button><button type="button" data-sample="reverse"></button><button type="button" data-sample="entrance"></button>
+          <a download></a><button class="sample-close" type="button"></button></nav></dialog>
+  </body>
 </html>

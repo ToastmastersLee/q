@@ -4,12 +4,12 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Meeting room 3D</title>
-    <link rel="stylesheet" href="../styles.css?v=20261118-tabs" />
+    <link rel="stylesheet" href="../styles.css?v=20261122-studio" />
     <script defer src="../coverage.js?v=20261118-tabs"></script>
     <script defer src="../coverage-ui.js?v=20261118-pickup"></script>
     <script defer src="../common.js?v=20261118-tabs"></script>
     <script defer src="ifp-image.js"></script>
-    <script defer src="app.js?v=20261118-tabs"></script>
+    <script defer src="app.js?v=20261122-studio"></script>
     <script defer src="../sidebar.js?v=20261118-tabs"></script>
   </head>
   <body class="meeting-3d">
@@ -44,6 +44,7 @@
         <span data-t="language"> </span>
         <select id="language"></select>
       </label>
+      <button id="sample-images" type="button" hidden>Sample images</button>
       <button id="export" class="primary" data-t="export"></button>
     </header>
     <main id="main">
@@ -114,7 +115,8 @@
           <section class="coverage" id="coverage"></section>
         </section>
         <section class="pane" role="tabpanel" id="pane-display" aria-labelledby="tab-display" tabindex="0" hidden>
-          <label class="field">
+          <select id="interior-view" hidden><option value=""></option><option value="front"></option><option value="reverse"></option><option value="entrance"></option></select>
+            <label class="field">
             <span data-t="renderQuality"> </span>
             <select id="quality" disabled>
               <option value="standard" data-t="standardQuality"></option>
@@ -128,5 +130,8 @@
         <p id="error" role="alert"></p>
       </aside>
     </main>
+  <dialog id="sample-dialog" aria-labelledby="sample-title"><h2 id="sample-title"></h2><img alt=""><nav>
+          <button type="button" data-sample="front"></button><button type="button" data-sample="reverse"></button><button type="button" data-sample="entrance"></button>
+          <a download></a><button class="sample-close" type="button"></button></nav></dialog>
   </body>
 </html>

@@ -86,7 +86,6 @@
     font-weight: 650;
 }
 
-.planner-row:has([id$="-interior-link"]) { grid-template-columns: minmax(0,1fr) 40px 40px minmax(60px,82px); }
 .planner-row bdi { overflow-wrap: anywhere; }
 
 .planner-link {

@@ -44,12 +44,6 @@
                 document.getElementById(`${name}-demo-link`).setAttribute('href',
                     `demos/${name}/index.html?${language}`);
             }
-            const qualityLabel = {en:'High fidelity',zh:'高保真',ko:'고품질',mn:'Өндөр чанар',ja:'高品質',es:'Alta fidelidad',fr:'Haute fidélité',ar:'عالية الدقة'};
-            for (const [name,path] of [['lcs','demos/lcs'],['meeting','planners/meeting/three-demo']]) {
-                const link = document.getElementById(name+'-interior-link');
-                link.href = path+'/index.html?'+language+'&quality=high&view=interior';
-                link.textContent = qualityLabel[this.lang] || qualityLabel.en;
-            }
             const meetingQuery = `?${language}&v=20261102-devices`;
             document.getElementById('meeting-2d-link').setAttribute('href',
                 `planners/meeting/index.html${meetingQuery}`);

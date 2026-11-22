@@ -33,7 +33,6 @@
           <button type="button" data-classroom-mode="simulation" aria-pressed="false">Simulation</button>
         </div>
         <select id="language-button" class="language-select" aria-label="Language"><option value="en">English</option></select>
-        <button id="sample-images" type="button" hidden>Sample images</button>
       <button id="export-button" class="primary-button" type="button" data-i18n="export">Export PNG</button>
       </div>
     </header>
@@ -134,6 +133,7 @@
         </div>
         <div class="sidebar-pane" id="sidebar-display" role="tabpanel" aria-labelledby="sidebar-tab-display" tabindex="0" hidden>
           <section class="sidebar-section">
+            <button id="sample-images" type="button" class="reset-button" hidden>Sample images</button>
             <select id="interior-view" hidden><option value=""></option><option value="front"></option><option value="reverse"></option><option value="entrance"></option></select>
             <label class="select-row" for="render-quality"><span id="quality-label">Render quality</span>
               <select id="render-quality" disabled><option value="standard">Standard</option><option value="high">High fidelity</option></select>

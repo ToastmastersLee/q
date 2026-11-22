@@ -37,7 +37,7 @@
         <div class="view-buttons" role="group" aria-label="Camera views">
         <button data-view="overview" data-i18n="overview">Overview</button><button data-view="top" data-i18n="top">Top</button><button data-view="stage" data-i18n="stage">Stage</button><button data-view="audience" data-i18n="audience">Audience</button>
       </div>
-        <div class="scene-tool-actions"><button id="high-fidelity" type="button" aria-pressed="false" hidden>High fidelity</button><button id="hall-gallery" type="button" hidden>Proposal images</button><button type="button" data-view="entrance" hidden>Entrance</button><button id="theme-toggle" type="button">Theme</button><button id="sidebar-toggle" type="button" aria-expanded="true">Hide sidebar</button></div>
+        <div class="scene-tool-actions"><button id="high-fidelity" type="button" aria-pressed="false" hidden>High fidelity</button><button type="button" data-view="entrance" hidden>Entrance</button><button id="theme-toggle" type="button">Theme</button><button id="sidebar-toggle" type="button" aria-expanded="true">Hide sidebar</button></div>
       </div>
       <div id="scene-error" class="scene-error" hidden></div>
       <div class="scene-hint" data-i18n="sceneHint">Drag to rotate · wheel to zoom · right drag to pan</div>
@@ -133,6 +133,7 @@
       </div>
       <div class="sidebar-pane" id="sidebar-display" role="tabpanel" aria-labelledby="sidebar-tab-display" tabindex="0" hidden>
         <section class="card">
+          <button id="hall-gallery" type="button" class="reset-demo" hidden>Proposal images</button>
           <label class="model-toggle"><input id="show-models" type="checkbox"><span id="model-caption">Show model numbers</span></label>
           <div class="check-grid"><label><input type="checkbox" data-kind="ifp" checked><span data-i18n="main">IFP</span></label><label><input type="checkbox" data-kind="podium" checked><span data-i18n="podium">Podium</span></label><label><input type="checkbox" data-kind="station" checked><span data-i18n="station">Recording Station</span></label></div>
           <label class="model-toggle"><input type="checkbox" id="show-recording-cameras" data-kind="camera" checked><span id="recording-camera-label">Recording cameras</span></label>

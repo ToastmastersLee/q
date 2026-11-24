@@ -5,25 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <meta name="description" content="迪拜展会 5×5m 三维布局与安装高度验证工具"/>
   <title>迪拜展位 · 空间实验室</title>
-  <script type="module" crossorigin src="./assets/index-CEV2e3Ne.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/index-Bf_ttkas.css">
+  <script type="module" crossorigin src="./assets/index-BXCEp8IO.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-Cc-VXH-f.css">
 </head>
 <body>
   <header>
     <div class="brand"><span class="brand-mark">iQ.</span><div><strong>展位空间实验室</strong><small>DUBAI / EXHIBITION PLANNER</small></div><span class="badge">POC 04</span></div>
     <div class="header-actions">
+      <select id="language" aria-label="语言"></select>
       <span id="save-status">本地方案</span>
       <button id="undo" aria-label="撤销" title="撤销 (Ctrl+Z)">↶</button><button id="redo" aria-label="重做" title="重做 (Ctrl+Shift+Z)">↷</button>
       <button id="export" class="primary">导出方案 ↗</button>
       <div class="more-wrap">
         <button id="more" aria-expanded="false" aria-controls="more-settings">更多 <span aria-hidden="true">▾</span></button>
         <section id="more-settings" aria-label="视图与显示设置" hidden>
-          <div class="settings-group"><h2>视角</h2>
-            <div class="view-options">
-              <button data-view="perspective">空间视图</button><button data-view="front">正视</button><button data-view="top">俯视</button>
-              <button data-view="left">左墙</button><button data-view="right">右墙</button><button id="home" title="回到完整展位">⌖ 全景</button>
-            </div>
-          </div>
           <div class="settings-group wire-legend"><h2>走线</h2>
             <div class="wire-scope" role="group" aria-label="走线显示范围"><button data-wire-scope="related">仅相关</button><button data-wire-scope="all">全部</button><button data-wire-scope="off">关闭</button></div>
             <div id="cable-filters" class="setting-options"></div>
@@ -38,10 +33,14 @@
       </div>
     </div>
   </header>
+  <div class="view-bar">
+    <div class="scene-caption"><i class="dot"></i><span id="view-label"></span></div>
+    <div class="view-options" role="group" aria-label="视角"><button data-view="perspective">空间视图</button><button data-view="front">正视</button><button data-view="top">俯视</button>
+              <button data-view="left">左墙</button><button data-view="right">右墙</button><button id="home" title="回到完整展位">⌖ 全景</button></div>
+  </div>
   <main>
     <section id="viewport" aria-label="三维展位场景">
-      <div class="scene-caption"><i class="dot"></i><span id="view-label">透视 · 自由观察</span></div>
-      <p class="scene-help"><strong>双击物件查看属性</strong><span>拖动旋转 · 滚轮缩放 · 右键平移</span></p>
+      <p class="scene-help"><strong>双击物件查看属性</strong><span id="gesture-hint"></span></p>
       <div id="toast" role="status"></div><div id="webgl-error" hidden>当前浏览器无法创建 WebGL 场景。请开启浏览器硬件加速后重新打开。</div>
     </section>
     <button id="open-right" class="panel-rail" aria-controls="right-panel" aria-expanded="false" hidden>‹ 展位面板</button>

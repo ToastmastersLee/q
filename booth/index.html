@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <meta name="description" content="迪拜展会 5×5m 三维布局与安装高度验证工具"/>
   <title>迪拜展位 · 空间实验室</title>
-  <script type="module" crossorigin src="./assets/index-UpBpLwFi.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/index-BLNEXh1g.css">
+  <script type="module" crossorigin src="./assets/index-BEizUeel.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-BC4tVDmn.css">
 </head>
 <body>
   <header>
@@ -63,7 +63,13 @@
       </section>
       <div id="selection-heading"><h2 id="selected-name"></h2><p id="selected-region"></p></div>
       <div class="inspector-scroll">
-        <section id="tab-edit" role="tabpanel" aria-labelledby="tab-button-edit"><div id="inspector"></div></section>
+        <section id="tab-edit" role="tabpanel" aria-labelledby="tab-button-edit">
+          <div id="inspector"></div>
+          <div class="layout-save">
+            <button type="button" id="save-layout">保存当前布局</button>
+            <span id="layout-save-result" role="status"></span>
+          </div>
+        </section>
         <section id="tab-connections" role="tabpanel" aria-labelledby="tab-button-connections" hidden><h3 id="connection-count"></h3><div id="connection-list"></div><p class="compact-note">在「更多 → 走线」中切换显示范围和线缆类型。</p></section>
         <section id="tab-checks" role="tabpanel" aria-labelledby="tab-button-checks" hidden><h3 id="check-count"></h3><div id="checks"></div></section>
       </div>

@@ -134,6 +134,7 @@
       <div class="sidebar-pane" id="sidebar-display" role="tabpanel" aria-labelledby="sidebar-tab-display" tabindex="0" hidden>
         <section class="card">
           <button id="hall-gallery" type="button" class="reset-demo" hidden>Proposal images</button>
+          <label id="proposal-light-option" class="model-toggle" hidden><input id="proposal-light" type="checkbox" checked><span>Proposal lighting</span></label>
           <label class="model-toggle"><input id="show-models" type="checkbox"><span id="model-caption">Show model numbers</span></label>
           <div class="check-grid"><label><input type="checkbox" data-kind="ifp" checked><span data-i18n="main">IFP</span></label><label><input type="checkbox" data-kind="podium" checked><span data-i18n="podium">Podium</span></label><label><input type="checkbox" data-kind="station" checked><span data-i18n="station">Recording Station</span></label></div>
           <label class="model-toggle"><input type="checkbox" id="show-recording-cameras" data-kind="camera" checked><span id="recording-camera-label">Recording cameras</span></label>
@@ -152,6 +153,6 @@
     <nav aria-label="Proposal views"><button type="button" data-sheet="stage">From stage</button><button type="button" data-sheet="audience">From rear</button><button type="button" data-sheet="entrance">Entrance</button></nav>
     <img alt="Large Lecture Hall 115"><footer><a download>Download PNG</a></footer>
   </div></dialog>
-  <script defer src="dist/aispeech-three.js?v=20261122-voice-area"></script>
+  <script defer src="dist/aispeech-three.js?v=20261124-light-toggle"></script>
 </body>
 </html>

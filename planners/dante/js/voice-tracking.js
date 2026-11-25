@@ -33,6 +33,18 @@
         return d.model + ' · ' + words(lang)[{student:7, teacher:8, panorama:9, tracker:10}[d.role]];
     }
 
+    // CV870 Pro tracking lens, datasheet p. 6. Microphone-directed PTZ uses a seat target at any distance.
+    // The separate 10 m Movement planning rule and the fixed panoramic lens do not gate this shot.
+    const studentLens = Object.freeze({opticalZoom:12, digitalZoom:8, wideHfov:81, teleHfov:7.6});
+    function closeUpFraming(distance, aspect) {
+        const halfAngle = Math.PI / 360;
+        const desired = .62 * aspect / Math.max(.7, distance); // 1.24 m tall subject frame
+        const optical = Math.max(Math.tan(studentLens.teleHfov * halfAngle),
+            Math.min(Math.tan(studentLens.wideHfov * halfAngle), desired));
+        return {verticalFov:Math.atan(optical / aspect) / halfAngle,
+            crop:Math.min(studentLens.digitalZoom, Math.max(1, optical / desired))};
+    }
+
     function makeHall(id, config) {
         const {length,width,height,lectern,rows,firstRow,pitch} = config;
         const teacherDistance = 10;
@@ -161,5 +173,5 @@
         const id = tracking?.hall;
         return id === undefined || id === 'large' ? halls.large : id === 'small' ? halls.small : undefined;
     }
-    App.voice = {...halls.large, halls, forTracking, makeHall};
+    App.voice = {...halls.large, halls, forTracking, makeHall, studentLens, closeUpFraming};
 })(window.AISpeech);

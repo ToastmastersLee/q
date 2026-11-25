@@ -18,6 +18,23 @@
         return notes[lang] || notes.en;
     }
     App.teacherFieldNote = teacherNote;
+    function voiceTrackingNote(lang) {
+        const {opticalZoom, digitalZoom} = App.voice.studentLens;
+        const zoom = `${opticalZoom}× / ${digitalZoom}×`;
+        const notes = {
+            zh: `吊麦阵列通过波束成形定位发言者，MT200 驱动 CV870 转向取景。镜头支持 ${opticalZoom}× 光学变焦和 ${digitalZoom}× 数字变焦。10 m 仅适用于视觉动作跟踪。`,
+            en: `The microphone array locates the speaker by beamforming. The MT200 aims the CV870 with ${opticalZoom}× optical and ${digitalZoom}× digital zoom. The 10 m rule applies only to visual movement tracking.`,
+            fr: `Le réseau de micros localise la voix et le MT200 oriente la CV870. Zoom optique / numérique : ${zoom}. Le seuil de 10 m concerne uniquement le suivi visuel des mouvements.`,
+            es: `La matriz de micrófonos localiza al hablante y el MT200 orienta la CV870. Zoom óptico / digital: ${zoom}. Los 10 m se aplican solo al seguimiento visual del movimiento.`,
+            ja: `マイクアレイが発言者の位置を検出し、MT200 が CV870 を向けます。光学／デジタルズームは ${zoom}。10 m の目安は映像による動作追跡専用です。`,
+            ko: `마이크 배열이 발언자 위치를 찾으면 MT200이 CV870을 조준합니다. 광학 / 디지털 줌: ${zoom}. 10 m 기준은 영상 기반 동작 추적에만 적용됩니다.`,
+            it: `I microfoni localizzano chi parla e MT200 orienta la CV870. Zoom ottico / digitale: ${zoom}. I 10 m valgono solo per il tracciamento visivo del movimento.`,
+            hu: `A mikrofontömb meghatározza a beszélő helyét, az MT200 pedig ráirányítja a CV870 kamerát. Optikai / digitális zoom: ${zoom}. A 10 m-es szabály csak a vizuális mozgáskövetésre vonatkozik.`,
+            mn: `Микрофоны массив яригчийн байршлыг тогтоож, MT200 нь CV870 камерыг чиглүүлнэ. Оптик / дижитал томруулалт: ${zoom}. 10 м-ийн босго зөвхөн дүрсээр хөдөлгөөн дагахад хамаарна.`,
+            ar: `تحدد مصفوفة الميكروفونات موقع المتحدث ويوجّه MT200 كاميرا CV870 نحوه. التكبير البصري / الرقمي: ${zoom}. تنطبق قاعدة 10 أمتار على التتبع البصري للحركة فقط.`
+        };
+        return notes[lang] || notes.en;
+    }
     App.voiceRotationSeats = (hall, count) => hall.zones(count).map(zone =>
         hall.seats.find(seat => seat.bank === zone.bank && seat.row === Math.floor((zone.start + zone.end - 1)/2) &&
             seat.x >= hall.desks[zone.bank]));
@@ -27,6 +44,9 @@
         host.innerHTML = '<label class="voice-switch"><input type="checkbox" class="voice-enable"><strong></strong></label><div class="voice-options" hidden><label><span></span><select class="voice-count"></select></label><label><span></span><select class="voice-seat"></select></label><div class="voice-actions"><button type="button" class="voice-play"></button><button type="button" class="voice-idle"></button></div><output aria-live="polite"></output><small class="teacher-field-note"></small></div>';
         const preset = document.querySelector('#presetSelect, #preset');
         const get = selector => host.querySelector(selector);
+        const methodNote=document.createElement('small');
+        methodNote.className='voice-method-note';
+        get('.teacher-field-note').before(methodNote);
         const enable = get('.voice-enable'), count = get('.voice-count'), seat = get('.voice-seat');
         const options = new Map(Object.values(halls).map(hall => {
             const option = new Option('', hall.small ? 'voice-hall-small' : 'voice-hall');
@@ -70,6 +90,7 @@
             get('.voice-play').setAttribute('aria-pressed',String(timer !== null));
             get('.voice-idle').textContent = w[6];
             const field = V.teacherField(stageWidthMm());
+            methodNote.textContent = voiceTrackingNote(lang);
             get('.teacher-field-note').textContent = teacherNote(language(), field);
             const shot = V.shot(t);
             get('output').textContent = w[11] + ' · ' + shot.camera.model + (shot.seat ? ' #' + shot.zone.number + ' → ' + shot.seat.id : ' · ' + w[3]);

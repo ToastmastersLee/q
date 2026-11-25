@@ -18,6 +18,9 @@
         return notes[lang] || notes.en;
     }
     App.teacherFieldNote = teacherNote;
+    App.voiceRotationSeats = (hall, count) => hall.zones(count).map(zone =>
+        hall.seats.find(seat => seat.bank === zone.bank && seat.row === Math.floor((zone.start + zone.end - 1)/2) &&
+            seat.x >= hall.desks[zone.bank]));
     App.bindVoiceControls = function (host, {read, area, stageWidthMm, language, toggle, resize, speak,
         localHall = () => null, modelFor = App.voice.forTracking}) {
         const {halls, words} = App.voice;
@@ -105,8 +108,7 @@
         get('.voice-play').onclick = () => {
             if (timer !== null) { stop(); refresh(); return; }
             const V = modelFor(read());
-            const list = V.zones(read().count).map(z => V.seats.find(s => s.bank === z.bank &&
-                s.row === Math.floor((z.start + z.end - 1)/2) && s.x >= V.desks[z.bank]).id);
+            const list = App.voiceRotationSeats(V, read().count).map(s => s.id);
             let cursor = 0;
             const advance = () => { if (cursor >= list.length) { pick(null); return; } speak(list[cursor++]); refresh(); };
             timer = setInterval(advance, 2400); advance();

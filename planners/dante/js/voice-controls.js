@@ -18,8 +18,9 @@
         return notes[lang] || notes.en;
     }
     App.teacherFieldNote = teacherNote;
-    App.bindVoiceControls = function (host, {read, area, stageWidthMm, language, toggle, resize, speak}) {
-        const {halls, forTracking, words} = App.voice;
+    App.bindVoiceControls = function (host, {read, area, stageWidthMm, language, toggle, resize, speak,
+        localHall = () => null, modelFor = App.voice.forTracking}) {
+        const {halls, words} = App.voice;
         host.innerHTML = '<label class="voice-switch"><input type="checkbox" class="voice-enable"><strong></strong></label><div class="voice-options" hidden><label><span></span><select class="voice-count"></select></label><label><span></span><select class="voice-seat"></select></label><div class="voice-actions"><button type="button" class="voice-play"></button><button type="button" class="voice-idle"></button></div><output aria-live="polite"></output><small class="teacher-field-note"></small></div>';
         const preset = document.querySelector('#presetSelect, #preset');
         const get = selector => host.querySelector(selector);
@@ -50,10 +51,10 @@
                 if (previousTitle !== undefined) { document.title = previousTitle; previousTitle = undefined; }
                 stop(); return;
             }
-            const V = forTracking(t);
+            const V = modelFor(t);
             previousTitle ??= document.title;
             document.title = V.hallName(lang) + (preset.id === 'preset' ? ' · Dante 3D' : ' · Dante 2D');
-            preset.value = options.get(V.id).value;
+            preset.value = options.get(V.id)?.value ?? V.id;
             if (seatHall !== V.id) {
                 seat.replaceChildren(new Option(w[3], ''), ...V.seats.map(s => new Option(s.id,s.id)));
                 seatHall = V.id;
@@ -72,7 +73,8 @@
         }
         function selectHall(hall) {
             stop();
-            if (!read()) preset.value = lastOrdinaryPreset;
+            if (localHall()) preset.value = localHall().id;
+            else if (!read()) preset.value = lastOrdinaryPreset;
             toggle(true, hall);
             refresh();
         }
@@ -89,10 +91,11 @@
                     return;
                 }
             }
-            if (read()) { stop(); toggle(false); preset.value = choice; }
+            if (read()) { stop(); if (!localHall()) toggle(false); preset.value = choice; }
             lastOrdinaryPreset = choice;
         }, true);
         enable.onchange = () => {
+            if (localHall()) { stop(); toggle(enable.checked, localHall()); refresh(); return; }
             if (enable.checked) selectHall(halls.large);
             else { stop(); toggle(false); refresh(); }
         };
@@ -101,7 +104,7 @@
         get('.voice-idle').onclick = () => pick(null);
         get('.voice-play').onclick = () => {
             if (timer !== null) { stop(); refresh(); return; }
-            const V = forTracking(read());
+            const V = modelFor(read());
             const list = V.zones(read().count).map(z => V.seats.find(s => s.bank === z.bank &&
                 s.row === Math.floor((z.start + z.end - 1)/2) && s.x >= V.desks[z.bank]).id);
             let cursor = 0;

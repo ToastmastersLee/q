@@ -49,7 +49,7 @@
                 stageLeft, stageRight, stageWidth, visibleWidth, percent:Math.round(100 * visibleWidth / stageWidth)};
         }
         const columns = config.seatsPerBank * 2;
-        const seats = Array.from({length: rows * columns}, (_, i) => {
+        const seats = config.seats || Array.from({length: rows * columns}, (_, i) => {
             const row = Math.floor(i / columns), col = i % columns, bank = Number(col >= columns / 2);
             return {id: String.fromCharCode(65 + row) + (col + 1), row, bank,
                 x: config.bankStarts[bank] + (col % config.seatsPerBank) * config.seatPitch, y:firstRow + row * pitch, rise:row * config.riser};
@@ -76,13 +76,13 @@
                 mountHeight:config.small ? (y >= width/2 ? 2.04 : 2.58) : (role === 'student' ? 2.75 : 2.65), install:role === 'teacher' || (role === 'student' && y > 1) ? 'ceiling' : 'wall', voice:true
             });
             return [...zones(count).map(z => camera('student', z.number, 'CV870', z.x, z.y)),
-                camera('panorama', 1, 'CV210 Student', length / 2, 0.48),
+                camera('panorama', 1, 'CV210 Student', config.panoramaX ?? length / 2, 0.48),
                 camera('teacher', 1, 'CV870', teacherMount.x, teacherMount.y),
                 {id:'voice-mt200', type:'tracker', role:'tracker', number:1, model:'AIVIS-MT200',
                  ...lectern, mountHeight:config.small ? 1.27 : .55, install:config.small ? 'floor' : 'cabinet', voice:true}];
         }
         function create(count = config.defaultCount, seat = null) {
-            return {...(config.small ? {hall:'small'} : {}), count, seat, devices:devices(count)};
+            return {...(id === 'large' ? {} : {hall:id}), count, seat, devices:devices(count)};
         }
         function valid(t, acceptPreviousMount = false) {
             if (!t || !Number.isInteger(t.count) || t.count < 2 || t.count > 6 ||
@@ -139,6 +139,7 @@
             return 'Aviation Training Building · ' + (config.small ? 'Small' : 'Large') + ' Lecture Hall';
         }
         function hallName(lang) {
+            if (config.title) return config.title(lang);
             if (lang === 'zh') return config.small ? '埃航小型阶梯教室' : '埃航大型阶梯教室';
             return 'Ethiopian Airlines · ' + (config.small ? 'Small' : 'Large') + ' Lecture Hall';
         }
@@ -160,5 +161,5 @@
         const id = tracking?.hall;
         return id === undefined || id === 'large' ? halls.large : id === 'small' ? halls.small : undefined;
     }
-    App.voice = {...halls.large, halls, forTracking};
+    App.voice = {...halls.large, halls, forTracking, makeHall};
 })(window.AISpeech);

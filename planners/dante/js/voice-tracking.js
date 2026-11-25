@@ -36,9 +36,9 @@
     // CV870 Pro tracking lens, datasheet p. 6. Microphone-directed PTZ uses a seat target at any distance.
     // The separate 10 m Movement planning rule and the fixed panoramic lens do not gate this shot.
     const studentLens = Object.freeze({opticalZoom:12, digitalZoom:8, wideHfov:81, teleHfov:7.6});
-    function closeUpFraming(distance, aspect) {
+    function closeUpFraming(distance, aspect, frameHeight=1.24) {
         const halfAngle = Math.PI / 360;
-        const desired = .62 * aspect / Math.max(.7, distance); // 1.24 m tall subject frame
+        const desired = frameHeight * .5 * aspect / Math.max(.7, distance);
         const optical = Math.max(Math.tan(studentLens.teleHfov * halfAngle),
             Math.min(Math.tan(studentLens.wideHfov * halfAngle), desired));
         return {verticalFov:Math.atan(optical / aspect) / halfAngle,

@@ -33,11 +33,11 @@
         return false;
       const ids = /* @__PURE__ */ new Set();
       return plan.screens.every((s) => {
-        if (!s || !zones.includes(s.zone) || typeof s.id !== "string" || !s.id || s.id.length > 100 || ids.has(s.id) || typeof s.name !== "string" || !s.name.trim() || s.name.length > 100 || ![s.widthMm, s.heightMm, s.depthMm].every(dimension) || !Number.isSafeInteger(s.offsetMm) || s.offsetMm < 0 || s.offsetMm > 1e5 || !Number.isFinite(s.x) || !Number.isFinite(s.y))
+        if (!s || !zones.includes(s.zone) || typeof s.id !== "string" || !s.id || s.id.length > 100 || ids.has(s.id) || typeof s.name !== "string" || !s.name.trim() || s.name.length > 100 || ![s.widthMm, s.heightMm].every(dimension) || !(dimension(s.depthMm) || s.name === "LE163MD 163\u2033 LED" && s.depthMm === 62.5) || !Number.isSafeInteger(s.offsetMm) || s.offsetMm < 0 || s.offsetMm > 1e5 || !Number.isFinite(s.x) || !Number.isFinite(s.y))
           return false;
         ids.add(s.id);
         const dims = catalog(s.zone)[s.size];
-        return s.size === null || Array.isArray(dims) && dims.every((v, i) => v === [s.widthMm, s.heightMm, s.depthMm][i]);
+        return s.size === null || s.zone === "front" && s.name === "QA1400 Pro" && s.size === 86 && s.widthMm === 1968 && s.heightMm === 1194 && s.depthMm === 87 || Array.isArray(dims) && dims.every((v, i) => v === [s.widthMm, s.heightMm, s.depthMm][i]);
       });
     }
     function label(s) {
@@ -409,8 +409,8 @@
         return n;
       };
       function refresh(force = false) {
-        const { plan, room, lang } = read(), w = words[lang] || words.en;
-        const key = JSON.stringify([plan, room, lang, zone, editing, notice, noticeState]);
+        const { plan, room, lang, frontWall } = read(), w = words[lang] || words.en;
+        const key = JSON.stringify([plan, room, lang, frontWall, zone, editing, notice, noticeState]);
         if (!force && previous === key) return;
         previous = key;
         const base = repairPlan || plan;
@@ -480,7 +480,7 @@
         width.min = "0.001";
         width.max = room.width;
         width.value = base.stageMm / 1e3;
-        field(w[1], width);
+        field(frontWall ? lang === "zh" ? "\u524D\u5899\u5E03\u5C4F\u5BBD\u5EA6\uFF08\u7C73\uFF09" : "Front display wall width (m)" : w[1], width);
         width.onkeydown = (event) => {
           if (event.key === "Enter") {
             event.preventDefault();
@@ -513,7 +513,7 @@
             const from = describe(base.screens);
             const to = describe(next.plan.screens);
             const why = message(next.replacedBecause, lang);
-            feedback = lang === "zh" ? "\u821E\u53F0\u5BBD\u5EA6\u5DF2\u6539\u4E3A " + metres + " \u7C73\u3002\u539F\u914D\u7F6E " + from + "\uFF1A" + why + "\u3002" + (to ? "\u5DF2\u81EA\u52A8\u6539\u4E3A\u63A8\u8350\u914D\u7F6E " + to + "\u3002" : "\u6CA1\u6709\u53EF\u5B89\u88C5\u7684\u6807\u51C6\u4E3B\u5C4F\uFF0C\u4E3B\u5C4F\u6570\u91CF\u5DF2\u8BBE\u4E3A 0\u3002\u53EF\u8F93\u5165\u81EA\u5B9A\u4E49\u5C4F\u5C3A\u5BF8\u3002") : "Stage width changed to " + metres + " m. " + from + " \u2014 " + why + ". " + (to ? "Switched to the recommended " + to + "." : "No standard screen fits. Stage screen count is now 0. You can enter custom dimensions.");
+            feedback = lang === "zh" ? (frontWall ? "\u524D\u5899\u5E03\u5C4F\u5BBD\u5EA6\u5DF2\u6539\u4E3A " : "\u821E\u53F0\u5BBD\u5EA6\u5DF2\u6539\u4E3A ") + metres + " \u7C73\u3002\u539F\u914D\u7F6E " + from + "\uFF1A" + why + "\u3002" + (to ? "\u5DF2\u81EA\u52A8\u6539\u4E3A\u63A8\u8350\u914D\u7F6E " + to + "\u3002" : "\u6CA1\u6709\u53EF\u5B89\u88C5\u7684\u6807\u51C6\u4E3B\u5C4F\uFF0C\u4E3B\u5C4F\u6570\u91CF\u5DF2\u8BBE\u4E3A 0\u3002\u53EF\u8F93\u5165\u81EA\u5B9A\u4E49\u5C4F\u5C3A\u5BF8\u3002") : (frontWall ? "Front display wall width changed to " : "Stage width changed to ") + metres + " m. " + from + " \u2014 " + why + ". " + (to ? "Switched to the recommended " + to + "." : "No standard screen fits. Stage screen count is now 0. You can enter custom dimensions.");
             delete addSizes.front;
           }
           apply(next, feedback);
@@ -1956,8 +1956,106 @@
     };
   }
 
+  // src/domain/lecture-hall.js
+  var tieredRoom = ({ width, depth }) => width > 15 || depth > 15;
+  function hallLayout({ width, depth, height = 3 }) {
+    if (!tieredRoom({ width, depth }) || width < 4 || width > 30 || depth < 5 || depth > 50) return null;
+    const start = Math.min(3.25, depth * 0.34);
+    const pitch = Math.min(1.5, (depth - start - 1.6) / 2);
+    const rows = Math.max(2, 1 + Math.floor((depth - 2.15 - start) / pitch));
+    const rise = Math.min(0.115, Math.max(0, height - 2.22) / (rows - 1));
+    const bank = Math.max(1, Math.floor((width / 2 - 1.35) / 1.03));
+    const tiers = [], seats = [];
+    for (let row = 0; row < rows; row++) {
+      const z = start + row * pitch, top = 0.02 + row * rise;
+      tiers.push({ start: z, end: row === rows - 1 ? depth : z + pitch, top });
+      for (let column = 0; column < bank * 2; column++) {
+        const side = column < bank ? -1 : 1;
+        const index = column < bank ? bank - column - 1 : column - bank;
+        const x = width / 2 + side * (0.71 + (0.5 + index) * (width / 2 - 1.1) / bank);
+        seats.push({ row, column, x, y: z + pitch * 0.47, rise: top });
+      }
+    }
+    return { tiers, seats, bank, rows };
+  }
+  var WALL_BASE_DEPTH = 0.08;
+  var FIRST_ROW = 3;
+  var REAR_CLEARANCE = 0.6;
+  function furniturePositions({ width, depth }, rearExtent) {
+    const columns = Math.max(1, Math.floor(width / 3.2));
+    const rows = Math.max(1, Math.floor((depth - 2.5) / 2.5));
+    const last = depth - WALL_BASE_DEPTH / 2 - REAR_CLEARANCE - rearExtent;
+    const step = rows > 1 ? (last - FIRST_ROW) / (rows - 1) : 0;
+    return Array.from({ length: rows * columns }, (_, index) => [
+      (index % columns + 0.5) * width / columns,
+      0,
+      FIRST_ROW + Math.floor(index / columns) * step
+    ]);
+  }
+  function listeningLayout(room, hall = hallLayout(room)) {
+    if (hall) return hall;
+    if (!(room.width >= 4 && room.width <= 30 && room.depth >= 5 && room.depth <= 50)) return null;
+    const bank = Math.max(1, Math.floor(room.width / 3.2));
+    const tables = furniturePositions(room, 0.78);
+    return { rows: tables.length / bank, bank, seats: tables.flatMap(([x, , z], i) => [-0.27, 0.27].map((offset, j) => ({ x: x + offset, y: z + 0.58, rise: 0, row: Math.floor(i / bank), column: i % bank * 2 + j }))) };
+  }
+  function speakerMount(room, point, index, count) {
+    const front = !tieredRoom(room) && index < 2;
+    const rear = !tieredRoom(room) && !front && index >= count - 2;
+    const left = point.x < room.width / 2;
+    return {
+      x: front || rear ? point.x : left ? 0 : room.width,
+      depth: front ? 0 : rear ? room.depth : point.y,
+      mount: front ? "front-wall" : rear ? "rear-wall" : "side-wall",
+      direction: front ? "rear" : rear ? "front" : left ? "right" : "left"
+    };
+  }
+  function arrivals(seat, main, fill) {
+    const distance = (speaker) => Math.hypot(seat.x - speaker.x, seat.y - speaker.depth, seat.rise + 1.2 - speaker.height);
+    const primary = distance(main), secondary = distance(fill);
+    const lead = (primary - secondary) / 0.343;
+    return { primary, secondary, lead, low: Math.max(0, lead + 5), high: Math.max(0, lead + 10) };
+  }
+  function zonePairs(speakers, width, right) {
+    return speakers.filter((s) => s.x >= width / 2 === right).sort((a, b) => a.depth - b.depth).filter((s, i, all) => !i || s.depth > all[i - 1].depth + 0.01);
+  }
+  function acousticReview(room, speakers) {
+    const hall = listeningLayout(room);
+    const zones = [false, true].map((side) => zonePairs(speakers, room.width, side));
+    const lateral = room.width > 18 && zones.every((group) => group.some((s) => s.mount === "side-wall"));
+    let maxDifference = 0;
+    for (const [side, group] of zones.entries()) {
+      for (const fill of group.slice(1)) {
+        for (const seat of hall?.seats || []) {
+          if (seat.x >= room.width / 2 !== Boolean(side)) continue;
+          const { primary, secondary } = arrivals(seat, group[0], fill);
+          maxDifference = Math.max(maxDifference, primary - secondary);
+        }
+      }
+    }
+    return { lateral, maxDifference, delay: zones.some((group) => group.length > 1) && (room.depth > 18 || maxDifference >= 10) };
+  }
+  var routingOptions = {
+    unknown: ["\u5F85\u6838\u5B9E\u5206\u533A\u63A5\u7EBF\u4E0E\u5EF6\u65F6\u80FD\u529B\uFF08FE-224N \u7528\u4E8E\u53CD\u9988\u6291\u5236\uFF09", "Verify zone routing and delay capability (FE-224N handles feedback)"],
+    shared: ["\u5171\u7528\u8F93\u51FA\uFF0C\u5148\u590D\u6838\u5206\u533A\u63A5\u7EBF", "Shared output: review zone wiring first"],
+    available: ["\u5DF2\u786E\u8BA4\u72EC\u7ACB\u5EF6\u65F6\u8F93\u51FA\uFF0C\u53EF\u590D\u7528", "Confirmed independent delay outputs: reuse existing processing"],
+    required: ["\u5DF2\u786E\u8BA4\u9700\u8865\u507F\u4E14\u6709\u72EC\u7ACB\u5206\u533A\uFF0C\u73B0\u6709\u8F93\u51FA\u65E0\u5EF6\u65F6\uFF1A\u5DE5\u7A0B\u9009\u914D\u591A\u901A\u9053 DSP", "Compensation confirmed; separate zones without delay: review an optional multichannel DSP"]
+  };
+  function reviewNotes(review, route, zh) {
+    if (!review) return [];
+    const notes = [];
+    if (review.delay) {
+      const path = review.maxDifference.toFixed(1);
+      const ms = (review.maxDifference / 0.343).toFixed(1);
+      const wiring = Object.hasOwn(routingOptions, route) ? routingOptions[route] : routingOptions.unknown;
+      notes.push((zh ? `\u524D\u540E\u533A\u5EF6\u65F6\u590D\u6838\u3002\u793A\u610F\u5E2D\u4F4D\u7684\u6700\u5927\u58F0\u7A0B\u5DEE ${path} m\uFF08${ms} ms\uFF09\u3002\u8BF7\u5728\u8986\u76D6\u4EA4\u754C\u5B9E\u6D4B\u3002` : `Review main/fill delay. Maximum modelled seat path difference: ${path} m (${ms} ms). Measure the coverage overlap. `) + wiring[zh ? 0 : 1]);
+    }
+    if (review.lateral) notes.push(zh ? "\u8D85\u5BBD\u5385\u5DE6\u53F3\u4FA7\u5899\u6269\u58F0\uFF1A\u590D\u6838\u6307\u5411\u3001\u4E0B\u503E\u548C\u7535\u5E73\uFF0C\u8BC4\u4F30\u4E2D\u533A\u8865\u58F0\uFF1B\u7EDF\u4E00\u5EF6\u65F6\u65E0\u6CD5\u5BF9\u9F50\u4E24\u4FA7\u542C\u4F17\u3002" : "Wide hall with opposing side-wall speakers: review aiming, tilt, level and centre fill. One delay cannot align both sides.");
+    return notes;
+  }
+
   // src/domain/audio-plan.js
-  var AUDIO_POLICY_VERSION = "2026-11-13";
+  var AUDIO_POLICY_VERSION = "2026-11-25";
   var BUILTIN_AMP_MODELS = ["NDP600", "NDP200", "NMP311", "SL100"];
   var emptyAudioConfig = () => ({ useBuiltInAmp: true, amplifier: {}, feedback: {} });
   function confirmedEquipment(item, requiredCapacity) {
@@ -1980,6 +2078,8 @@
     s210Count,
     speakerCount,
     qnexModel = "NDP600",
+    speakers = [],
+    height = 3,
     audioConfig = {},
     minimum = minimumPickup(width, depth)
   }) {
@@ -1990,7 +2090,10 @@
     const amplifierProvided = amplifierRequired && confirmedEquipment(audioConfig.amplifier, externalSpeakers || 1);
     const feedbackProvided = feedbackRequired && confirmedEquipment(audioConfig.feedback, 1);
     const amplifierQuantity = amplifierRequired ? Math.max(1, Math.ceil(externalSpeakers / 4)) : 0;
+    const mounts = speakers.slice(0, speakerCount).map((p, i) => p.mount ? p : { ...speakerMount({ width, depth }, p, i, speakers.length), height: Math.min(2.5, height - 0.3) });
+    const review = acousticReview({ width, depth, height }, mounts);
     return {
+      review,
       policyVersion: AUDIO_POLICY_VERSION,
       minimum,
       actualCount: s210Count,
@@ -2029,7 +2132,7 @@
       if (provided) notes.push(`${zh ? "\u5BA2\u6237\u63D0\u4F9B" : "Customer provided"} \u2014 ${label}: ${config[key].model}; ${zh ? "\u5BB9\u91CF" : "capacity"} ${config[key].capacity}; ${config[key].notes}`);
       if (invalid) notes.push(zh ? `${label}\u7684\u5DF2\u6709\u8BBE\u5907\u786E\u8BA4\u4E0D\u5B8C\u6574\u6216\u5BB9\u91CF\u4E0D\u8DB3\uFF0C\u4ECD\u8BA1\u5165\u91C7\u8D2D\u3002` : `${label} declaration is incomplete or capacity is insufficient; purchase remains included.`);
     }
-    return notes;
+    return notes.concat(reviewNotes(plan.review, config?.delayRouting, zh));
   }
 
   // src/domain/plan-snapshot.js
@@ -2205,7 +2308,6 @@
     const s210CoverageUnmet = showS210 && s210s.length > 0 && (coverage.best < activeS210CoverageTarget.best || coverage.limit < activeS210CoverageTarget.limit);
     const s210OverCapacity = showS210 && s210s.length > S210_MAX_COUNT;
     const needsPs610AmpReview = showSpeakers && speakers.length > 0;
-    const needsDelayReview = showSpeakers && speakers.length >= 4 && roomLength > 18;
     return {
       cameraBomLines,
       totalCameraQty,
@@ -2216,8 +2318,7 @@
       activeS210CoverageTarget,
       s210CoverageUnmet,
       s210OverCapacity,
-      needsPs610AmpReview,
-      needsDelayReview
+      needsPs610AmpReview
     };
   }
 
@@ -2356,7 +2457,15 @@
         checked: audioConfig.useBuiltInAmp !== false,
         onChange: (e) => setAudioConfig((current) => ({ ...current, useBuiltInAmp: e.target.checked }))
       }
-    ), " ", zh ? "\u4F7F\u7528Q-NEX\u5185\u7F6E\u529F\u653E\u5E26\u524D\u4E24\u53EAPS610\uFF082\xD740W\uFF09" : "Use Q-NEX built-in amplification for the first two PS610 (2 x 40W)"), ["amplifier", "feedback"].map((key) => {
+    ), " ", zh ? "\u4F7F\u7528Q-NEX\u5185\u7F6E\u529F\u653E\u5E26\u524D\u4E24\u53EAPS610\uFF082\xD740W\uFF09" : "Use Q-NEX built-in amplification for the first two PS610 (2 x 40W)"), audioPlan.review.delay && /* @__PURE__ */ React.createElement("label", null, zh ? "\u524D\u540E\u533A\u4FE1\u53F7\u8DEF\u7531" : "Front/fill signal routing", /* @__PURE__ */ React.createElement(
+      "select",
+      {
+        className: inputClass,
+        value: audioConfig.delayRouting || "unknown",
+        onChange: (e) => setAudioConfig((current) => ({ ...current, delayRouting: e.target.value }))
+      },
+      Object.entries(routingOptions).map(([k, v]) => /* @__PURE__ */ React.createElement("option", { key: k, value: k }, v[zh ? 0 : 1]))
+    )), ["amplifier", "feedback"].map((key) => {
       const item = audioConfig[key] || {};
       const label = key === "amplifier" ? zh ? "\u529F\u653E" : "Amplifier" : zh ? "\u53CD\u9988\u6291\u5236\u5668" : "Feedback suppressor";
       return /* @__PURE__ */ React.createElement("div", { key, className: "lcs-customer-equipment" }, /* @__PURE__ */ React.createElement("label", null, /* @__PURE__ */ React.createElement(
@@ -3146,8 +3255,7 @@
       needsFeedbackMicCountReview,
       s210CoverageUnmet,
       s210OverCapacity,
-      needsPs610AmpReview,
-      needsDelayReview
+      needsPs610AmpReview
     } = getBomDecisions({
       showTeacherCam,
       showStudentCam,
@@ -3169,6 +3277,8 @@
       depth: roomLength,
       s210Count: showS210 ? s210s.length : 0,
       speakerCount: showSpeakers ? speakers.length : 0,
+      speakers,
+      height: roomHeight,
       qnexModel,
       audioConfig,
       minimum
@@ -3579,7 +3689,6 @@
       maxDistance,
       needsA3006,
       needsCameraPoEExpansion,
-      needsDelayReview,
       needsFeedbackMicCountReview,
       needsFeedbackSuppressor,
       needsPs610AmpReview,

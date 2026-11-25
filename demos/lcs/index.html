@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="styles.css?v=20261030-planning-reset">
   <link rel="stylesheet" href="styles-presentation.css?v=20261122-studio">
   <link rel="stylesheet" href="styles-camera-field.css">
-  <script defer src="dist/app.js?v=has10-1"></script>
+  <script defer src="dist/app.js?v=tiered-hall-1"></script>
 </head>
 <body>
   <div id="app" class="app-shell">
@@ -100,6 +100,15 @@
           </details>
         </div>
         <div class="sidebar-pane" id="sidebar-coverage" role="tabpanel" aria-labelledby="sidebar-tab-coverage" tabindex="0" hidden>
+          <section id="delay-review" class="sidebar-section" hidden>
+            <h3><span data-delay-en="Main/fill delay review" data-delay-zh="哈斯效应 · 前后区延时复核">Main/fill delay review</span></h3>
+            <label class="check-row"><input id="delay-enabled" type="checkbox"><span data-delay-en="Show paths and tap a seat" data-delay-zh="显示声程并点选座位">Show paths and tap a seat</span></label>
+            <label class="select-row"><span data-delay-en="Listening position" data-delay-zh="听音位置">Listening position</span><select id="delay-seat"></select></label>
+            <label class="select-row"><span data-delay-en="Speaker side" data-delay-zh="音箱侧">Speaker side</span><select id="delay-side"><option value="auto" data-delay-en="Nearest" data-delay-zh="就近">Nearest</option><option value="left" data-delay-en="Left" data-delay-zh="左侧">Left</option><option value="right" data-delay-en="Right" data-delay-zh="右侧">Right</option></select></label>
+            <label class="select-row"><span data-delay-en="Fill speaker" data-delay-zh="补声音箱">Fill speaker</span><select id="delay-fill"></select></label>
+            <label class="select-row"><span data-delay-en="Zone routing" data-delay-zh="分区接线">Zone routing</span><select id="delay-routing" style="max-width:100%;min-width:0"></select></label>
+            <output id="delay-result" aria-live="polite" style="display:block;white-space:pre-line;line-height:1.55;margin-top:.8em"></output>
+          </section>
           <section id="camera-field-panel" class="sidebar-section camera-field-panel" data-enabled="false">
             <h3 data-field-i18n="heading">Camera field of view</h3>
             <label class="check-row"><input id="camera-field-enabled" type="checkbox"><span data-field-i18n="enabled">Show 3D camera field</span></label>

@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="styles.css?v=20261030-planning-reset">
   <link rel="stylesheet" href="styles-presentation.css?v=20261122-studio">
   <link rel="stylesheet" href="styles-camera-field.css">
-  <script defer src="dist/app.js?v=tiered-hall-1"></script>
+  <script defer src="dist/app.js?v=hall-projection-1"></script>
 </head>
 <body>
   <div id="app" class="app-shell">
@@ -19,7 +19,7 @@
         <div><div class="eyebrow" data-i18n="eyebrow">INTERACTIVE ROOM STUDY</div><h1 data-i18n="title">LCS 810 · 3D Room Demo</h1></div>
       </div>
       <div class="room-toolbar room-controls">
-        <label><span data-i18n="preset">Preset</span><select id="preset"><option value="standard" data-i18n="standard">Standard 8 × 10</option><option value="large" data-i18n="large">Large 10 × 20</option><option value="lecture" data-i18n="lecture">Lecture 12 × 15</option><option value="ultra" data-i18n="ultra">Auditorium 17 × 37</option><option value="custom" data-i18n="custom">Custom</option></select></label>
+        <label><span data-i18n="preset">Preset</span><select id="preset"><option value="standard" data-i18n="standard">Standard 8 × 10</option><option value="large" data-i18n="large">Large 10 × 20</option><option value="lecture" data-i18n="lecture">Lecture 12 × 15</option><option value="ultra" data-i18n="ultra">Auditorium 17 × 37</option><option value="hall26x15">Tiered auditorium case · 26 × 15 m</option><option value="custom" data-i18n="custom">Custom</option></select></label>
         <label><span data-i18n="width">WIDTH</span><input id="room-width" type="number" min="4" max="30" step="0.1" value="8"></label>
         <label><span data-i18n="depth">DEPTH</span><input id="room-depth" type="number" min="5" max="50" step="0.1" value="10"></label>
         <label><span data-i18n="height">HEIGHT</span><input id="room-height-input" type="number" min="2.4" max="6" step="0.1" value="3"></label>
@@ -50,9 +50,9 @@
           <button type="button" data-view="top" class="view-button" data-i18n="top">Top</button>
           <button type="button" data-view="stage" class="view-button" data-i18n="stageView">Stage</button>
           <button type="button" data-view="audience" class="view-button" data-i18n="audienceView">Audience</button>
-          <button type="button" data-view="has10" class="view-button" hidden>HAS10</button>
+
         </div>
-        <div class="scene-tool-actions"><button id="fidelity-toggle" type="button" aria-pressed="false" disabled>High fidelity</button><button id="theme-toggle" type="button">Theme</button><button id="sidebar-toggle" type="button" aria-expanded="true">Hide sidebar</button></div>
+        <div class="scene-tool-actions"><button id="fidelity-toggle" type="button" aria-pressed="false" disabled>High fidelity</button><button id="lighting-toggle" type="button" aria-pressed="true" hidden>Proposal lighting</button><button id="theme-toggle" type="button">Theme</button><button id="sidebar-toggle" type="button" aria-expanded="true">Hide sidebar</button></div>
       </div>
         <div class="scene-bottomline"><span data-i18n="gestureHint">Drag to orbit · Scroll to zoom · Right drag to pan · Click a device</span><span id="frame-status">3D</span></div>
         <div id="scene-error" class="scene-error" role="alert" hidden></div>
@@ -70,9 +70,12 @@
         <div class="sidebar-pane" id="sidebar-config" role="tabpanel" aria-labelledby="sidebar-tab-config" tabindex="0">
           <div class="sidebar-intro"><h2 data-i18n="layoutTitle">System layout</h2><p data-i18n="layoutDesc">A clear view of where the core LCS devices would be installed.</p></div>
           <div class="metric-row"><div><span data-i18n="width">WIDTH</span><strong id="width-metric">8.0 <small>m</small></strong></div><div><span data-i18n="depth">DEPTH</span><strong id="depth-metric">10.0 <small>m</small></strong></div><div><span data-i18n="height">HEIGHT</span><strong id="height-metric">3.0 <small>m</small></strong></div></div>
+          <section id="projection-control" class="sidebar-section selected-section" hidden></section>
           <section id="s210-controls" class="sidebar-section selected-section"><label class="select-row"><span id="s210-count-label">S210 quantities</span><select id="s210-count"></select></label><p id="s210-count-status" aria-live="polite"></p></section>
           <section class="sidebar-section selected-section">
             <div id="equipment-controls">
+              <label class="select-row"><span id="podium-label">Optional podium</span><select id="podium-model"><option value="NDP600">NDP600 · HAS10</option><option>SL100</option><option>NDP200</option></select></label>
+              <button type="button" data-view="has10" class="reset-button" hidden>Podium close-up</button>
               <div class="subheading" data-i18n="equipment">Equipment configuration</div>
               <label style="display:none"><span data-i18n="ifpSize">IFP size</span><select id="ifp-size"><option value="65">65&quot;</option><option value="75">75&quot;</option><option value="86" selected>86&quot;</option></select></label>
               <label style="display:none"><span data-i18n="ifpCount">IFP panels</span><select id="ifp-count"><option value="1">1</option><option value="2" selected>2</option></select></label>
@@ -145,6 +148,7 @@
           <section class="sidebar-section">
             <button id="sample-images" type="button" class="reset-button" hidden>Sample images</button>
             <select id="interior-view" hidden><option value=""></option><option value="front"></option><option value="reverse"></option><option value="entrance"></option></select>
+            <label id="proposal-light-option" class="check-row" hidden><input id="proposal-light" type="checkbox" checked><span>Proposal lighting</span></label>
             <label class="select-row" for="render-quality"><span id="quality-label">Render quality</span>
               <select id="render-quality" disabled><option value="standard">Standard</option><option value="high">High fidelity</option></select>
             </label>

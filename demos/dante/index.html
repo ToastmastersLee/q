@@ -15,7 +15,7 @@
   <header class="topbar">
     <div class="brand"><span class="brand-mark">◉</span><div><strong>Dante</strong><small data-i18n="brandSub">3D classroom planner</small></div></div>
     <div class="room-controls">
-      <label><span data-i18n="preset">Room</span><select id="preset"><option value="medium">8 × 10 m</option><option value="standard">10 × 10 m</option><option value="large">10 × 14 m</option><option value="step">10 × 20 m</option><option value="small">5 × 6 m</option><option value="custom" data-i18n="custom">Custom</option></select></label>
+      <label><span data-i18n="preset">Room</span><select id="preset"><option value="medium">8 × 10 m</option><option value="standard">10 × 10 m</option><option value="large">10 × 14 m</option><option value="step">10 × 20 m</option><option value="small">5 × 6 m</option><option value="hall26x15">Tiered auditorium case · 26 × 15 m</option><option value="custom" data-i18n="custom">Custom</option></select></label>
       <label><span data-i18n="length">Length X</span><input id="room-length" type="number" min="2" max="40" step="0.5" value="8"></label>
       <label><span data-i18n="width">Depth Y</span><input id="room-width" type="number" min="2" max="40" step="0.5" value="10"></label>
       <button id="recalculate" class="primary" data-i18n="recalculate">Recalculate</button>
@@ -51,6 +51,7 @@
       </div>
       <div class="sidebar-pane" id="sidebar-config" role="tabpanel" aria-labelledby="sidebar-tab-config" tabindex="0">
         <section class="card intro"><h1 data-i18n="title">Classroom coverage in 3D</h1><p id="plan-origin" class="microcopy" hidden></p><p id="reference-note" class="microcopy"></p><p data-i18n="intro">Devices and floor positions follow the 2D Recalculate rules.</p></section>
+        <section class="card" id="projection-control" hidden></section>
         <section class="card" id="audio-count-controls"></section>
         <section class="card height-profile-card">
           <h2 id="profile-heading">Ceiling height &amp; microphone reach</h2>
@@ -153,6 +154,6 @@
     <nav aria-label="Proposal views"><button type="button" data-sheet="stage">From stage</button><button type="button" data-sheet="audience">From rear</button><button type="button" data-sheet="entrance">Entrance</button></nav>
     <img alt="Large Lecture Hall 115"><footer><a download>Download PNG</a></footer>
   </div></dialog>
-  <script defer src="dist/aispeech-three.js?v=20261124-light-toggle"></script>
+  <script defer src="dist/aispeech-three.js?v=hall-projection-1"></script>
 </body>
 </html>

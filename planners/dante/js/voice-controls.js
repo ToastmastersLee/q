@@ -35,9 +35,14 @@
         };
         return notes[lang] || notes.en;
     }
-    App.voiceRotationSeats = (hall, count) => hall.zones(count).map(zone =>
-        hall.seats.find(seat => seat.bank === zone.bank && seat.row === Math.floor((zone.start + zone.end - 1)/2) &&
-            seat.x >= hall.desks[zone.bank]));
+    App.voiceRotationSeats = (hall, count) => {
+        const zones = hall.zones(count);
+        return zones.map(zone => {
+            const row = Math.floor((zone.start + zone.end - 1)/2);
+            const x = hall.desks[zone.bank] ?? zone.x;
+            return hall.seats.find(seat => seat.row === row && seat.x >= x && hall.zoneFor(seat,zones) === zone);
+        });
+    };
     App.bindVoiceControls = function (host, {read, area, stageWidthMm, language, toggle, resize, speak,
         localHall = () => null, modelFor = App.voice.forTracking}) {
         const {halls, words} = App.voice;

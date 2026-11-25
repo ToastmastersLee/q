@@ -69,6 +69,11 @@
         const seatById = new Map(seats.map(seat => [seat.id, seat]));
         function zones(count) {
             if (!Number.isInteger(count) || count < 2 || count > 6) throw new RangeError('Student camera count must be 2–6');
+            if (count === config.frontMounts?.length) {
+                return config.frontMounts.map(({x,y},i) => ({
+                    number:i+1, section:i, start:0, end:rows, x, y, color:colors[i]
+                }));
+            }
             const result = [];
             for (let tier = 0; result.length < count; tier++) {
                 for (const bank of [0, 1]) {
@@ -87,7 +92,9 @@
                 id:'voice-' + role + '-' + number, type:'camera', role, number, model, x, y,
                 mountHeight:config.small ? (y >= width/2 ? 2.04 : 2.58) : (role === 'student' ? 2.75 : 2.65), install:role === 'teacher' || (role === 'student' && y > 1) ? 'ceiling' : 'wall', voice:true
             });
-            return [...zones(count).map(z => camera('student', z.number, 'CV870', z.x, z.y)),
+            return [...zones(count).map(z => ({
+                    ...camera('student', z.number, 'CV870', z.x, z.y), ...config.frontMounts?.[z.section]
+                })),
                 camera('panorama', 1, 'CV210 Student', config.panoramaX ?? length / 2, 0.48),
                 camera('teacher', 1, 'CV870', teacherMount.x, teacherMount.y),
                 {id:'voice-mt200', type:'tracker', role:'tracker', number:1, model:'AIVIS-MT200',
@@ -113,6 +120,7 @@
             });
         }
         function zoneFor(seat, list) {
+            if (list[0].section !== undefined) return list[Math.min(list.length-1, Math.floor(seat.x / length * list.length))];
             return list.find(z => z.bank === seat.bank && seat.row >= z.start && seat.row < z.end);
         }
         function shot(t) {

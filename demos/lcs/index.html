@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="styles.css?v=20261030-planning-reset">
   <link rel="stylesheet" href="styles-presentation.css?v=20261122-studio">
   <link rel="stylesheet" href="styles-camera-field.css">
-  <script defer src="dist/app.js?v=fixed-aux-cast-1"></script>
+  <script defer src="dist/app.js?v=20261126-audio"></script>
 </head>
 <body>
   <div id="app" class="app-shell">
@@ -71,10 +71,13 @@
           <div class="sidebar-intro"><h2 data-i18n="layoutTitle">System layout</h2><p data-i18n="layoutDesc">A clear view of where the core LCS devices would be installed.</p></div>
           <div class="metric-row"><div><span data-i18n="width">WIDTH</span><strong id="width-metric">8.0 <small>m</small></strong></div><div><span data-i18n="depth">DEPTH</span><strong id="depth-metric">10.0 <small>m</small></strong></div><div><span data-i18n="height">HEIGHT</span><strong id="height-metric">3.0 <small>m</small></strong></div></div>
           <section id="projection-control" class="sidebar-section selected-section" hidden></section>
+          <section id="reinforcement-config" class="sidebar-section">
+            <label class="select-row"><span id="speaker-model-label">Loudspeakers</span><select id="speaker-model"><option value="PS610">PS610</option><option value="EBS-630">Takstar EBS-630</option></select></label>
+            <label class="select-row"><span id="pickup-mode-label">Microphones</span><select id="pickup-mode"><option value="distributed">Distributed S210</option><option value="wireless">D90 + 2 stage S210</option></select></label>
+          </section>
           <section id="s210-controls" class="sidebar-section selected-section"><label class="select-row"><span id="s210-count-label">S210 quantities</span><select id="s210-count"></select></label><p id="s210-count-status" aria-live="polite"></p></section>
           <section class="sidebar-section selected-section">
             <div id="equipment-controls">
-              <label class="select-row"><span id="podium-label">Optional podium</span><select id="podium-model"><option value="NDP600">NDP600 · HAS10</option><option>SL100</option><option>NDP200</option></select></label>
               <button type="button" data-view="has10" class="reset-button" hidden>Podium close-up</button>
               <div class="subheading" data-i18n="equipment">Equipment configuration</div>
               <label style="display:none"><span data-i18n="ifpSize">IFP size</span><select id="ifp-size"><option value="65">65&quot;</option><option value="75">75&quot;</option><option value="86" selected>86&quot;</option></select></label>
@@ -94,6 +97,7 @@
           </section>
         </div>
         <div class="sidebar-pane" id="sidebar-devices" role="tabpanel" aria-labelledby="sidebar-tab-devices" tabindex="0" hidden>
+          <section class="sidebar-section"><label class="select-row"><span id="podium-label">Optional podium</span><select id="podium-model"><option value="NDP600">NDP600 · HAS10</option><option>SL100</option><option>NDP200</option></select></label><div id="podium-options"></div></section>
           <div id="display-layout" class="sidebar-section"></div>
           <section class="sidebar-section selected-section" aria-live="polite"><div class="section-heading"><h3 data-i18n="selected">Selected device</h3></div><div id="device-detail" class="device-detail"></div><button id="adjust-camera-field" class="reset-button" type="button" data-sidebar-copy="adjustCamera" hidden>Adjust field of view</button><button id="adjust-s210-aim" class="reset-button" type="button" hidden>Aim S210</button><button id="open-av-matrix" class="reset-button" type="button" hidden>Open AV Matrix</button></section>
           <details class="settings-panel">

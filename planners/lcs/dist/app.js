@@ -75,9 +75,9 @@
       return [...grouped.values()];
     }
     function doorSpans(depth) {
-      const width = Math.min(1.16, (depth - 0.36) / 2);
-      const inset = Math.max(width / 2 + 0.08, Math.min(1.45, depth * 0.2));
-      return [inset, depth - inset].map((c) => [mm(c - width / 2), mm(c + width / 2)]);
+      const width2 = Math.min(1.16, (depth - 0.36) / 2);
+      const inset = Math.max(width2 / 2 + 0.08, Math.min(1.45, depth * 0.2));
+      return [inset, depth - inset].map((c) => [mm(c - width2 / 2), mm(c + width2 / 2)]);
     }
     function freeSpans(start, end, blocked) {
       const free = [];
@@ -152,16 +152,16 @@
         const slack = free - items.reduce((sum, s) => sum + (front ? s.widthMm : s.depthMm), 0);
         if (slack < 0) return fail(zone, "width", -slack);
         for (const s of items) {
-          const height = mm(front ? ceiling(s.y) : Math.max(room.height, room.profile?.rear || 0));
+          const height2 = mm(front ? ceiling(s.y) : Math.max(room.height, room.profile?.rear || 0));
           if (front && (s.y < 0 || Math.max(s.depthMm, s.y * 1e3 + s.depthMm / 2) > mm(room.depth)))
             return fail(zone, "projection");
           const mount = room.mainHeight;
-          if (s.heightMm > height) return fail(zone, "height", s.heightMm - height);
-          if (front && mount != null && (s.heightMm / 2 > mm(mount) || s.heightMm / 2 + mm(mount) > height))
+          if (s.heightMm > height2) return fail(zone, "height", s.heightMm - height2);
+          if (front && mount != null && (s.heightMm / 2 > mm(mount) || s.heightMm / 2 + mm(mount) > height2))
             return fail(
               zone,
               "height",
-              Math.ceil(Math.max(s.heightMm / 2 - mm(mount), s.heightMm / 2 + mm(mount) - height))
+              Math.ceil(Math.max(s.heightMm / 2 - mm(mount), s.heightMm / 2 + mm(mount) - height2))
             );
           if (!front && s.offsetMm + s.widthMm > mm(room.width))
             return fail(zone, "projection", s.offsetMm + s.widthMm - mm(room.width));
@@ -302,6 +302,21 @@
       nextId
     };
   })();
+
+  // ../shared-interiors/projection-case.js
+  var width = 200 * 0.0254 * 16 / Math.sqrt(337);
+  var height = width * 9 / 16;
+  var caseStudentCameraX = (roomWidth) => roomWidth / 2 + width / 2 + 0.65;
+  function caseCeilingDisplays(roomWidth, roomDepth, size = 75) {
+    return ["L0", "L1", "R0", "R1"].map((id, index) => ({
+      id,
+      side: index < 2 ? "left" : "right",
+      size: Number(size),
+      mount: "ceiling",
+      x: roomWidth * (index + 0.5) / 4,
+      y: roomDepth / 2
+    }));
+  }
 
   // ../shared-planning/display-editor.js
   (function() {
@@ -474,23 +489,23 @@
           }
           apply(next);
         }
-        const width = node("input");
-        width.type = "number";
-        width.step = "0.001";
-        width.min = "0.001";
-        width.max = room.width;
-        width.value = base.stageMm / 1e3;
-        field(frontWall ? lang === "zh" ? "\u524D\u5899\u5E03\u5C4F\u5BBD\u5EA6\uFF08\u7C73\uFF09" : "Front display wall width (m)" : w[1], width);
-        width.onkeydown = (event) => {
+        const width2 = node("input");
+        width2.type = "number";
+        width2.step = "0.001";
+        width2.min = "0.001";
+        width2.max = room.width;
+        width2.value = base.stageMm / 1e3;
+        field(frontWall ? lang === "zh" ? "\u524D\u5899\u5E03\u5C4F\u5BBD\u5EA6\uFF08\u7C73\uFF09" : "Front display wall width (m)" : w[1], width2);
+        width2.onkeydown = (event) => {
           if (event.key === "Enter") {
             event.preventDefault();
-            width.blur();
+            width2.blur();
           }
         };
-        width.onchange = () => {
-          const metres = width.valueAsNumber;
+        width2.onchange = () => {
+          const metres = width2.valueAsNumber;
           const stageMm = Math.round(metres * 1e3);
-          if (!Number.isFinite(metres) || width.validity.stepMismatch || stageMm < 1) {
+          if (!Number.isFinite(metres) || width2.validity.stepMismatch || stageMm < 1) {
             notice = w[2];
             noticeState = "blocked";
             refresh(true);
@@ -644,7 +659,7 @@
         const output = node("output");
         output.setAttribute("role", notice ? "alert" : "status");
         output.setAttribute("aria-atomic", "true");
-        if (notice && !editing) width.parentElement.after(output);
+        if (notice && !editing) width2.parentElement.after(output);
         else box.append(output);
         output.dataset.state = notice ? noticeState : result.status;
         output.textContent = notice || message(result, lang, zone);
@@ -774,10 +789,10 @@
 
   // src/domain/display-layout.js
   var F = globalThis.DisplayFit;
-  function lcsRoom(width, depth, height, hub, doorSide = "right") {
-    return { width, depth, height, stations: hub ? [hub] : [], doorSide };
+  function lcsRoom(width2, depth, height2, hub, doorSide = "right") {
+    return { width: width2, depth, height: height2, stations: hub ? [hub] : [], doorSide };
   }
-  function legacyDisplays(width, panel, enabled, displays, size) {
+  function legacyDisplays(width2, panel, enabled, displays, size) {
     const screens = [];
     if (enabled && panel) {
       const screen = F.standard("front", 86, "ifp-1", panel.x, panel.y);
@@ -796,7 +811,7 @@
       const zone = String(d.id).startsWith("L") ? "left" : "right";
       screens.push(F.standard(zone, Number(size), "display-" + d.id, d.x, d.y));
     }
-    return { stageMm: Math.round(width * 1e3), screens };
+    return { stageMm: Math.round(width2 * 1e3), screens };
   }
 
   // src/i18n.js
@@ -1449,8 +1464,8 @@
     hu: ["Teremmagass\xE1g (m)", "A magass\xE1g a szerel\xE9si ellen\u0151rz\xE9shez kell; a 2D lefedetts\xE9g nem v\xE1ltozik.", "Tov\xE1bbi be\xE1ll\xEDt\xE1sok", "Lefedetts\xE9g \xE1llapota", "A terem magass\xE1ga legal\xE1bb 3,5 m. Ellen\u0151rizze a szerel\xE9si magass\xE1got, \xE9s sz\xFCks\xE9g eset\xE9n haszn\xE1ljon f\xFCggesztett konzolt."],
     ar: ["\u0627\u0631\u062A\u0641\u0627\u0639 \u0627\u0644\u063A\u0631\u0641\u0629 (\u0645)", "\u064A\u064F\u0633\u062C\u0644 \u0627\u0644\u0627\u0631\u062A\u0641\u0627\u0639 \u0644\u0645\u0631\u0627\u062C\u0639\u0629 \u0627\u0644\u062A\u0631\u0643\u064A\u0628\u061B \u0644\u0627 \u062A\u062A\u063A\u064A\u0631 \u0627\u0644\u062A\u063A\u0637\u064A\u0629 \u062B\u0646\u0627\u0626\u064A\u0629 \u0627\u0644\u0623\u0628\u0639\u0627\u062F.", "\u062E\u064A\u0627\u0631\u0627\u062A \u0625\u0636\u0627\u0641\u064A\u0629", "\u062D\u0627\u0644\u0629 \u0627\u0644\u062A\u063A\u0637\u064A\u0629", "\u0627\u0631\u062A\u0641\u0627\u0639 \u0627\u0644\u063A\u0631\u0641\u0629 3.5 \u0645 \u0623\u0648 \u0623\u0643\u062B\u0631. \u062A\u062D\u0642\u0642 \u0645\u0646 \u0627\u0631\u062A\u0641\u0627\u0639 \u0627\u0644\u062A\u0631\u0643\u064A\u0628 \u0648\u0627\u0633\u062A\u062E\u062F\u0645 \u062D\u0627\u0645\u0644\u0627\u064B \u0645\u0639\u0644\u0642\u0627\u064B \u0639\u0646\u062F \u0627\u0644\u062D\u0627\u062C\u0629."]
   };
-  for (const [language, [height, heightNote, moreOptions, coverageStatus, heightWarning]] of Object.entries(workspaceCopy)) {
-    Object.assign(i18n[language], { height, heightNote, moreOptions, coverageStatus, heightWarning });
+  for (const [language, [height2, heightNote, moreOptions, coverageStatus, heightWarning]] of Object.entries(workspaceCopy)) {
+    Object.assign(i18n[language], { height: height2, heightNote, moreOptions, coverageStatus, heightWarning });
   }
 
   // src/themes.js
@@ -1598,9 +1613,9 @@
     const r = facing === "down" ? a * (1 + Math.sin(theta)) : a * (1 - Math.sin(theta));
     return d <= r;
   };
-  var calculateS210Coverage = (mics, width, length, cols = 30) => {
-    if (!mics || mics.length === 0 || width <= 0 || length <= 0) return { best: 0, limit: 0 };
-    const rows = Math.round(cols * (length / width));
+  var calculateS210Coverage = (mics, width2, length, cols = 30) => {
+    if (!mics || mics.length === 0 || width2 <= 0 || length <= 0) return { best: 0, limit: 0 };
+    const rows = Math.round(cols * (length / width2));
     if (isNaN(rows) || rows <= 0) return { best: 0, limit: 0 };
     let bestCovered = 0;
     let limitCovered = 0;
@@ -1608,7 +1623,7 @@
     for (let r = 0; r < rows; r++) {
       const y = (r + 0.5) * (length / rows);
       for (let c = 0; c < cols; c++) {
-        const x = (c + 0.5) * (width / cols);
+        const x = (c + 0.5) * (width2 / cols);
         let isBest = false;
         let isLimit = false;
         for (const mic of mics) {
@@ -1637,7 +1652,7 @@
   var S210_A3006_CAPACITY = 8;
   var S210_DIRECT_HOST_CAPACITY = 2;
   var S210_MAX_COUNT = S210_A3006_CAPACITY + S210_DIRECT_HOST_CAPACITY;
-  var placeS210FrontRow = (mics, width, length) => {
+  var placeS210FrontRow = (mics, width2, length) => {
     if (mics.length === 0) return mics;
     const frontRowY = Math.min(...mics.map((mic) => mic.y));
     const frontRow = mics.filter((mic) => Math.abs(mic.y - frontRowY) < 1e-6);
@@ -1646,12 +1661,12 @@
     return mics.map((mic) => {
       if (!frontRowIds.has(mic.id)) return { ...mic, facing: "up" };
       const index = frontRow.findIndex((item) => item.id === mic.id);
-      const x = frontRow.length === 1 ? width / 2 : width * (0.3 + 0.4 * index / (frontRow.length - 1));
-      return { ...mic, x: clamp(x, 0.3, width - 0.3), y: frontY, facing: "down" };
+      const x = frontRow.length === 1 ? width2 / 2 : width2 * (0.3 + 0.4 * index / (frontRow.length - 1));
+      return { ...mic, x: clamp(x, 0.3, width2 - 0.3), y: frontY, facing: "down" };
     });
   };
-  var buildAuxDisplays = (width, length, size) => {
-    if (width <= 8 && length <= 10) return [];
+  var buildAuxDisplays = (width2, length, size) => {
+    if (width2 <= 8 && length <= 10) return [];
     let maxDist = 4.1;
     if (size === "65") maxDist = 5;
     if (size === "75") maxDist = 5.6;
@@ -1663,25 +1678,25 @@
         const yPos = 6 + i * maxDist;
         if (yPos < length - 2) {
           nextDisplays.push({ id: `L${i}`, x: 0.5, y: yPos });
-          nextDisplays.push({ id: `R${i}`, x: width - 0.5, y: yPos });
+          nextDisplays.push({ id: `R${i}`, x: width2 - 0.5, y: yPos });
         }
       }
     }
     return nextDisplays;
   };
-  var buildLargeScreen = (width) => ({
-    x: width / 2,
+  var buildLargeScreen = (width2) => ({
+    x: width2 / 2,
     y: 0.35,
     width: 86 * 0.0254 * 16 / Math.sqrt(337)
   });
-  var buildS210CandidateLayout = (width, length, count, colCount, spreadRows = true) => {
+  var buildS210CandidateLayout = (width2, length, count, colCount, spreadRows = true) => {
     const rowCount = Math.ceil(count / colCount);
     const mics = [];
     for (let row = 0; row < rowCount; row++) {
       const unitsInRow = Math.min(colCount, count - mics.length);
       for (let col = 0; col < unitsInRow; col++) {
         const id = mics.length;
-        const x = unitsInRow === 1 ? width / 2 : (col + 0.5) * width / unitsInRow;
+        const x = unitsInRow === 1 ? width2 / 2 : (col + 0.5) * width2 / unitsInRow;
         const lastRowY = clamp(length - 0.5, 1.2, length - 0.3);
         const firstRearRowY = Math.min(0.8 + 2 * s210BestRange, lastRowY);
         const legacyRatio = rowCount === 1 ? 0.5 : 0.32 + 0.58 * row / (rowCount - 1);
@@ -1695,15 +1710,15 @@
         });
       }
     }
-    return placeS210FrontRow(mics, width, length);
+    return placeS210FrontRow(mics, width2, length);
   };
-  var scoreS210Layout = (mics, width, length) => {
-    const coverage = calculateS210Coverage(mics, width, length);
+  var scoreS210Layout = (mics, width2, length) => {
+    const coverage = calculateS210Coverage(mics, width2, length);
     return { ...coverage, score: coverage.best + coverage.limit };
   };
-  var optimizeS210RearRows = (mics, width, length) => {
+  var optimizeS210RearRows = (mics, width2, length) => {
     let optimized = mics.map((mic) => ({ ...mic }));
-    let currentScore = scoreS210Layout(optimized, width, length).score;
+    let currentScore = scoreS210Layout(optimized, width2, length).score;
     const rowYs = [...new Set(optimized.map((mic) => mic.y))].sort((a, b) => a - b);
     if (rowYs.length < 2) return optimized;
     for (const step of [0.5, 0.1]) {
@@ -1719,7 +1734,7 @@
             const candidateY = clamp(oldY + delta * step, lower, upper);
             if (Math.abs(candidateY - bestY) < 1e-8) continue;
             const candidate = optimized.map((mic) => Math.abs(mic.y - oldY) < 1e-8 ? { ...mic, y: candidateY } : mic);
-            const candidateScore = scoreS210Layout(candidate, width, length).score;
+            const candidateScore = scoreS210Layout(candidate, width2, length).score;
             if (candidateScore > bestScore + 1e-8) {
               bestY = candidateY;
               bestScore = candidateScore;
@@ -1737,28 +1752,28 @@
     }
     return optimized;
   };
-  var buildCoverageOptimizedS210Layout = (width, length) => {
+  var buildCoverageOptimizedS210Layout = (width2, length) => {
     const expandedTarget = { best: 75, limit: 85 };
     let bestFallback = null;
     const bestPickupArea = 3 * Math.PI * s210BestRange ** 2 / 8;
-    const areaLimitedStart = Math.ceil(expandedTarget.best * width * length / (bestPickupArea * 100));
+    const areaLimitedStart = Math.ceil(expandedTarget.best * width2 * length / (bestPickupArea * 100));
     const startCount = Math.max(3, Math.min(S210_MAX_COUNT, areaLimitedStart));
     for (let count = startCount; count <= S210_MAX_COUNT; count++) {
-      const columnOptions = width >= 9 ? [2, 1] : [1];
+      const columnOptions = width2 >= 9 ? [2, 1] : [1];
       let qualifyingLayout = null;
       let qualifyingScore = -Infinity;
       for (const colCount of columnOptions) {
         if (colCount > count) continue;
         const seeds = [
-          buildS210CandidateLayout(width, length, count, colCount, false),
-          buildS210CandidateLayout(width, length, count, colCount, true)
+          buildS210CandidateLayout(width2, length, count, colCount, false),
+          buildS210CandidateLayout(width2, length, count, colCount, true)
         ];
-        const baseline = seeds.map((layout) => ({ layout, ...scoreS210Layout(layout, width, length) })).sort((a, b) => b.score - a.score)[0];
+        const baseline = seeds.map((layout) => ({ layout, ...scoreS210Layout(layout, width2, length) })).sort((a, b) => b.score - a.score)[0];
         if (!bestFallback || baseline.score > bestFallback.score) {
           bestFallback = { layout: baseline.layout, score: baseline.score };
         }
-        const candidate = optimizeS210RearRows(baseline.layout, width, length);
-        const candidateCoverage = scoreS210Layout(candidate, width, length);
+        const candidate = optimizeS210RearRows(baseline.layout, width2, length);
+        const candidateCoverage = scoreS210Layout(candidate, width2, length);
         if (!bestFallback || candidateCoverage.score > bestFallback.score) {
           bestFallback = { layout: candidate, score: candidateCoverage.score };
         }
@@ -1769,63 +1784,63 @@
       }
       if (qualifyingLayout) return qualifyingLayout;
     }
-    return bestFallback ? bestFallback.layout : optimizeS210RearRows(buildS210CandidateLayout(width, length, 3, 1), width, length);
+    return bestFallback ? bestFallback.layout : optimizeS210RearRows(buildS210CandidateLayout(width2, length, 3, 1), width2, length);
   };
-  var buildDirectHostPairLayout = (width, length) => {
-    if (width >= 13) {
+  var buildDirectHostPairLayout = (width2, length) => {
+    if (width2 >= 13) {
       return placeS210FrontRow([
-        { id: 0, x: width * 0.3, y: length * 0.5, label: "S1", facing: "up" },
-        { id: 1, x: width * 0.7, y: length * 0.5, label: "S2", facing: "up" }
-      ], width, length);
+        { id: 0, x: width2 * 0.3, y: length * 0.5, label: "S1", facing: "up" },
+        { id: 1, x: width2 * 0.7, y: length * 0.5, label: "S2", facing: "up" }
+      ], width2, length);
     }
     const frontY = clamp(Math.min(length * 0.46, s210BestRange), 1.2, length - 1.2);
     const rearY = clamp(length - 0.5, frontY + 1.2, length - 0.3);
     return placeS210FrontRow([
-      { id: 0, x: width / 2, y: frontY, label: "S1", facing: "up" },
-      { id: 1, x: width / 2, y: rearY, label: "S2", facing: "up" }
-    ], width, length);
+      { id: 0, x: width2 / 2, y: frontY, label: "S1", facing: "up" },
+      { id: 1, x: width2 / 2, y: rearY, label: "S2", facing: "up" }
+    ], width2, length);
   };
-  var meetsDirectHostTarget = (mics, width, length) => {
-    const coverage = calculateS210Coverage(mics, width, length);
+  var meetsDirectHostTarget = (mics, width2, length) => {
+    const coverage = calculateS210Coverage(mics, width2, length);
     return coverage.best >= s210DirectHostTarget.best && coverage.limit >= s210DirectHostTarget.limit;
   };
-  var buildFixedS210Layout = (width, length, count) => {
+  var buildFixedS210Layout = (width2, length, count) => {
     if (!Number.isInteger(count) || count < 0 || count > S210_MAX_COUNT) throw new RangeError("Invalid S210 count");
     if (count === 0) return [];
-    const candidates = (width >= 9 ? [1, 2] : [1]).filter((cols) => cols <= count).flatMap((cols) => [false, true].map((spread) => optimizeS210RearRows(buildS210CandidateLayout(width, length, count, cols, spread), width, length)));
-    return candidates.sort((a, b) => scoreS210Layout(b, width, length).score - scoreS210Layout(a, width, length).score)[0];
+    const candidates = (width2 >= 9 ? [1, 2] : [1]).filter((cols) => cols <= count).flatMap((cols) => [false, true].map((spread) => optimizeS210RearRows(buildS210CandidateLayout(width2, length, count, cols, spread), width2, length)));
+    return candidates.sort((a, b) => scoreS210Layout(b, width2, length).score - scoreS210Layout(a, width2, length).score)[0];
   };
-  var buildS210Layout = (width, length, s210s, fixedCount = null) => {
-    if (fixedCount !== null) return buildFixedS210Layout(width, length, fixedCount);
+  var buildS210Layout = (width2, length, s210s, fixedCount = null) => {
+    if (fixedCount !== null) return buildFixedS210Layout(width2, length, fixedCount);
     const shallowRoom = length <= 6;
     if (shallowRoom) {
-      const single = buildS210CandidateLayout(width, length, 1, 1);
-      if (meetsDirectHostTarget(single, width, length)) return single;
+      const single = buildS210CandidateLayout(width2, length, 1, 1);
+      if (meetsDirectHostTarget(single, width2, length)) return single;
     }
     const existingPair = s210s.length === 2 ? placeS210FrontRow(s210s.map((mic, index) => ({
       ...mic,
       id: index,
-      x: clamp(mic.x, 0.3, width - 0.3),
+      x: clamp(mic.x, 0.3, width2 - 0.3),
       y: clamp(mic.y, 0.3, length - 0.3),
       label: mic.label || `S${index + 1}`
-    })), width, length) : null;
-    if (existingPair && meetsDirectHostTarget(existingPair, width, length)) {
+    })), width2, length) : null;
+    if (existingPair && meetsDirectHostTarget(existingPair, width2, length)) {
       return existingPair;
     }
-    const proposedPair = buildDirectHostPairLayout(width, length);
-    if (meetsDirectHostTarget(proposedPair, width, length)) {
+    const proposedPair = buildDirectHostPairLayout(width2, length);
+    if (meetsDirectHostTarget(proposedPair, width2, length)) {
       return proposedPair;
     }
     if (shallowRoom) {
-      const optimizedPair = buildFixedS210Layout(width, length, 2);
-      if (meetsDirectHostTarget(optimizedPair, width, length)) return optimizedPair;
+      const optimizedPair = buildFixedS210Layout(width2, length, 2);
+      if (meetsDirectHostTarget(optimizedPair, width2, length)) return optimizedPair;
     }
-    return buildCoverageOptimizedS210Layout(width, length);
+    return buildCoverageOptimizedS210Layout(width2, length);
   };
-  var buildSpeakerLayout = (width, length) => {
+  var buildSpeakerLayout = (width2, length) => {
     const pairCount = Math.max(2, Math.ceil(length / 9.5));
-    const leftX = clamp(0.8, 0.3, width / 2);
-    const rightX = clamp(width - 0.8, width / 2, width - 0.3);
+    const leftX = clamp(0.8, 0.3, width2 / 2);
+    const rightX = clamp(width2 - 0.8, width2 / 2, width2 - 0.3);
     const nextSpeakers = [];
     for (let i = 0; i < pairCount; i++) {
       const y = pairCount === 1 ? length / 2 : 1.5 + i * (length - 3) / (pairCount - 1);
@@ -1837,84 +1852,85 @@
 
   // src/domain/presets.js
   function getPresetLayout(preset) {
+    if (preset === "hall26x15") return { width: 26, length: 15, teacherCam: { x: 13, y: 10 }, studentCams: [{ id: 0, x: 13, y: 0.15 }], hub: { x: 0.41, y: 0 }, largeScreen: buildLargeScreen(26), displaySize: "75" };
     if (preset === "standard") {
-      const width = 8;
+      const width2 = 8;
       const length = 10;
       return {
-        width,
+        width: width2,
         length,
-        teacherCam: { x: width / 2, y: 5 },
-        studentCams: [{ id: 0, x: width / 2, y: 1 }],
+        teacherCam: { x: width2 / 2, y: 5 },
+        studentCams: [{ id: 0, x: width2 / 2, y: 1 }],
         speakers: [
           { id: 0, x: 0.8, y: 1.5 },
-          { id: 1, x: width - 0.8, y: 1.5 },
+          { id: 1, x: width2 - 0.8, y: 1.5 },
           { id: 2, x: 0.8, y: length - 1.5 },
-          { id: 3, x: width - 0.8, y: length - 1.5 }
+          { id: 3, x: width2 - 0.8, y: length - 1.5 }
         ],
-        largeScreen: buildLargeScreen(width),
+        largeScreen: buildLargeScreen(width2),
         hub: { x: 1.5, y: 1 },
         displaySize: "55"
       };
     }
     if (preset === "large") {
-      const width = 10;
+      const width2 = 10;
       const length = 20;
       return {
-        width,
+        width: width2,
         length,
-        teacherCam: { x: width / 2, y: 7 },
-        studentCams: [{ id: 0, x: width / 2, y: 1 }],
+        teacherCam: { x: width2 / 2, y: 7 },
+        studentCams: [{ id: 0, x: width2 / 2, y: 1 }],
         speakers: [
           { id: 0, x: 1, y: 2 },
-          { id: 1, x: width - 1, y: 2 },
+          { id: 1, x: width2 - 1, y: 2 },
           { id: 2, x: 1, y: 9 },
-          { id: 3, x: width - 1, y: 9 },
+          { id: 3, x: width2 - 1, y: 9 },
           { id: 4, x: 1, y: 16 },
-          { id: 5, x: width - 1, y: 16 }
+          { id: 5, x: width2 - 1, y: 16 }
         ],
-        largeScreen: buildLargeScreen(width),
+        largeScreen: buildLargeScreen(width2),
         hub: { x: 1.5, y: 1 },
         displaySize: "65"
       };
     }
     if (preset === "lecture") {
-      const width = 12;
+      const width2 = 12;
       const length = 15;
       return {
-        width,
+        width: width2,
         length,
-        teacherCam: { x: width / 2, y: 7 },
-        studentCams: [{ id: 0, x: width / 2, y: 1 }],
+        teacherCam: { x: width2 / 2, y: 7 },
+        studentCams: [{ id: 0, x: width2 / 2, y: 1 }],
         speakers: [
           { id: 0, x: 1, y: 2 },
-          { id: 1, x: width - 1, y: 2 },
+          { id: 1, x: width2 - 1, y: 2 },
           { id: 2, x: 1, y: length - 2 },
-          { id: 3, x: width - 1, y: length - 2 }
+          { id: 3, x: width2 - 1, y: length - 2 }
         ],
-        largeScreen: buildLargeScreen(width),
+        largeScreen: buildLargeScreen(width2),
         hub: { x: 1.5, y: 1 },
         displaySize: "65"
       };
     }
     if (preset === "ultra") {
-      const width = 17;
+      const width2 = 17;
       const length = 37;
       return {
-        width,
+        width: width2,
         length,
-        teacherCam: { x: width / 2, y: 9 },
-        studentCams: [{ id: 0, x: width / 2, y: 1 }],
+        teacherCam: { x: width2 / 2, y: 9 },
+        studentCams: [{ id: 0, x: width2 / 2, y: 1 }],
         speakers: [
           { id: 0, x: 1.5, y: 3 },
-          { id: 1, x: width - 1.5, y: 3 },
+          { id: 1, x: width2 - 1.5, y: 3 },
           { id: 2, x: 1.5, y: 15 },
-          { id: 3, x: width - 1.5, y: 15 },
+          { id: 3, x: width2 - 1.5, y: 15 },
           { id: 4, x: 1.5, y: 27 },
-          { id: 5, x: width - 1.5, y: 27 },
+          { id: 5, x: width2 - 1.5, y: 27 },
           { id: 6, x: 1.5, y: length - 3 },
-          { id: 7, x: width - 1.5, y: length - 3 }
+          { id: 7, x: width2 - 1.5, y: length - 3 }
         ],
-        largeScreen: buildLargeScreen(width),
+        largeScreen: buildLargeScreen(width2),
         hub: { x: 2, y: 1.5 },
         displaySize: "75"
       };
@@ -1923,8 +1939,8 @@
   }
 
   // src/domain/camera-layout.js
-  function placeCv870Cameras({ width, depth, teacher, students, teacherModel, studentModel }) {
-    const center = width / 2;
+  function placeCv870Cameras({ width: width2, depth, teacher, students, teacherModel, studentModel }) {
+    const center = width2 / 2;
     return {
       teacher: teacherModel === "CV870" ? { x: center, y: Math.min(depth, 10) } : teacher,
       students: studentModel === "CV870" ? [{ id: 0, x: center, y: 0 }] : students
@@ -1944,27 +1960,27 @@
   }
 
   // src/domain/recalculate.js
-  function recalculateLayout({ width, depth, teacher, students, teacherModel = "CV870", studentModel = "CV870", s210s = [], displaySize = "55", s210Count = null }) {
-    const cameras = placeCv870Cameras({ width, depth, teacher, students, teacherModel, studentModel });
+  function recalculateLayout({ width: width2, depth, teacher, students, teacherModel = "CV870", studentModel = "CV870", s210s = [], displaySize = "55", s210Count = null }) {
+    const cameras = placeCv870Cameras({ width: width2, depth, teacher, students, teacherModel, studentModel });
     return {
       teacherCam: cameras.teacher,
       studentCams: cameras.students,
-      s210s: buildS210Layout(width, depth, s210s, s210Count),
-      speakers: buildSpeakerLayout(width, depth),
-      displays: buildAuxDisplays(width, depth, displaySize),
-      largeScreen: buildLargeScreen(width)
+      s210s: buildS210Layout(width2, depth, s210s, s210Count),
+      speakers: buildSpeakerLayout(width2, depth),
+      displays: buildAuxDisplays(width2, depth, displaySize),
+      largeScreen: buildLargeScreen(width2)
     };
   }
 
   // src/domain/lecture-hall.js
-  var tieredRoom = ({ width, depth }) => width > 15 || depth > 15;
-  function hallLayout({ width, depth, height = 3 }) {
-    if (!tieredRoom({ width, depth }) || width < 4 || width > 30 || depth < 5 || depth > 50) return null;
+  var tieredRoom = ({ width: width2, depth }) => width2 > 15 || depth > 15;
+  function hallLayout({ width: width2, depth, height: height2 = 3 }) {
+    if (!tieredRoom({ width: width2, depth }) || width2 < 4 || width2 > 30 || depth < 5 || depth > 50) return null;
     const start = Math.min(3.25, depth * 0.34);
     const pitch = Math.min(1.5, (depth - start - 1.6) / 2);
     const rows = Math.max(2, 1 + Math.floor((depth - 2.15 - start) / pitch));
-    const rise = Math.min(0.115, Math.max(0, height - 2.22) / (rows - 1));
-    const bank = Math.max(1, Math.floor((width / 2 - 1.35) / 1.03));
+    const rise = Math.min(0.115, Math.max(0, height2 - 2.22) / (rows - 1));
+    const bank = Math.max(1, Math.floor((width2 / 2 - 1.35) / 1.03));
     const tiers = [], seats = [];
     for (let row = 0; row < rows; row++) {
       const z = start + row * pitch, top = 0.02 + row * rise;
@@ -1972,7 +1988,7 @@
       for (let column = 0; column < bank * 2; column++) {
         const side = column < bank ? -1 : 1;
         const index = column < bank ? bank - column - 1 : column - bank;
-        const x = width / 2 + side * (0.71 + (0.5 + index) * (width / 2 - 1.1) / bank);
+        const x = width2 / 2 + side * (0.71 + (0.5 + index) * (width2 / 2 - 1.1) / bank);
         seats.push({ row, column, x, y: z + pitch * 0.47, rise: top });
       }
     }
@@ -1981,13 +1997,13 @@
   var WALL_BASE_DEPTH = 0.08;
   var FIRST_ROW = 3;
   var REAR_CLEARANCE = 0.6;
-  function furniturePositions({ width, depth }, rearExtent) {
-    const columns = Math.max(1, Math.floor(width / 3.2));
+  function furniturePositions({ width: width2, depth }, rearExtent) {
+    const columns = Math.max(1, Math.floor(width2 / 3.2));
     const rows = Math.max(1, Math.floor((depth - 2.5) / 2.5));
     const last = depth - WALL_BASE_DEPTH / 2 - REAR_CLEARANCE - rearExtent;
     const step = rows > 1 ? (last - FIRST_ROW) / (rows - 1) : 0;
     return Array.from({ length: rows * columns }, (_, index) => [
-      (index % columns + 0.5) * width / columns,
+      (index % columns + 0.5) * width2 / columns,
       0,
       FIRST_ROW + Math.floor(index / columns) * step
     ]);
@@ -2000,6 +2016,7 @@
     return { rows: tables.length / bank, bank, seats: tables.flatMap(([x, , z], i) => [-0.27, 0.27].map((offset, j) => ({ x: x + offset, y: z + 0.58, rise: 0, row: Math.floor(i / bank), column: i % bank * 2 + j }))) };
   }
   function speakerMount(room, point, index, count) {
+    if (point.mount) return { ...point, depth: point.y ?? point.depth };
     const front = !tieredRoom(room) && index < 2;
     const rear = !tieredRoom(room) && !front && index >= count - 2;
     const left = point.x < room.width / 2;
@@ -2016,8 +2033,8 @@
     const lead = (primary - secondary) / 0.343;
     return { primary, secondary, lead, low: Math.max(0, lead + 5), high: Math.max(0, lead + 10) };
   }
-  function zonePairs(speakers, width, right) {
-    return speakers.filter((s) => s.x >= width / 2 === right).sort((a, b) => a.depth - b.depth).filter((s, i, all) => !i || s.depth > all[i - 1].depth + 0.01);
+  function zonePairs(speakers, width2, right) {
+    return speakers.filter((s) => s.x >= width2 / 2 === right).sort((a, b) => a.depth - b.depth).filter((s, i, all) => !i || s.depth > all[i - 1].depth + 0.01);
   }
   function acousticReview(room, speakers) {
     const hall = listeningLayout(room);
@@ -2054,17 +2071,102 @@
     return notes;
   }
 
+  // src/domain/reinforcement.js
+  var EBS630 = "EBS-630";
+  var ceilingRadius = (height2, rise = 0) => Math.max(0, height2 - rise - 1.2) * Math.tan(55 * Math.PI / 180);
+  function audioProfile(room, options = {}, model = "NDP600") {
+    const compatible = ["NDP200", "NDP600", "NMP311"].includes(model);
+    const wireless = compatible && (options.pickupMode ? options.pickupMode === "wireless" : tieredRoom(room) || options.speakerModel === EBS630);
+    return {
+      ...options,
+      speakerModel: options.speakerModel === EBS630 ? EBS630 : "PS610",
+      pickupMode: wireless ? "wireless" : "distributed",
+      d90: compatible && (wireless || Boolean(options.d90))
+    };
+  }
+  function stageMics(width2, depth) {
+    return [0.32, 0.68].map((fraction, id) => ({ id, x: width2 * fraction, y: Math.min(2, depth * 0.23), facing: "up", label: "S" + (id + 1) }));
+  }
+  function ceilingCoverage(room, speakers) {
+    const seats = listeningLayout(room)?.seats || [];
+    const missed = seats.filter((seat) => !speakers.some((p) => Math.hypot(p.x - seat.x, (p.depth ?? p.y) - seat.y) <= ceilingRadius(p.height ?? room.height, seat.rise)));
+    return {
+      total: seats.length,
+      missed,
+      columns: new Set(speakers.map((s) => s.x)).size,
+      rows: new Set(speakers.map((s) => s.depth ?? s.y)).size
+    };
+  }
+  function ceilingGrid(room) {
+    const { width: width2, depth, height: height2 } = room;
+    const hall = hallLayout(room);
+    const seats = listeningLayout(room, hall)?.seats || [];
+    if (!seats.length) return [];
+    const start = hall?.tiers[0].start ?? Math.max(0, Math.min(...seats.map((s) => s.y)) - 1.2);
+    const span = depth - start;
+    let best = [], bestMiss = Infinity;
+    for (let count = 1; count <= 100; count++) {
+      const shapes = [];
+      for (let rows = 1; rows <= count; rows++) if (count % rows === 0) {
+        const cols = count / rows;
+        shapes.push({ rows, cols, aspect: Math.abs(Math.log(width2 / cols / (span / rows))) });
+      }
+      shapes.sort((a, b) => a.aspect - b.aspect);
+      for (const { rows, cols } of shapes) {
+        let missed = 0;
+        for (const s of seats) {
+          const col = Math.min(cols - 1, Math.max(0, Math.floor(s.x / width2 * cols)));
+          const row = Math.min(rows - 1, Math.max(0, Math.floor((s.y - start) / span * rows)));
+          if (Math.hypot(s.x - (col + 0.5) * width2 / cols, s.y - start - (row + 0.5) * span / rows) > ceilingRadius(height2, s.rise)) missed++;
+          if (missed >= bestMiss) break;
+        }
+        if (missed >= bestMiss) continue;
+        bestMiss = missed;
+        best = Array.from({ length: count }, (_, id) => ({
+          id,
+          model: EBS630,
+          mount: "ceiling",
+          direction: "down",
+          x: (id % cols + 0.5) * width2 / cols,
+          y: start + (Math.floor(id / cols) + 0.5) * span / rows,
+          height: height2
+        }));
+        if (!missed) return best;
+      }
+    }
+    return best;
+  }
+  function reinforcementLayout(room, model, preset) {
+    if (model === EBS630) return ceilingGrid(room);
+    const { width: width2, depth, height: height2 } = room;
+    if (preset !== "hall26x15") return buildSpeakerLayout(width2, depth);
+    const pair = (y, mount, direction, fraction) => [fraction, 1 - fraction].map((f) => ({
+      x: width2 * f,
+      y,
+      mount,
+      direction: direction || (f < 0.5 ? "right" : "left"),
+      model: "PS610",
+      height: mount === "rear-overhead" ? height2 - 0.35 : Math.min(2.5, height2 - 0.3)
+    }));
+    return [
+      ...pair(0.08, "front-wall", "rear", 0.27),
+      ...pair(depth * 0.32, "side-wall", null, 0),
+      ...pair(depth * 0.65, "side-wall", null, 0),
+      ...pair(depth - 0.65, "rear-overhead", "front", 0.27)
+    ].map((point, id) => ({ ...point, id }));
+  }
+
   // src/domain/audio-plan.js
-  var AUDIO_POLICY_VERSION = "2026-11-25";
+  var AUDIO_POLICY_VERSION = "2026-11-26";
   var BUILTIN_AMP_MODELS = ["NDP600", "NDP200", "NMP311", "SL100"];
   var emptyAudioConfig = () => ({ useBuiltInAmp: true, amplifier: {}, feedback: {} });
   function confirmedEquipment(item, requiredCapacity) {
     return item?.confirmed === true && typeof item.model === "string" && item.model.trim().length > 0 && typeof item.notes === "string" && item.notes.trim().length > 0 && Number.isInteger(item.capacity) && item.capacity >= requiredCapacity;
   }
-  function minimumPickup(width, depth) {
-    if (![width, depth].every((n) => Number.isFinite(n) && n > 0)) return null;
-    const layout = buildS210Layout(width, depth, []);
-    const coverage = calculateS210Coverage(layout, width, depth);
+  function minimumPickup(width2, depth) {
+    if (![width2, depth].every((n) => Number.isFinite(n) && n > 0)) return null;
+    const layout = buildS210Layout(width2, depth, []);
+    const coverage = calculateS210Coverage(layout, width2, depth);
     const target = layout.length <= 2 ? { best: 80, limit: 95 } : { best: 75, limit: 85 };
     return {
       count: layout.length,
@@ -2073,34 +2175,44 @@
     };
   }
   function evaluateAudioPlan({
-    width,
+    width: width2,
     depth,
     s210Count,
     speakerCount,
     qnexModel = "NDP600",
     speakers = [],
-    height = 3,
+    height: height2 = 3,
     audioConfig = {},
-    minimum = minimumPickup(width, depth)
+    minimum = minimumPickup(width2, depth)
   }) {
-    const builtInSpeakers = audioConfig.useBuiltInAmp !== false && BUILTIN_AMP_MODELS.includes(qnexModel) ? Math.min(2, speakerCount) : 0;
-    const externalSpeakers = Math.max(0, speakerCount - builtInSpeakers);
-    const amplifierRequired = speakerCount > 0 && (speakerCount >= 6 || width * depth > 150);
-    const feedbackRequired = s210Count > 0 && speakerCount > 0;
+    const largeRoom = width2 * depth > 150;
+    const hasBuiltIn = BUILTIN_AMP_MODELS.includes(qnexModel) && audioConfig.useBuiltInAmp !== false;
+    const builtInSpeakers = hasBuiltIn && speakerCount <= 4 && !(largeRoom && speakerCount <= 2) ? Math.min(2, speakerCount) : 0;
+    const externalSpeakers = speakerCount - builtInSpeakers;
+    const amplifierRequired = externalSpeakers > 0;
+    const wireless = audioConfig.pickupMode === "wireless";
+    const feedbackRequired = !wireless && s210Count > 0 && speakerCount > 0;
     const amplifierProvided = amplifierRequired && confirmedEquipment(audioConfig.amplifier, externalSpeakers || 1);
     const feedbackProvided = feedbackRequired && confirmedEquipment(audioConfig.feedback, 1);
     const amplifierQuantity = amplifierRequired ? Math.max(1, Math.ceil(externalSpeakers / 4)) : 0;
-    const mounts = speakers.slice(0, speakerCount).map((p, i) => p.mount ? p : { ...speakerMount({ width, depth }, p, i, speakers.length), height: Math.min(2.5, height - 0.3) });
-    const review = acousticReview({ width, depth, height }, mounts);
+    const mounts = speakers.slice(0, speakerCount).map((p, i) => p.mount ? { ...p, depth: p.depth ?? p.y } : { ...speakerMount({ width: width2, depth }, p, i, speakers.length), height: Math.min(2.5, height2 - 0.3) });
+    const review = acousticReview({ width: width2, depth, height: height2 }, mounts.filter((s) => s.mount !== "ceiling"));
+    const model = audioConfig.speakerModel || "PS610";
+    const ceiling = model === EBS630 ? ceilingCoverage({ width: width2, depth, height: height2 }, mounts) : null;
     return {
       review,
+      model,
+      ceiling,
+      wireless,
+      d90: Boolean(audioConfig.d90 || wireless),
+      miniMixer: qnexModel === "NDP200" && Boolean(audioConfig.d90 || wireless),
       policyVersion: AUDIO_POLICY_VERSION,
       minimum,
       actualCount: s210Count,
-      reviewSuggested: s210Count > 0 && minimum?.count >= 4,
+      reviewSuggested: !wireless && s210Count > 0 && minimum?.count >= 4,
       suggestedCount: minimum ? Math.min(S210_MAX_COUNT, minimum.count + 2) : null,
-      engineeringReview: !!minimum && (minimum.unmet || minimum.count >= S210_MAX_COUNT || s210Count >= S210_MAX_COUNT),
-      a3006Required: s210Count >= 3,
+      engineeringReview: !wireless && !!minimum && (minimum.unmet || minimum.count >= S210_MAX_COUNT || s210Count >= S210_MAX_COUNT),
+      a3006Required: !wireless && s210Count >= 3,
       overCapacity: s210Count > S210_MAX_COUNT,
       amplifierRequired,
       amplifierQuantity,
@@ -2117,15 +2229,27 @@
   }
   function audioPlanNotes(plan, config = {}, lang = "en") {
     const zh = lang === "zh", notes = [];
-    if (plan.actualCount > 0 && plan.minimum) {
+    if (plan.wireless) notes.push(zh ? "\u6559\u5E08\u8170\u5305\u9EA6\u4E0E\u5B66\u751F\u624B\u6301\u9EA6\u7528\u4E8E\u6269\u58F0\u548C\u5F55\u64AD\u3002\u821E\u53F0 S210 \u4EC5\u9001\u5F55\u64AD\u4E3B\u673A\u3002" : "Teacher bodypack and student handheld feed PA and recording. Stage S210 feeds recording only.");
+    if (plan.miniMixer) notes.push(zh ? "\u9E45\u9888\u9EA6\u5E95\u5EA7\u4E0E D90 \u63A5\u6536\u673A \u2192 \u56DB\u901A\u9053\u7EBF\u8DEF\u6DF7\u97F3\u5668 \u2192 NMP311 MIC IN\u3002" : "Gooseneck base and D90 receiver \u2192 four-channel line mixer \u2192 NMP311 MIC IN.");
+    if (plan.ceiling && !plan.ceiling.total) notes.push(zh ? "\u5F53\u524D\u5C3A\u5BF8\u6CA1\u6709\u53EF\u9A8C\u8BC1\u7684\u5EA7\u4F4D\u5E03\u5C40\uFF0C\u9700\u63D0\u4F9B\u5EA7\u4F4D\u56FE\u540E\u8BA1\u7B97\u3002" : "Provide a seating plan to size loudspeakers for these dimensions.");
+    if (plan.ceiling?.total) {
+      const { total, missed, columns, rows } = plan.ceiling;
+      if (columns && rows) notes.push(zh ? `\u6A2A\u5411 ${columns} \u5217 \xD7 \u7EB5\u6DF1 ${rows} \u6392\uFF0C\u6309\u5404\u6392\u5EA7\u4F4D\u6807\u9AD8\u8BA1\u7B97\u3002` : `${columns} across \xD7 ${rows} rows, sized for the elevation of each seating row.`);
+      notes.push(zh ? `EBS-630 \u6807\u79F0 110\xB0\uFF0C\u5750\u59FF\u8033\u9AD8 1.2 m\u3002\u51E0\u4F55\u8986\u76D6 ${total - missed.length}/${total} \u5EA7\uFF1B\u73B0\u573A\u590D\u6838\u58F0\u538B\u548C\u6E05\u6670\u5EA6\u3002` : `EBS-630 nominal 110\xB0 cone, seated ear height 1.2 m. Geometric coverage ${total - missed.length}/${total} seats; verify SPL and intelligibility on site.`);
+    }
+    if (!plan.wireless && plan.actualCount > 0 && plan.minimum) {
       notes.push(zh ? `S210\uFF1A\u7B97\u6CD5\u6700\u4F4E ${plan.minimum.count} \u652F\uFF1B\u5F53\u524D\u91C7\u7528 ${plan.actualCount} \u652F\u3002` : `S210: calculated minimum ${plan.minimum.count}; selected ${plan.actualCount}.`);
       if (plan.reviewSuggested && plan.suggestedCount > plan.minimum.count) notes.push(zh ? `\u5EFA\u8BAE\u4EBA\u5DE5\u6BD4\u8F83 ${plan.minimum.count} \u4E0E ${plan.suggestedCount} \u652F\u65B9\u6848\uFF1B\u589E\u52A0\u6570\u91CF\u987B\u7ECF\u4E1A\u52A1\u786E\u8BA4\u3002` : `Manually compare ${plan.minimum.count} versus ${plan.suggestedCount} microphones; extra units require project confirmation.`);
       if (plan.engineeringReview) notes.push(zh ? "\u5DF2\u8FBE\u5230\u5BB9\u91CF\u4E0A\u9650\u6216\u6700\u4F4E\u8986\u76D6\u672A\u8FBE\u6807\uFF0C\u8BF7\u5DE5\u7A0B\u590D\u6838\u3002" : "Engineering review required: capacity limit reached or minimum coverage target unmet.");
       notes.push(zh ? "\u8986\u76D6\u4E3A\u51E0\u4F55\u4F30\u7B97\uFF0C\u9700\u73B0\u573A\u6838\u5B9E\u6DF7\u54CD\u3001\u566A\u58F0\u548C\u5B89\u88C5\u6761\u4EF6\u3002" : "Coverage is a geometric estimate; verify reverberation, noise and mounting on site.");
     }
     if (plan.amplifierRequired) {
-      notes.push(zh ? `\u529F\u653E\u5206\u914D\uFF1AQ-NEX \u5185\u7F6E\u529F\u653E\uFF082\xD740W\uFF09\u5E26 ${plan.builtInSpeakers} \u53EA\uFF1B\u5916\u7F6E\u529F\u653E\u5E26 ${plan.externalSpeakers} \u53EA PS610\u3002` : `Amplifier routing: Q-NEX built-in amplifier (2 x 40W) serves ${plan.builtInSpeakers}; external amplification serves ${plan.externalSpeakers} PS610 speakers.`);
-      if (!plan.amplifierProvided) notes.push(zh ? "EKA-415\uFF1A\u6BCF\u901A\u9053\u4E00\u53EAPS610\uFF1B\u987B\u786E\u8BA4\u9650\u5E45/\u589E\u76CA\u8C03\u8BD5\u53CAAC220V/50Hz\u7535\u6E90\u3002\u516D\u53EA\u5168\u90E8\u63A5\u4E00\u53F0\u4EC5\u4F5C\u4E3A\u5DF2\u6838\u5B9E\u8D1F\u8F7D\u4E0E\u63A5\u7EBF\u7684\u4EBA\u5DE5\u5DE5\u7A0B\u5907\u9009\u3002" : "EKA-415: one PS610 per channel; confirm limiter/gain commissioning and AC220V/50Hz supply. Six speakers on one EKA-415 is a manual engineering alternative only after load and wiring verification.");
+      if (plan.externalSpeakers > 4 && !plan.amplifierProvided) {
+        const n = plan.amplifierQuantity;
+        const loads = Array.from({ length: n }, (_, i) => Math.floor(plan.externalSpeakers / n) + (i < plan.externalSpeakers % n ? 1 : 0));
+        notes.push(zh ? "\u5404\u53F0 EKA-415 \u7684\u97F3\u7BB1\u6570\u91CF\u4E3A " + loads.join(" + ") + "\u3002" : "Speakers per EKA-415: " + loads.join(" + ") + ".");
+      }
+      notes.push(zh ? `\u5185\u7F6E\u529F\u653E\u5E26 ${plan.builtInSpeakers} \u53EA\uFF0C\u5916\u7F6E\u529F\u653E\u5E26 ${plan.externalSpeakers} \u53EA ${plan.model}\u3002EKA-415 \u6BCF\u901A\u9053\u4E00\u53EA\uFF0C\u5728\u7EBF\u8DEF\u7535\u5E73\u4FA7\u5206\u914D\u4FE1\u53F7\u3002\u8BF7\u6838\u5BF9\u9650\u5E45\u3001\u589E\u76CA\u4E0E AC220V/50Hz\u3002` : `Built-in amplifier: ${plan.builtInSpeakers}; external amplifier(s): ${plan.externalSpeakers} ${plan.model}. One speaker per EKA-415 channel, line-level distribution. Verify limiter, gain and AC220V/50Hz.`);
     }
     for (const [key, provided, invalid] of [["amplifier", plan.amplifierProvided, plan.amplifierDeclarationInvalid], ["feedback", plan.feedbackProvided, plan.feedbackDeclarationInvalid]]) {
       const label = key === "amplifier" ? zh ? "\u529F\u653E" : "Amplifier" : zh ? "\u53CD\u9988\u6291\u5236\u5668" : "Feedback suppressor";
@@ -2167,6 +2291,7 @@
     if (snapshot.audioConfig !== void 0) {
       const config = snapshot.audioConfig;
       if (!config || typeof config !== "object" || Array.isArray(config) || config.useBuiltInAmp !== void 0 && typeof config.useBuiltInAmp !== "boolean") return "snapshotInvalid";
+      if (config.speakerModel !== void 0 && !["EBS-630", "PS610"].includes(config.speakerModel) || config.pickupMode !== void 0 && !["wireless", "distributed"].includes(config.pickupMode) || config.d90 !== void 0 && typeof config.d90 !== "boolean") return "snapshotInvalid";
       for (const key of ["amplifier", "feedback"]) {
         const item = config[key];
         if (item === void 0) continue;
@@ -2213,6 +2338,7 @@
     showDisplays,
     showLargeScreen,
     displayPlan,
+    preset,
     qnexModel = "NDP600",
     audioConfig = emptyAudioConfig(),
     s210Request = { mode: "fixed", count: s210s.length }
@@ -2222,6 +2348,7 @@
       ...displayPlan ? { displayPlan } : {},
       projectTitle,
       lang,
+      ...preset === "hall26x15" ? { preset } : {},
       room: { width: roomWidth, depth: roomLength, height: roomHeight },
       cameraPlan: { teacher: activeCameraPlan.teacher, student: activeCameraPlan.student, studentQty: activeStudentQty },
       layout: { teacherCam, studentCams: studentCams.slice(0, activeStudentQty), s210s, speakers, displays, largeScreen, hub },
@@ -2254,14 +2381,18 @@
     const { line } = window.Quotation;
     const lines = [...window.Quotation.qnexLines(v.qnexModel), line("LCS810 GEN2", 1, "K3200N1-D15 recording host for lecture capture and USB hybrid learning. Audio-processing and interaction modules are optional; confirm ordered options.")];
     v.cameraBomLines.forEach((l) => lines.push(line(l.model.label, l.quantity, `${l.role === v.longDistanceCopy.teacher ? "Teacher" : "Student"} camera for lecture recording; confirm GEN2 protocol, tracking and power compatibility.`)));
-    if (v.showS210) lines.push(line("S210", v.s210s.length, "Ceiling microphone for room voice capture. Confirm GEN2 audio configuration and on-site coverage."));
+    if (v.audioPlan.d90) lines.push(line("D90", 1, "Dual-channel wireless system for teacher and student speech."));
+    if (v.audioPlan.miniMixer) lines.push(line("4-Channel Mini Line Mixer", 1, "Combines the gooseneck base and the D90 receiver for the NDP200 microphone input."));
+    if (v.showS210) lines.push(line("S210", v.s210s.length, v.audioPlan.wireless ? "Stage pickup for recording only." : "Ceiling microphone for room voice capture. Confirm GEN2 audio configuration and on-site coverage."));
     if (v.needsA3006) lines.push(line("A3006", 1, "S210 microphone expansion mixer. Confirm GEN2 routing and USB conferencing compatibility."));
-    if (v.showSpeakers) lines.push(line("PS610", v.speakers.length, "Room sound reinforcement speaker. Amplification and load matching require confirmation."));
+    if (v.showSpeakers) lines.push(line(v.audioPlan.model, v.speakers.length, "Room sound reinforcement speaker. Amplification and load matching require confirmation."));
     if (v.needsCameraPoEExpansion) lines.push(line("External PoE switch", 1, "Camera network expansion; select model, PoE budget, VLAN and control path."));
     if (v.audioPlan.purchaseFeedback) lines.push(line("FE-224N", v.audioPlan.purchaseFeedback, "Required feedback suppressor on the microphone reinforcement path; coordinate with A3006 DSP. Confirm generation and routing."));
-    if (v.audioPlan.purchaseAmplifiers) lines.push(line("EKA-415", v.audioPlan.purchaseAmplifiers, `Required external amplifier. Q-NEX serves ${v.audioPlan.builtInSpeakers} PS610; external amplifier(s) serve ${v.audioPlan.externalSpeakers}. One speaker per channel; confirm limiter/gain commissioning and AC220V/50Hz supply.`));
+    if (v.audioPlan.purchaseAmplifiers) lines.push(line("EKA-415", v.audioPlan.purchaseAmplifiers, `Required external amplifier. Q-NEX serves ${v.audioPlan.builtInSpeakers} speakers; external amplifier(s) serve ${v.audioPlan.externalSpeakers}. One speaker per channel; confirm limiter/gain commissioning and AC220V/50Hz supply.`));
     if (v.displayPlan) for (const { screen, count } of DisplayFit.groups(v.displayPlan.screens)) lines.push(line(DisplayFit.quotationName(screen), count, `${screen.widthMm} \xD7 ${screen.heightMm} \xD7 ${screen.depthMm} mm`));
-    else if (v.showLargeScreen) lines.push(line("QA1400 Pro 86-inch", 1, "86-inch interactive flat panel for teaching presentations, touch interaction and hybrid learning."));
+    else if (v.showLargeScreen && v.preset === "hall26x15") {
+      lines.push(line("200-inch motorized projection screen", 1, "Stage presentation screen."), line("Laser projector", 1, "Ceiling projector for the stage screen. Confirm throw and light output."));
+    } else if (v.showLargeScreen) lines.push(line("QA1400 Pro 86-inch", 1, "86-inch interactive flat panel for teaching presentations, touch interaction and hybrid learning."));
     if (!v.displayPlan && v.showDisplays) lines.push(line(`Auxiliary Display / TV ${v.displaySize}-inch`, v.displays.length, "Auxiliary display coverage; model, mounting and signal distribution require selection."));
     return {
       sceneKind: "lcs",
@@ -2432,7 +2563,7 @@
   // src/components/AudioPlanning.jsx
   function PickupSuggestion() {
     const { audioPlan: p, s210Request, lang, showS210, handleAdoptSuggested, roomIsValid } = useApp();
-    if (!roomIsValid || !showS210 || !p.minimum) return null;
+    if (!roomIsValid || !showS210 || p.wireless || !p.minimum) return null;
     const zh = lang === "zh";
     return /* @__PURE__ */ React.createElement("div", { id: "pickup-suggestion", className: "lcs-pickup-summary", "data-mode": s210Request.mode }, /* @__PURE__ */ React.createElement("span", null, zh ? `S210\uFF1A\u6700\u4F4E ${p.minimum.count} \xB7 \u5F53\u524D ${p.actualCount}` : `S210: minimum ${p.minimum.count} \xB7 selected ${p.actualCount}`, " \xB7 ", s210Request.mode === "auto" ? zh ? "\u81EA\u52A8" : "Automatic" : zh ? "\u6307\u5B9A\u6570\u91CF" : "Specified quantity"), p.reviewSuggested && p.suggestedCount > p.minimum.count && /* @__PURE__ */ React.createElement("span", null, zh ? `\u5EFA\u8BAE\u4EBA\u5DE5\u8BC4\u4F30 ${p.suggestedCount} \u652F\uFF1B\u8986\u76D6\u4E3A\u4F30\u7B97\u3002` : `Review ${p.suggestedCount} microphones on site; coverage is estimated.`), p.reviewSuggested && p.suggestedCount > p.actualCount && /* @__PURE__ */ React.createElement(
       "button",
@@ -2445,19 +2576,20 @@
     ), p.engineeringReview && /* @__PURE__ */ React.createElement("strong", null, zh ? "\u5BB9\u91CF\u6216\u8986\u76D6\u9700\u5DE5\u7A0B\u590D\u6838" : "Capacity / coverage needs engineering review"));
   }
   function AudioEquipmentControls() {
-    const { audioConfig, setAudioConfig, audioPlan, lang, th } = useApp();
+    const { audioConfig, setAudioConfig, audioPlan, qnexModel, lang, th } = useApp();
     const zh = lang === "zh";
     const update = (key, field, value) => setAudioConfig((current) => ({ ...current, [key]: { ...current[key], [field]: value } }));
     const inputClass = `${th.inputBg} ${th.inputText} border rounded p-1 w-full`;
-    return /* @__PURE__ */ React.createElement("fieldset", { id: "audio-equipment", className: "lcs-audio-equipment" }, /* @__PURE__ */ React.createElement("legend", null, zh ? "\u6269\u58F0\u4E0E\u5BA2\u6237\u5DF2\u6709\u8BBE\u5907" : "Amplification and customer equipment"), /* @__PURE__ */ React.createElement("label", null, /* @__PURE__ */ React.createElement(
+    return /* @__PURE__ */ React.createElement("fieldset", { id: "audio-equipment", className: "lcs-audio-equipment" }, /* @__PURE__ */ React.createElement("legend", null, zh ? "\u6269\u58F0\u4E0E\u5BA2\u6237\u5DF2\u6709\u8BBE\u5907" : "Amplification and customer equipment"), /* @__PURE__ */ React.createElement("label", null, zh ? "\u97F3\u7BB1\u90E8\u7F72" : "Loudspeaker deployment", /* @__PURE__ */ React.createElement("select", { id: "speaker-model", className: inputClass, value: audioConfig.speakerModel, onChange: (e) => setAudioConfig((c) => ({ ...c, speakerModel: e.target.value })) }, /* @__PURE__ */ React.createElement("option", { value: "PS610" }, zh ? "PS610 \u58C1\u6302\u6269\u58F0" : "PS610 wall speakers"), /* @__PURE__ */ React.createElement("option", { value: "EBS-630" }, zh ? "\u5F97\u80DC EBS-630 \u5438\u9876\u6269\u58F0" : "Takstar EBS-630 ceiling speakers"))), /* @__PURE__ */ React.createElement("label", null, zh ? "\u8BDD\u7B52\u7528\u9014" : "Microphone routing", /* @__PURE__ */ React.createElement("select", { id: "pickup-mode", className: inputClass, value: audioConfig.pickupMode, onChange: (e) => setAudioConfig((c) => ({ ...c, pickupMode: e.target.value })) }, /* @__PURE__ */ React.createElement("option", { value: "distributed" }, zh ? "S210 \u5206\u5E03\u62FE\u97F3" : "Distributed S210"), /* @__PURE__ */ React.createElement("option", { value: "wireless", disabled: qnexModel === "SL100" }, zh ? "D90 \u6269\u58F0\uFF0B\u821E\u53F0\u53CC S210 \u5F55\u64AD" : "D90 PA + two stage S210 for recording"))), /* @__PURE__ */ React.createElement("label", null, /* @__PURE__ */ React.createElement(
       "input",
       {
         id: "use-built-in-amp",
         type: "checkbox",
-        checked: audioConfig.useBuiltInAmp !== false,
+        disabled: audioPlan.externalSpeakers > 4,
+        checked: audioConfig.useBuiltInAmp !== false && audioPlan.externalSpeakers <= 4,
         onChange: (e) => setAudioConfig((current) => ({ ...current, useBuiltInAmp: e.target.checked }))
       }
-    ), " ", zh ? "\u4F7F\u7528Q-NEX\u5185\u7F6E\u529F\u653E\u5E26\u524D\u4E24\u53EAPS610\uFF082\xD740W\uFF09" : "Use Q-NEX built-in amplification for the first two PS610 (2 x 40W)"), audioPlan.review.delay && /* @__PURE__ */ React.createElement("label", null, zh ? "\u524D\u540E\u533A\u4FE1\u53F7\u8DEF\u7531" : "Front/fill signal routing", /* @__PURE__ */ React.createElement(
+    ), " ", zh ? "\u4F7F\u7528Q-NEX\u5185\u7F6E\u529F\u653E\u5E26\u524D\u4E24\u53EA\u97F3\u7BB1\uFF082\xD740W\uFF09" : "Use Q-NEX built-in amplification for the first two speakers (2 x 40W)"), audioPlan.review.delay && /* @__PURE__ */ React.createElement("label", null, zh ? "\u524D\u540E\u533A\u4FE1\u53F7\u8DEF\u7531" : "Front/fill signal routing", /* @__PURE__ */ React.createElement(
       "select",
       {
         className: inputClass,
@@ -2485,7 +2617,7 @@
           value: item.model || "",
           onChange: (e) => update(key, "model", e.target.value)
         }
-      )), /* @__PURE__ */ React.createElement("label", null, key === "amplifier" ? zh ? "\u53EF\u5E26PS610\u6570\u91CF" : "Supported PS610 quantity" : zh ? "\u53EF\u7528\u9EA6\u514B\u98CE\u901A\u9053" : "Usable microphone channels", /* @__PURE__ */ React.createElement(
+      )), /* @__PURE__ */ React.createElement("label", null, key === "amplifier" ? zh ? "\u53EF\u5E26\u97F3\u7BB1\u6570\u91CF" : "Supported speaker quantity" : zh ? "\u53EF\u7528\u9EA6\u514B\u98CE\u901A\u9053" : "Usable microphone channels", /* @__PURE__ */ React.createElement(
         "input",
         {
           id: `${key}-capacity`,
@@ -2556,6 +2688,8 @@
       lang,
       largeScreen,
       longRoomEnabled,
+      audioConfig,
+      stageOnly,
       preset,
       projectTitle,
       roomHeight,
@@ -2613,7 +2747,7 @@
       handleReset
     } = useApp();
     const [optionsOpen, setOptionsOpen] = React.useState(false);
-    return /* @__PURE__ */ React.createElement("header", { className: "lcs-toolbar" }, /* @__PURE__ */ React.createElement("div", { className: "lcs-toolbar-main" }, /* @__PURE__ */ React.createElement("a", { href: new URLSearchParams(location.search).get("home") || "../../index.html" }, window.Quotation.words(lang)[3]), /* @__PURE__ */ React.createElement("div", { className: "lcs-brand" }, /* @__PURE__ */ React.createElement("h1", { className: `font-black uppercase tracking-tighter italic ${th.headerText}` }, projectTitle), /* @__PURE__ */ React.createElement("p", { className: `font-mono tracking-widest uppercase ${th.subText}` }, t.subtitle)), /* @__PURE__ */ React.createElement("div", { className: "lcs-room-controls" }, /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.preset, /* @__PURE__ */ React.createElement("select", { value: preset, onChange: (e) => handlePresetChange(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded border` }, /* @__PURE__ */ React.createElement("option", { value: "custom" }, t.presetCustom), /* @__PURE__ */ React.createElement("option", { value: "standard" }, t.presetStandard), /* @__PURE__ */ React.createElement("option", { value: "large" }, t.presetLarge), /* @__PURE__ */ React.createElement("option", { value: "lecture" }, t.presetLecture), /* @__PURE__ */ React.createElement("option", { value: "ultra" }, t.presetUltra))), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.width, /* @__PURE__ */ React.createElement("input", { type: "number", key: roomWidth, defaultValue: roomWidth, min: "0.1", onBlur: (e) => {
+    return /* @__PURE__ */ React.createElement("header", { className: "lcs-toolbar" }, /* @__PURE__ */ React.createElement("div", { className: "lcs-toolbar-main" }, /* @__PURE__ */ React.createElement("a", { href: new URLSearchParams(location.search).get("home") || "../../index.html" }, window.Quotation.words(lang)[3]), /* @__PURE__ */ React.createElement("div", { className: "lcs-brand" }, /* @__PURE__ */ React.createElement("h1", { className: `font-black uppercase tracking-tighter italic ${th.headerText}` }, projectTitle), /* @__PURE__ */ React.createElement("p", { className: `font-mono tracking-widest uppercase ${th.subText}` }, t.subtitle)), /* @__PURE__ */ React.createElement("div", { className: "lcs-room-controls" }, /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.preset, /* @__PURE__ */ React.createElement("select", { value: preset, onChange: (e) => handlePresetChange(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded border` }, /* @__PURE__ */ React.createElement("option", { value: "custom" }, t.presetCustom), /* @__PURE__ */ React.createElement("option", { value: "standard" }, t.presetStandard), /* @__PURE__ */ React.createElement("option", { value: "large" }, t.presetLarge), /* @__PURE__ */ React.createElement("option", { value: "lecture" }, t.presetLecture), /* @__PURE__ */ React.createElement("option", { value: "hall26x15" }, lang === "zh" ? "\u9AD8\u6821\u9636\u68AF\u793C\u5802 \xB7 26 \xD7 15" : "Tiered auditorium \xB7 26 \xD7 15"), /* @__PURE__ */ React.createElement("option", { value: "ultra" }, t.presetUltra))), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.width, /* @__PURE__ */ React.createElement("input", { type: "number", key: roomWidth, defaultValue: roomWidth, min: "0.1", onBlur: (e) => {
       if (!changeRoomDimension("width", Number(e.target.value))) e.target.value = roomWidth;
     }, onKeyDown: (e) => {
       if (e.key === "Enter") e.currentTarget.blur();
@@ -2642,7 +2776,7 @@
         className: "font-bold text-[10px] px-3 py-1 rounded h-[28px] bg-blue-600 hover:bg-blue-700 text-white border border-blue-400"
       },
       threeDCopy.open3D
-    )), /* @__PURE__ */ React.createElement("button", { type: "button", className: `lcs-panel-trigger ${th.inputBg} ${th.inputText} ${th.inputBorder}`, "aria-expanded": optionsOpen, "aria-controls": "lcs-options", onClick: () => setOptionsOpen(!optionsOpen) }, t.moreOptions, " ", /* @__PURE__ */ React.createElement("span", { "aria-hidden": "true" }, optionsOpen ? "\u25B4" : "\u25BE"))), /* @__PURE__ */ React.createElement(PickupSuggestion, null), !roomIsValid && /* @__PURE__ */ React.createElement("p", { className: "text-[10px] font-bold text-red-500" }, t.invalidDimensions), (threeDError || screenError) && /* @__PURE__ */ React.createElement("p", { id: "open-3d-error", role: "alert", className: "text-[10px] font-bold text-red-500" }, threeDError || screenError), roomHeight >= 3.5 && /* @__PURE__ */ React.createElement("p", { className: "lcs-height-warning text-[10px] font-bold text-amber-500" }, "\u26A0 ", t.heightWarning), optionsOpen && /* @__PURE__ */ React.createElement("aside", { id: "lcs-options", className: `lcs-options-panel ${th.panelBg} ${th.panelBorder}` }, /* @__PURE__ */ React.createElement("button", { disabled: Boolean(screenError), id: "export-quotation", className: "p-2 rounded bg-blue-600 text-white", onClick: (e) => window.Quotation.download(e.currentTarget, quote) }, window.Quotation.words(lang)[0]), /* @__PURE__ */ React.createElement(DisplayLayout, null), /* @__PURE__ */ React.createElement(AudioEquipmentControls, null), /* @__PURE__ */ React.createElement("div", { className: "lcs-options-grid" }, /* @__PURE__ */ React.createElement("label", { className: "text-xs flex flex-col" }, "Q-NEX ", lang === "zh" ? "\u7CFB\u7EDF" : "System", /* @__PURE__ */ React.createElement("select", { id: "qnex-model", value: qnexModel, onChange: (e) => setQnexModel(e.target.value), className: `${th.inputBg} ${th.inputText} p-1 rounded border` }, window.Quotation.qnexModels.map((model) => /* @__PURE__ */ React.createElement("option", { key: model, value: model }, model)))), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.cameraPackage, /* @__PURE__ */ React.createElement("select", { value: cameraPackage, onChange: (e) => handleCameraPackageChange(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded border` }, /* @__PURE__ */ React.createElement("option", { value: "CV870" }, t.cv870Package), /* @__PURE__ */ React.createElement("option", { value: "CV210" }, t.cv210Package))), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.s210Count, /* @__PURE__ */ React.createElement("select", { id: "s210-count", value: s210s.length, onChange: (e) => handleS210CountChange(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded border` }, Array.from({ length: S210_MAX_COUNT + 1 }, (_, n) => n).map((n) => /* @__PURE__ */ React.createElement("option", { key: n, value: n }, n)))), !displayPlan && /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.dispSize, /* @__PURE__ */ React.createElement("select", { value: displaySize, onChange: (e) => setDisplaySize(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded border` }, /* @__PURE__ */ React.createElement("option", { value: "55" }, '55" (', t.maximumShort, " 4.1m)"), /* @__PURE__ */ React.createElement("option", { value: "65" }, '65" (', t.maximumShort, " 5.0m)"), /* @__PURE__ */ React.createElement("option", { value: "75" }, '75" (', t.maximumShort, " 5.6m)"))), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.dispRename, /* @__PURE__ */ React.createElement("input", { type: "text", value: displayName, onChange: (e) => setDisplayName(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded w-24 border` })), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.titleRename, /* @__PURE__ */ React.createElement("input", { type: "text", value: projectTitle, onChange: (e) => setProjectTitle(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded w-48 border` })), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.hubRename, /* @__PURE__ */ React.createElement("input", { type: "text", value: hubName, onChange: (e) => setHubName(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded w-20 border` })), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.theme, /* @__PURE__ */ React.createElement("select", { value: themeKey, onChange: (e) => setThemeKey(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded border` }, /* @__PURE__ */ React.createElement("option", { value: "dark" }, t.themeDark), /* @__PURE__ */ React.createElement("option", { value: "light" }, t.themeLight), /* @__PURE__ */ React.createElement("option", { value: "highContrast" }, t.themeHighContrast))), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.language, /* @__PURE__ */ React.createElement("select", { value: lang, onChange: (e) => setLang(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded border` }, /* @__PURE__ */ React.createElement("option", { value: "en" }, "English"), /* @__PURE__ */ React.createElement("option", { value: "zh" }, "\u7B80\u4F53\u4E2D\u6587"), /* @__PURE__ */ React.createElement("option", { value: "fr" }, "Fran\xE7ais"), /* @__PURE__ */ React.createElement("option", { value: "es" }, "Espa\xF1ol"), /* @__PURE__ */ React.createElement("option", { value: "ja" }, "\u65E5\u672C\u8A9E"), /* @__PURE__ */ React.createElement("option", { value: "ko" }, "\uD55C\uAD6D\uC5B4"), /* @__PURE__ */ React.createElement("option", { value: "it" }, "Italiano"), /* @__PURE__ */ React.createElement("option", { value: "hu" }, "Magyar"), /* @__PURE__ */ React.createElement("option", { value: "ar" }, "\u0627\u0644\u0639\u0631\u0628\u064A\u0629"))), /* @__PURE__ */ React.createElement(
+    )), /* @__PURE__ */ React.createElement("button", { type: "button", className: `lcs-panel-trigger ${th.inputBg} ${th.inputText} ${th.inputBorder}`, "aria-expanded": optionsOpen, "aria-controls": "lcs-options", onClick: () => setOptionsOpen(!optionsOpen) }, t.moreOptions, " ", /* @__PURE__ */ React.createElement("span", { "aria-hidden": "true" }, optionsOpen ? "\u25B4" : "\u25BE"))), /* @__PURE__ */ React.createElement(PickupSuggestion, null), !roomIsValid && /* @__PURE__ */ React.createElement("p", { className: "text-[10px] font-bold text-red-500" }, t.invalidDimensions), (threeDError || screenError) && /* @__PURE__ */ React.createElement("p", { id: "open-3d-error", role: "alert", className: "text-[10px] font-bold text-red-500" }, threeDError || screenError), roomHeight >= 3.5 && /* @__PURE__ */ React.createElement("p", { className: "lcs-height-warning text-[10px] font-bold text-amber-500" }, "\u26A0 ", t.heightWarning), optionsOpen && /* @__PURE__ */ React.createElement("aside", { id: "lcs-options", className: `lcs-options-panel ${th.panelBg} ${th.panelBorder}` }, /* @__PURE__ */ React.createElement("button", { disabled: Boolean(screenError), id: "export-quotation", className: "p-2 rounded bg-blue-600 text-white", onClick: (e) => window.Quotation.download(e.currentTarget, quote) }, window.Quotation.words(lang)[0]), preset !== "hall26x15" && /* @__PURE__ */ React.createElement(DisplayLayout, null), /* @__PURE__ */ React.createElement(AudioEquipmentControls, null), /* @__PURE__ */ React.createElement("div", { className: "lcs-options-grid" }, /* @__PURE__ */ React.createElement("label", { className: "text-xs flex flex-col" }, "Q-NEX ", lang === "zh" ? "\u7CFB\u7EDF" : "System", /* @__PURE__ */ React.createElement("select", { id: "qnex-model", value: qnexModel, onChange: (e) => setQnexModel(e.target.value), className: `${th.inputBg} ${th.inputText} p-1 rounded border` }, [.../* @__PURE__ */ new Set([...window.Quotation.qnexModels, "NDP200"])].map((model) => /* @__PURE__ */ React.createElement("option", { key: model, value: model }, model)))), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.cameraPackage, /* @__PURE__ */ React.createElement("select", { value: cameraPackage, onChange: (e) => handleCameraPackageChange(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded border` }, /* @__PURE__ */ React.createElement("option", { value: "CV870" }, t.cv870Package), /* @__PURE__ */ React.createElement("option", { value: "CV210" }, t.cv210Package))), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.s210Count, /* @__PURE__ */ React.createElement("select", { id: "s210-count", disabled: stageOnly, value: s210s.length, onChange: (e) => handleS210CountChange(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded border` }, Array.from({ length: S210_MAX_COUNT + 1 }, (_, n) => n).map((n) => /* @__PURE__ */ React.createElement("option", { key: n, value: n }, n)))), !displayPlan && /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.dispSize, /* @__PURE__ */ React.createElement("select", { value: displaySize, onChange: (e) => setDisplaySize(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded border` }, /* @__PURE__ */ React.createElement("option", { value: "55" }, '55" (', t.maximumShort, " 4.1m)"), /* @__PURE__ */ React.createElement("option", { value: "65" }, '65" (', t.maximumShort, " 5.0m)"), /* @__PURE__ */ React.createElement("option", { value: "75" }, '75" (', t.maximumShort, " 5.6m)"))), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.dispRename, /* @__PURE__ */ React.createElement("input", { type: "text", value: displayName, onChange: (e) => setDisplayName(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded w-24 border` })), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.titleRename, /* @__PURE__ */ React.createElement("input", { type: "text", value: projectTitle, onChange: (e) => setProjectTitle(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded w-48 border` })), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.hubRename, /* @__PURE__ */ React.createElement("input", { type: "text", value: hubName, onChange: (e) => setHubName(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded w-20 border` })), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.theme, /* @__PURE__ */ React.createElement("select", { value: themeKey, onChange: (e) => setThemeKey(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded border` }, /* @__PURE__ */ React.createElement("option", { value: "dark" }, t.themeDark), /* @__PURE__ */ React.createElement("option", { value: "light" }, t.themeLight), /* @__PURE__ */ React.createElement("option", { value: "highContrast" }, t.themeHighContrast))), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] uppercase font-bold flex flex-col opacity-80" }, t.language, /* @__PURE__ */ React.createElement("select", { value: lang, onChange: (e) => setLang(e.target.value), className: `${th.inputBg} ${th.inputText} ${th.inputBorder} p-1 rounded border` }, /* @__PURE__ */ React.createElement("option", { value: "en" }, "English"), /* @__PURE__ */ React.createElement("option", { value: "zh" }, "\u7B80\u4F53\u4E2D\u6587"), /* @__PURE__ */ React.createElement("option", { value: "fr" }, "Fran\xE7ais"), /* @__PURE__ */ React.createElement("option", { value: "es" }, "Espa\xF1ol"), /* @__PURE__ */ React.createElement("option", { value: "ja" }, "\u65E5\u672C\u8A9E"), /* @__PURE__ */ React.createElement("option", { value: "ko" }, "\uD55C\uAD6D\uC5B4"), /* @__PURE__ */ React.createElement("option", { value: "it" }, "Italiano"), /* @__PURE__ */ React.createElement("option", { value: "hu" }, "Magyar"), /* @__PURE__ */ React.createElement("option", { value: "ar" }, "\u0627\u0644\u0639\u0631\u0628\u064A\u0629"))), /* @__PURE__ */ React.createElement(
       "button",
       {
         onClick: () => setIsRotated(!isRotated),
@@ -2659,7 +2793,7 @@
       },
       "\u{1F4BE} ",
       t.exportPng
-    )), cameraPackage === "CV210" && /* @__PURE__ */ React.createElement("p", { className: "mt-2 text-[9px] font-bold text-amber-500" }, t.cv210PackageNote), /* @__PURE__ */ React.createElement("div", { id: "device-visibility", className: `mt-3 p-2 rounded border ${th.panelBorder} ${th.panelBg} inline-block` }, /* @__PURE__ */ React.createElement("p", { className: `text-[10px] font-bold uppercase mb-1 ${th.subText}` }, t.toggleVis), /* @__PURE__ */ React.createElement("div", { className: "flex flex-wrap gap-4" }, /* @__PURE__ */ React.createElement("label", { className: "text-[10px] flex items-center gap-1 cursor-pointer" }, /* @__PURE__ */ React.createElement("input", { type: "checkbox", checked: showTeacherCam, onChange: (e) => setShowTeacherCam(e.target.checked) }), t.tCamLbl), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] flex items-center gap-1 cursor-pointer" }, /* @__PURE__ */ React.createElement("input", { type: "checkbox", checked: showStudentCam, onChange: (e) => setShowStudentCam(e.target.checked) }), t.sCamLbl), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] flex items-center gap-1 cursor-pointer" }, /* @__PURE__ */ React.createElement("input", { type: "checkbox", checked: showS210, onChange: (e) => setShowS210(e.target.checked) }), t.s210Lbl), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] flex items-center gap-1 cursor-pointer" }, /* @__PURE__ */ React.createElement("input", { type: "checkbox", checked: showSpeakers, onChange: (e) => setShowSpeakers(e.target.checked) }), t.ps610Speaker), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] flex items-center gap-1 cursor-pointer" }, /* @__PURE__ */ React.createElement("input", { type: "checkbox", checked: showDisplays, onChange: (e) => setShowDisplays(e.target.checked) }), displayName), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] flex items-center gap-1 cursor-pointer" }, /* @__PURE__ */ React.createElement("input", { type: "checkbox", checked: showLargeScreen, onChange: (e) => setShowLargeScreen(e.target.checked) }), lang === "zh" ? "\u4E3B\u5C4F / IFP" : "Main screen / IFP"))), longRoomEnabled && /* @__PURE__ */ React.createElement(
+    )), cameraPackage === "CV210" && /* @__PURE__ */ React.createElement("p", { className: "mt-2 text-[9px] font-bold text-amber-500" }, t.cv210PackageNote), /* @__PURE__ */ React.createElement("div", { id: "device-visibility", className: `mt-3 p-2 rounded border ${th.panelBorder} ${th.panelBg} inline-block` }, /* @__PURE__ */ React.createElement("p", { className: `text-[10px] font-bold uppercase mb-1 ${th.subText}` }, t.toggleVis), /* @__PURE__ */ React.createElement("div", { className: "flex flex-wrap gap-4" }, /* @__PURE__ */ React.createElement("label", { className: "text-[10px] flex items-center gap-1 cursor-pointer" }, /* @__PURE__ */ React.createElement("input", { type: "checkbox", checked: showTeacherCam, onChange: (e) => setShowTeacherCam(e.target.checked) }), t.tCamLbl), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] flex items-center gap-1 cursor-pointer" }, /* @__PURE__ */ React.createElement("input", { type: "checkbox", checked: showStudentCam, onChange: (e) => setShowStudentCam(e.target.checked) }), t.sCamLbl), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] flex items-center gap-1 cursor-pointer" }, /* @__PURE__ */ React.createElement("input", { type: "checkbox", checked: showS210, onChange: (e) => setShowS210(e.target.checked) }), t.s210Lbl), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] flex items-center gap-1 cursor-pointer" }, /* @__PURE__ */ React.createElement("input", { type: "checkbox", checked: showSpeakers, onChange: (e) => setShowSpeakers(e.target.checked) }), audioConfig.speakerModel === "EBS-630" ? "EBS-630" : t.ps610Speaker), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] flex items-center gap-1 cursor-pointer" }, /* @__PURE__ */ React.createElement("input", { type: "checkbox", checked: showDisplays, onChange: (e) => setShowDisplays(e.target.checked) }), displayName), /* @__PURE__ */ React.createElement("label", { className: "text-[10px] flex items-center gap-1 cursor-pointer" }, /* @__PURE__ */ React.createElement("input", { type: "checkbox", checked: showLargeScreen, onChange: (e) => setShowLargeScreen(e.target.checked) }), lang === "zh" ? "\u4E3B\u5C4F / IFP" : "Main screen / IFP"))), longRoomEnabled && /* @__PURE__ */ React.createElement(
       "button",
       {
         onClick: () => setIsLongDistancePanelOpen(true),
@@ -2667,7 +2801,7 @@
       },
       "\u{1F4F7} ",
       t.longDistancePlan
-    ), /* @__PURE__ */ React.createElement("details", { className: "lcs-status-details" }, /* @__PURE__ */ React.createElement("summary", { className: `text-xs font-bold ${th.headerText}` }, t.coverageStatus), /* @__PURE__ */ React.createElement("div", { className: "flex flex-wrap gap-3 mt-3" }, showTeacherCam && /* @__PURE__ */ React.createElement("div", { className: `${th.panelBg} border ${teacherDistanceWarning || teacherBelowTypicalRange || teacherStageCoverageWarning ? "border-red-500 border-2" : th.panelBorder} p-3 rounded-xl min-w-[160px] shadow-lg` }, /* @__PURE__ */ React.createElement("p", { className: `text-[10px] font-bold uppercase mb-1 ${th.subText}` }, t.teacherCam, " \xB7 ", teacherCameraModel.label), /* @__PURE__ */ React.createElement("div", { className: "flex justify-between items-end" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { className: `text-[10px] uppercase font-mono ${th.subText}` }, t.dist), /* @__PURE__ */ React.createElement("p", { className: `text-sm font-mono font-black ${teacherDistanceWarning || teacherBelowTypicalRange ? "text-red-500" : "text-yellow-500"}` }, tDist.toFixed(1), "m")), /* @__PURE__ */ React.createElement("div", { className: "text-right" }, /* @__PURE__ */ React.createElement("p", { className: `text-[10px] uppercase font-mono ${th.subText}` }, t.cov), /* @__PURE__ */ React.createElement("p", { className: "text-sm font-mono font-black text-yellow-500" }, tWidth.toFixed(1), "m"))), teacherDistanceWarning && /* @__PURE__ */ React.createElement("p", { className: "text-red-500 text-[9px] font-bold mt-1 animate-pulse" }, formatDistanceLimitWarning(teacherMaxDistance)), teacherBelowTypicalRange && /* @__PURE__ */ React.createElement("p", { className: "text-amber-500 text-[9px] font-bold mt-1" }, t.typicalRangeWarn), teacherStageCoverageWarning && /* @__PURE__ */ React.createElement("p", { className: "text-amber-500 text-[9px] font-bold mt-1" }, t.stageCoverageWarn)), showStudentCam && /* @__PURE__ */ React.createElement("div", { className: `${th.panelBg} border ${studentDistanceWarning || studentBelowTypicalRange ? "border-red-500 border-2" : th.panelBorder} p-3 rounded-xl min-w-[160px] shadow-lg` }, /* @__PURE__ */ React.createElement("p", { className: `text-[10px] font-bold uppercase mb-1 ${th.subText}` }, t.studentCam, " \xB7 ", studentCameraModel.label, " \xD7", activeStudentQty), /* @__PURE__ */ React.createElement("div", { className: "flex justify-between items-end" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { className: `text-[10px] uppercase font-mono ${th.subText}` }, t.dist), /* @__PURE__ */ React.createElement("p", { className: "text-sm font-mono font-black text-red-500" }, formatMetricRange(studentDistances), "m")), /* @__PURE__ */ React.createElement("div", { className: "text-right" }, /* @__PURE__ */ React.createElement("p", { className: `text-[10px] uppercase font-mono ${th.subText}` }, t.cov), /* @__PURE__ */ React.createElement("p", { className: "text-sm font-mono font-black text-red-500" }, formatMetricRange(studentWidths), "m"))), studentDistanceWarning && /* @__PURE__ */ React.createElement("p", { className: "text-red-500 text-[9px] font-bold mt-1 animate-pulse" }, formatDistanceLimitWarning(studentMaxDistance)), studentBelowTypicalRange && /* @__PURE__ */ React.createElement("p", { className: "text-amber-500 text-[9px] font-bold mt-1" }, t.typicalRangeWarn)), showS210 && /* @__PURE__ */ React.createElement("div", { className: `${th.panelBg} border ${s210OverCapacity ? "border-red-500 border-2" : th.panelBorder} p-3 rounded-xl min-w-[200px] shadow-lg flex flex-col justify-between` }, /* @__PURE__ */ React.createElement("div", { className: "flex justify-between items-center mb-1" }, /* @__PURE__ */ React.createElement("p", { className: `text-[10px] font-bold uppercase ${th.subText}` }, t.s210Mic), /* @__PURE__ */ React.createElement(
+    ), /* @__PURE__ */ React.createElement("details", { className: "lcs-status-details" }, /* @__PURE__ */ React.createElement("summary", { className: `text-xs font-bold ${th.headerText}` }, t.coverageStatus), /* @__PURE__ */ React.createElement("div", { className: "flex flex-wrap gap-3 mt-3" }, showTeacherCam && /* @__PURE__ */ React.createElement("div", { className: `${th.panelBg} border ${teacherDistanceWarning || teacherBelowTypicalRange || teacherStageCoverageWarning ? "border-red-500 border-2" : th.panelBorder} p-3 rounded-xl min-w-[160px] shadow-lg` }, /* @__PURE__ */ React.createElement("p", { className: `text-[10px] font-bold uppercase mb-1 ${th.subText}` }, t.teacherCam, " \xB7 ", teacherCameraModel.label), /* @__PURE__ */ React.createElement("div", { className: "flex justify-between items-end" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { className: `text-[10px] uppercase font-mono ${th.subText}` }, t.dist), /* @__PURE__ */ React.createElement("p", { className: `text-sm font-mono font-black ${teacherDistanceWarning || teacherBelowTypicalRange ? "text-red-500" : "text-yellow-500"}` }, tDist.toFixed(1), "m")), /* @__PURE__ */ React.createElement("div", { className: "text-right" }, /* @__PURE__ */ React.createElement("p", { className: `text-[10px] uppercase font-mono ${th.subText}` }, t.cov), /* @__PURE__ */ React.createElement("p", { className: "text-sm font-mono font-black text-yellow-500" }, tWidth.toFixed(1), "m"))), teacherDistanceWarning && /* @__PURE__ */ React.createElement("p", { className: "text-red-500 text-[9px] font-bold mt-1 animate-pulse" }, formatDistanceLimitWarning(teacherMaxDistance)), teacherBelowTypicalRange && /* @__PURE__ */ React.createElement("p", { className: "text-amber-500 text-[9px] font-bold mt-1" }, t.typicalRangeWarn), teacherStageCoverageWarning && /* @__PURE__ */ React.createElement("p", { className: "text-amber-500 text-[9px] font-bold mt-1" }, t.stageCoverageWarn)), showStudentCam && /* @__PURE__ */ React.createElement("div", { className: `${th.panelBg} border ${studentDistanceWarning || studentBelowTypicalRange ? "border-red-500 border-2" : th.panelBorder} p-3 rounded-xl min-w-[160px] shadow-lg` }, /* @__PURE__ */ React.createElement("p", { className: `text-[10px] font-bold uppercase mb-1 ${th.subText}` }, t.studentCam, " \xB7 ", studentCameraModel.label, " \xD7", activeStudentQty), /* @__PURE__ */ React.createElement("div", { className: "flex justify-between items-end" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { className: `text-[10px] uppercase font-mono ${th.subText}` }, t.dist), /* @__PURE__ */ React.createElement("p", { className: "text-sm font-mono font-black text-red-500" }, formatMetricRange(studentDistances), "m")), /* @__PURE__ */ React.createElement("div", { className: "text-right" }, /* @__PURE__ */ React.createElement("p", { className: `text-[10px] uppercase font-mono ${th.subText}` }, t.cov), /* @__PURE__ */ React.createElement("p", { className: "text-sm font-mono font-black text-red-500" }, formatMetricRange(studentWidths), "m"))), studentDistanceWarning && /* @__PURE__ */ React.createElement("p", { className: "text-red-500 text-[9px] font-bold mt-1 animate-pulse" }, formatDistanceLimitWarning(studentMaxDistance)), studentBelowTypicalRange && /* @__PURE__ */ React.createElement("p", { className: "text-amber-500 text-[9px] font-bold mt-1" }, t.typicalRangeWarn)), showS210 && !stageOnly && /* @__PURE__ */ React.createElement("div", { className: `${th.panelBg} border ${s210OverCapacity ? "border-red-500 border-2" : th.panelBorder} p-3 rounded-xl min-w-[200px] shadow-lg flex flex-col justify-between` }, /* @__PURE__ */ React.createElement("div", { className: "flex justify-between items-center mb-1" }, /* @__PURE__ */ React.createElement("p", { className: `text-[10px] font-bold uppercase ${th.subText}` }, t.s210Mic), /* @__PURE__ */ React.createElement(
       "button",
       {
         onClick: handleAddS210,
@@ -2813,6 +2947,8 @@
   function RoomCanvas() {
     const [detailsOpen, setDetailsOpen] = React.useState(false);
     const {
+      preset,
+      lang,
       displayPlan,
       stageWidth,
       displayName,
@@ -2828,6 +2964,10 @@
       hubName,
       isRotated,
       largeScreen,
+      roomHeight,
+      audioConfig,
+      audioPlan,
+      stageOnly,
       maxDistance,
       padding,
       roomIsValid,
@@ -2866,6 +3006,8 @@
       vbH,
       vbW
     } = useApp();
+    const tiers = audioPlan.ceiling && hallLayout({ width: roomWidth, depth: roomLength, height: roomHeight })?.tiers;
+    const bands = tiers ? [{ start: 0, end: tiers[0].start, top: 0 }, ...tiers] : [{ start: 0, end: roomLength, top: 0 }];
     return /* @__PURE__ */ React.createElement(
       "div",
       {
@@ -2885,10 +3027,10 @@
           xmlns: "http://www.w3.org/2000/svg",
           className: "lcs-room-svg drop-shadow-2xl opacity-95 transition-all duration-300"
         },
-        /* @__PURE__ */ React.createElement("defs", null, /* @__PURE__ */ React.createElement("clipPath", { id: "room-clip" }, /* @__PURE__ */ React.createElement("rect", { x: padding, y: padding, width: roomWidth * scale, height: roomLength * scale })), /* @__PURE__ */ React.createElement("pattern", { id: "grid-pattern", width: "25", height: "25", patternUnits: "userSpaceOnUse" }, /* @__PURE__ */ React.createElement("circle", { cx: "1.5", cy: "1.5", r: "1", fill: th.gridLines }))),
+        /* @__PURE__ */ React.createElement("defs", null, /* @__PURE__ */ React.createElement("clipPath", { id: "room-clip" }, /* @__PURE__ */ React.createElement("rect", { x: padding, y: padding, width: roomWidth * scale, height: roomLength * scale })), audioPlan.ceiling && bands.map((band, i) => /* @__PURE__ */ React.createElement("clipPath", { key: i, id: "speaker-band-" + i }, /* @__PURE__ */ React.createElement("rect", { x: tx(0), y: ty(band.start), width: roomWidth * scale, height: (band.end - band.start) * scale }))), /* @__PURE__ */ React.createElement("pattern", { id: "grid-pattern", width: "25", height: "25", patternUnits: "userSpaceOnUse" }, /* @__PURE__ */ React.createElement("circle", { cx: "1.5", cy: "1.5", r: "1", fill: th.gridLines }))),
         /* @__PURE__ */ React.createElement("rect", { width: "100%", height: "100%", fill: th.svgBg }),
         /* @__PURE__ */ React.createElement("rect", { width: "100%", height: "100%", fill: "url(#grid-pattern)" }),
-        /* @__PURE__ */ React.createElement("g", { id: "rotated-group", transform: isRotated ? `translate(0, ${vbW}) rotate(-90)` : "" }, /* @__PURE__ */ React.createElement("rect", { x: padding, y: padding, width: roomWidth * scale, height: roomLength * scale, stroke: th.roomBorder, strokeWidth: themeKey === "highContrast" ? 6 : 4, fill: th.roomFill }), displayPlan && DisplayFit.doorSpans(roomLength).map(([a, b]) => /* @__PURE__ */ React.createElement("path", { key: a, d: `M ${tx(roomWidth)} ${ty(a / 1e3)} v ${(b - a) * scale / 1e3}`, stroke: "#f39950", strokeWidth: "4" })), /* @__PURE__ */ React.createElement("rect", { x: tx((roomWidth - stageWidth) / 2), y: ty(0), width: stageWidth * scale, height: 2.2 * scale, fill: th.stageFill, stroke: th.pillarStroke, strokeWidth: "1" }), /* @__PURE__ */ React.createElement("text", { x: tx(roomWidth / 2), y: ty(1.1), textAnchor: "middle", fill: themeKey === "light" ? "#475569" : "#94a3b8", className: "text-sm font-bold opacity-60", style: { fontFamily: "sans-serif", fontWeight: "bold" } }, t.stage), /* @__PURE__ */ React.createElement("g", { transform: `translate(${tx(roomWidth * 0.25)}, ${ty(1.6)})` }, /* @__PURE__ */ React.createElement("rect", { x: -0.4 * scale, y: -0.2 * scale, width: 0.8 * scale, height: 0.4 * scale, fill: "transparent", stroke: th.pillarStroke, strokeWidth: "2" }), /* @__PURE__ */ React.createElement("line", { x1: "0", y1: -0.2 * scale, x2: "0", y2: -0.4 * scale, stroke: th.pillarStroke, strokeWidth: "2" })), /* @__PURE__ */ React.createElement("text", { x: tx(roomWidth / 2), y: ty(roomLength / 2 + 2), textAnchor: "middle", fill: themeKey === "light" ? "#cbd5e1" : "#1e293b", className: "text-2xl font-black opacity-20 uppercase", style: { fontFamily: "sans-serif", fontWeight: "bold" } }, t.audience), showS210 && s210s.map((mic) => /* @__PURE__ */ React.createElement("g", { key: `s210-range-${mic.id}`, clipPath: "url(#room-clip)" }, /* @__PURE__ */ React.createElement(
+        /* @__PURE__ */ React.createElement("g", { id: "rotated-group", transform: isRotated ? `translate(0, ${vbW}) rotate(-90)` : "" }, /* @__PURE__ */ React.createElement("rect", { x: padding, y: padding, width: roomWidth * scale, height: roomLength * scale, stroke: th.roomBorder, strokeWidth: themeKey === "highContrast" ? 6 : 4, fill: th.roomFill }), displayPlan && DisplayFit.doorSpans(roomLength).map(([a, b]) => /* @__PURE__ */ React.createElement("path", { key: a, d: `M ${tx(roomWidth)} ${ty(a / 1e3)} v ${(b - a) * scale / 1e3}`, stroke: "#f39950", strokeWidth: "4" })), /* @__PURE__ */ React.createElement("rect", { x: tx((roomWidth - stageWidth) / 2), y: ty(0), width: stageWidth * scale, height: 2.2 * scale, fill: th.stageFill, stroke: th.pillarStroke, strokeWidth: "1" }), /* @__PURE__ */ React.createElement("text", { x: tx(roomWidth / 2), y: ty(1.1), textAnchor: "middle", fill: themeKey === "light" ? "#475569" : "#94a3b8", className: "text-sm font-bold opacity-60", style: { fontFamily: "sans-serif", fontWeight: "bold" } }, t.stage), /* @__PURE__ */ React.createElement("g", { transform: `translate(${tx(roomWidth * 0.25)}, ${ty(1.6)})` }, /* @__PURE__ */ React.createElement("rect", { x: -0.4 * scale, y: -0.2 * scale, width: 0.8 * scale, height: 0.4 * scale, fill: "transparent", stroke: th.pillarStroke, strokeWidth: "2" }), /* @__PURE__ */ React.createElement("line", { x1: "0", y1: -0.2 * scale, x2: "0", y2: -0.4 * scale, stroke: th.pillarStroke, strokeWidth: "2" })), /* @__PURE__ */ React.createElement("text", { x: tx(roomWidth / 2), y: ty(roomLength / 2 + 2), textAnchor: "middle", fill: themeKey === "light" ? "#cbd5e1" : "#1e293b", className: "text-2xl font-black opacity-20 uppercase", style: { fontFamily: "sans-serif", fontWeight: "bold" } }, t.audience), showSpeakers && audioPlan.ceiling && /* @__PURE__ */ React.createElement("g", { clipPath: "url(#room-clip)", pointerEvents: "none" }, bands.map((band, i) => /* @__PURE__ */ React.createElement("g", { key: i, clipPath: "url(#speaker-band-" + i + ")" }, speakers.map((p) => /* @__PURE__ */ React.createElement("circle", { key: p.id, cx: tx(p.x), cy: ty(p.y), r: ceilingRadius(roomHeight, band.top) * scale, fill: "#44adaa", fillOpacity: ".035", stroke: "#44adaa", strokeOpacity: ".45", strokeDasharray: "4 3" }))))), showS210 && s210s.map((mic) => /* @__PURE__ */ React.createElement("g", { key: `s210-range-${mic.id}`, clipPath: "url(#room-clip)" }, /* @__PURE__ */ React.createElement(
           "path",
           {
             d: getCardioidPath2(mic.x, mic.y, s210LimitRange2, mic.facing),
@@ -2996,7 +3138,7 @@
               clipPath: "url(#room-clip)"
             }
           );
-        }), displayPlan?.screens.filter((p) => p.zone === "front" ? showLargeScreen : showDisplays).map((p) => /* @__PURE__ */ React.createElement("g", { key: p.id, "data-screen-id": p.id, className: "draggable", onMouseDown: () => setIsDragging("lcd:" + p.id), transform: `translate(${tx(p.x)},${ty(p.y)})` }, /* @__PURE__ */ React.createElement("rect", { x: -p.widthMm * scale / 2e3, y: -p.depthMm * scale / 2e3, width: p.widthMm * scale / 1e3, height: p.depthMm * scale / 1e3, rx: "2", fill: p.zone === "front" ? "#0072ce" : "#387fb8" }), /* @__PURE__ */ React.createElement("text", { textAnchor: "middle", y: "-8", fill: "#38bdf8", fontSize: "10" }, DisplayFit.label(p)))), !displayPlan && showLargeScreen && /* @__PURE__ */ React.createElement("g", { className: "draggable", onMouseDown: () => setIsDragging("largeScreen"), transform: `translate(${tx(largeScreen.x)}, ${ty(largeScreen.y)})` }, /* @__PURE__ */ React.createElement(
+        }), displayPlan?.screens.filter((p) => p.zone === "front" ? showLargeScreen : showDisplays).map((p) => /* @__PURE__ */ React.createElement("g", { key: p.id, "data-screen-id": p.id, className: "draggable", onMouseDown: () => setIsDragging("lcd:" + p.id), transform: `translate(${tx(p.x)},${ty(p.y)})` }, /* @__PURE__ */ React.createElement("rect", { x: -p.widthMm * scale / 2e3, y: -p.depthMm * scale / 2e3, width: p.widthMm * scale / 1e3, height: p.depthMm * scale / 1e3, rx: "2", fill: p.zone === "front" ? "#0072ce" : "#387fb8" }), /* @__PURE__ */ React.createElement("text", { textAnchor: "middle", y: "-8", fill: "#38bdf8", fontSize: "10" }, DisplayFit.label(p)))), !displayPlan && showLargeScreen && /* @__PURE__ */ React.createElement("g", { className: "draggable", onMouseDown: () => preset !== "hall26x15" && setIsDragging("largeScreen"), transform: `translate(${tx(largeScreen.x)}, ${ty(largeScreen.y)})` }, /* @__PURE__ */ React.createElement(
           "rect",
           {
             x: -(largeScreen.width * scale) / 2,
@@ -3019,7 +3161,7 @@
             stroke: "none",
             rx: "2"
           }
-        ), /* @__PURE__ */ React.createElement("text", { y: "-10", textAnchor: "middle", fill: "#38bdf8", className: "font-black text-[9px]", style: { fontFamily: "sans-serif", fontWeight: "bold" } }, "QA1400 Pro 86\u2033 IFP")), !displayPlan && showDisplays && displays.map((disp) => /* @__PURE__ */ React.createElement("g", { key: `disp-${disp.id}`, className: "draggable", onMouseDown: () => setIsDragging(`disp-${disp.id}`), transform: `translate(${tx(disp.x)}, ${ty(disp.y)})` }, /* @__PURE__ */ React.createElement("rect", { x: -0.8 * scale, y: -0.1 * scale, width: 1.6 * scale, height: 0.2 * scale, fill: "#3b82f6", stroke: "#1d4ed8", strokeWidth: "1", rx: "2" }), /* @__PURE__ */ React.createElement("text", { y: "-8", textAnchor: "middle", fill: "#2563eb", className: "font-black text-[9px]", style: { fontFamily: "sans-serif", fontWeight: "bold" } }, displayName, " (", displaySize, '")'))), showSpeakers && speakers.map((spk) => /* @__PURE__ */ React.createElement("g", { key: `spk-${spk.id}`, className: "draggable", onMouseDown: () => setIsDragging(`spk-${spk.id}`), transform: `translate(${tx(spk.x)}, ${ty(spk.y)})` }, /* @__PURE__ */ React.createElement("rect", { x: -0.4 * scale, y: -0.4 * scale, width: 0.8 * scale, height: 0.8 * scale, fill: "#1e293b", stroke: "#64748b", strokeWidth: "2", rx: "2" }), /* @__PURE__ */ React.createElement("circle", { cx: "0", cy: "0", r: "4", fill: "#94a3b8" }), /* @__PURE__ */ React.createElement("text", { y: "18", textAnchor: "middle", fill: themeKey === "light" ? "#475569" : "#94a3b8", className: "text-[8px] font-bold", style: { fontFamily: "sans-serif", fontWeight: "bold" } }, "PS610 ", spk.id + 1))), /* @__PURE__ */ React.createElement("g", { transform: `translate(${tx(roomWidth - 1.4)}, ${ty(0.65)})`, pointerEvents: "none" }, /* @__PURE__ */ React.createElement("rect", { x: -1.2 * scale, y: -0.22 * scale, width: 2.4 * scale, height: 0.44 * scale, rx: "3", fill: "#0072ce" }), /* @__PURE__ */ React.createElement("text", { textAnchor: "middle", y: "4", fill: "white", fontSize: "10" }, "Q-NEX ", qnexModel)), /* @__PURE__ */ React.createElement("g", { className: "draggable", onMouseDown: () => setIsDragging("hub"), transform: `translate(${tx(hub.x)}, ${ty(hub.y)})` }, /* @__PURE__ */ React.createElement("rect", { x: -1.2 * scale, y: -0.5 * scale, width: 2.4 * scale, height: 1 * scale, fill: "#0f172a", stroke: "#3b82f6", strokeWidth: "2", rx: "4" }), /* @__PURE__ */ React.createElement("text", { textAnchor: "middle", y: "4", fill: "#ffffff", className: "text-[10px] font-black", style: { fontFamily: "sans-serif", fontWeight: "bold" } }, hubName)), showTeacherCam && /* @__PURE__ */ React.createElement("g", { className: "draggable", onMouseDown: () => setIsDragging("teacher"), transform: `translate(${tx(teacherCam.x)}, ${ty(teacherCam.y)})` }, /* @__PURE__ */ React.createElement("circle", { r: 0.5 * scale, fill: "rgba(250, 204, 21, 0.3)" }), /* @__PURE__ */ React.createElement("circle", { r: 0.25 * scale, fill: "#facc15", stroke: teacherDistanceWarning || teacherBelowTypicalRange ? "#ef4444" : "#000000", strokeWidth: "2" }), /* @__PURE__ */ React.createElement("text", { y: "-16", textAnchor: "middle", fill: "#d97706", className: "font-black text-[10px] drop-shadow-md", style: { fontFamily: "sans-serif", fontWeight: "bold" } }, t.tCamLbl, " \xB7 ", teacherCameraModel.label)), showStudentCam && studentCameraMetrics.map((camera) => /* @__PURE__ */ React.createElement("g", { key: `student-camera-${camera.id}`, className: "draggable", onMouseDown: () => setIsDragging(`student-${camera.id}`), transform: `translate(${tx(camera.x)}, ${ty(camera.y)})` }, /* @__PURE__ */ React.createElement("circle", { r: 0.5 * scale, fill: "rgba(239, 68, 68, 0.3)" }), /* @__PURE__ */ React.createElement("circle", { r: 0.25 * scale, fill: "#ef4444", stroke: camera.overDistance || camera.belowTypicalRange ? "#ffffff" : "#000000", strokeWidth: "2" }), /* @__PURE__ */ React.createElement("text", { y: "24", textAnchor: "middle", fill: "#dc2626", className: "font-black text-[10px] drop-shadow-md", style: { fontFamily: "sans-serif", fontWeight: "bold" } }, t.sCamLbl, " ", camera.id + 1, " \xB7 ", studentCameraModel.label))), showS210 && s210s.map((mic) => /* @__PURE__ */ React.createElement("g", { key: `s210-${mic.id}`, className: "draggable group", transform: `translate(${tx(mic.x)}, ${ty(mic.y)})` }, /* @__PURE__ */ React.createElement("circle", { r: 0.4 * scale, fill: "rgba(52, 211, 153, 0.3)", stroke: "#10b981", strokeWidth: "2", strokeDasharray: "2 2", onMouseDown: () => setIsDragging(`s210-${mic.id}`) }), /* @__PURE__ */ React.createElement("circle", { r: 0.25 * scale, fill: "#10b981", onMouseDown: () => setIsDragging(`s210-${mic.id}`) }), /* @__PURE__ */ React.createElement(
+        ), /* @__PURE__ */ React.createElement("text", { y: "-10", textAnchor: "middle", fill: "#38bdf8", className: "font-black text-[9px]", style: { fontFamily: "sans-serif", fontWeight: "bold" } }, preset === "hall26x15" ? lang === "zh" ? "200\u2033 \u7535\u52A8\u5E55\u5E03" : "200\u2033 motorized screen" : "QA1400 Pro 86\u2033 IFP")), !displayPlan && showDisplays && displays.map((disp) => /* @__PURE__ */ React.createElement("g", { key: `disp-${disp.id}`, className: "draggable", onMouseDown: () => !disp.mount && setIsDragging(`disp-${disp.id}`), transform: `translate(${tx(disp.x)}, ${ty(disp.y)})` }, /* @__PURE__ */ React.createElement("rect", { x: -0.8 * scale, y: -0.1 * scale, width: 1.6 * scale, height: 0.2 * scale, fill: "#3b82f6", stroke: "#1d4ed8", strokeWidth: "1", rx: "2" }), /* @__PURE__ */ React.createElement("text", { y: "-8", textAnchor: "middle", fill: "#2563eb", className: "font-black text-[9px]", style: { fontFamily: "sans-serif", fontWeight: "bold" } }, displayName, " (", displaySize, '")'))), showSpeakers && audioPlan.ceiling?.missed.map((s) => /* @__PURE__ */ React.createElement("circle", { key: s.row + "-" + s.column, cx: tx(s.x), cy: ty(s.y), r: "4", fill: "#d74733" })), showSpeakers && speakers.map((spk) => /* @__PURE__ */ React.createElement("g", { key: `spk-${spk.id}`, className: "draggable", onMouseDown: () => !spk.mount && setIsDragging(`spk-${spk.id}`), transform: `translate(${tx(spk.x)}, ${ty(spk.y)})` }, spk.model === "EBS-630" ? /* @__PURE__ */ React.createElement("circle", { r: 0.23 * scale, fill: "#fafafa", stroke: "#657a80" }) : /* @__PURE__ */ React.createElement("rect", { x: -0.4 * scale, y: -0.4 * scale, width: 0.8 * scale, height: 0.8 * scale, fill: "#1e293b", stroke: "#64748b", strokeWidth: "2", rx: "2" }), /* @__PURE__ */ React.createElement("circle", { cx: "0", cy: "0", r: "4", fill: "#94a3b8" }), /* @__PURE__ */ React.createElement("text", { y: "18", textAnchor: "middle", fill: themeKey === "light" ? "#475569" : "#94a3b8", className: "text-[8px] font-bold", style: { fontFamily: "sans-serif", fontWeight: "bold" } }, audioConfig.speakerModel, " ", spk.id + 1))), /* @__PURE__ */ React.createElement("g", { transform: `translate(${tx(roomWidth - 1.4)}, ${ty(0.65)})`, pointerEvents: "none" }, /* @__PURE__ */ React.createElement("rect", { x: -1.2 * scale, y: -0.22 * scale, width: 2.4 * scale, height: 0.44 * scale, rx: "3", fill: "#0072ce" }), /* @__PURE__ */ React.createElement("text", { textAnchor: "middle", y: "4", fill: "white", fontSize: "10" }, "Q-NEX ", qnexModel)), /* @__PURE__ */ React.createElement("g", { className: "draggable", onMouseDown: () => setIsDragging("hub"), transform: `translate(${tx(hub.x)}, ${ty(hub.y)})` }, /* @__PURE__ */ React.createElement("rect", { x: -1.2 * scale, y: -0.5 * scale, width: 2.4 * scale, height: 1 * scale, fill: "#0f172a", stroke: "#3b82f6", strokeWidth: "2", rx: "4" }), /* @__PURE__ */ React.createElement("text", { textAnchor: "middle", y: "4", fill: "#ffffff", className: "text-[10px] font-black", style: { fontFamily: "sans-serif", fontWeight: "bold" } }, hubName)), showTeacherCam && /* @__PURE__ */ React.createElement("g", { className: "draggable", onMouseDown: () => setIsDragging("teacher"), transform: `translate(${tx(teacherCam.x)}, ${ty(teacherCam.y)})` }, /* @__PURE__ */ React.createElement("circle", { r: 0.5 * scale, fill: "rgba(250, 204, 21, 0.3)" }), /* @__PURE__ */ React.createElement("circle", { r: 0.25 * scale, fill: "#facc15", stroke: teacherDistanceWarning || teacherBelowTypicalRange ? "#ef4444" : "#000000", strokeWidth: "2" }), /* @__PURE__ */ React.createElement("text", { y: "-16", textAnchor: "middle", fill: "#d97706", className: "font-black text-[10px] drop-shadow-md", style: { fontFamily: "sans-serif", fontWeight: "bold" } }, t.tCamLbl, " \xB7 ", teacherCameraModel.label)), showStudentCam && studentCameraMetrics.map((camera) => /* @__PURE__ */ React.createElement("g", { key: `student-camera-${camera.id}`, className: "draggable", onMouseDown: () => setIsDragging(`student-${camera.id}`), transform: `translate(${tx(camera.x)}, ${ty(camera.y)})` }, /* @__PURE__ */ React.createElement("circle", { r: 0.5 * scale, fill: "rgba(239, 68, 68, 0.3)" }), /* @__PURE__ */ React.createElement("circle", { r: 0.25 * scale, fill: "#ef4444", stroke: camera.overDistance || camera.belowTypicalRange ? "#ffffff" : "#000000", strokeWidth: "2" }), /* @__PURE__ */ React.createElement("text", { y: "24", textAnchor: "middle", fill: "#dc2626", className: "font-black text-[10px] drop-shadow-md", style: { fontFamily: "sans-serif", fontWeight: "bold" } }, t.sCamLbl, " ", camera.id + 1, " \xB7 ", studentCameraModel.label))), showS210 && s210s.map((mic) => /* @__PURE__ */ React.createElement("g", { key: `s210-${mic.id}`, className: "draggable group", transform: `translate(${tx(mic.x)}, ${ty(mic.y)})` }, /* @__PURE__ */ React.createElement("circle", { r: 0.4 * scale, fill: "rgba(52, 211, 153, 0.3)", stroke: "#10b981", strokeWidth: "2", strokeDasharray: "2 2", onMouseDown: () => !stageOnly && setIsDragging(`s210-${mic.id}`) }), /* @__PURE__ */ React.createElement("circle", { r: 0.25 * scale, fill: "#10b981", onMouseDown: () => !stageOnly && setIsDragging(`s210-${mic.id}`) }), /* @__PURE__ */ React.createElement(
           "path",
           {
             d: mic.facing === "down" ? "M -4,-2 L 0,3 L 4,-2 Z" : "M -4,2 L 0,-3 L 4,2 Z",
@@ -3029,6 +3171,7 @@
         ), /* @__PURE__ */ React.createElement("text", { y: "-14", textAnchor: "middle", fill: "#059669", className: "font-black text-[10px] drop-shadow-md pointer-events-none", style: { fontFamily: "sans-serif", fontWeight: "bold" } }, t.s210Lbl, " ", mic.label), /* @__PURE__ */ React.createElement(
           "g",
           {
+            style: stageOnly ? { display: "none" } : void 0,
             onClick: (e) => {
               e.stopPropagation();
               handleDeleteS210(mic.id);
@@ -3043,6 +3186,7 @@
         ), /* @__PURE__ */ React.createElement(
           "g",
           {
+            style: stageOnly ? { display: "none" } : void 0,
             onClick: (e) => {
               e.stopPropagation();
               handleToggleS210Facing(mic.id);
@@ -3123,15 +3267,27 @@
     const maxDistance = 10;
     const [teacherCam, setTeacherCam] = useState(initialLayout.teacherCam);
     const [studentCams, setStudentCams] = useState(initialLayout.studentCams);
-    const [s210s, setS210s] = useState(initialLayout.s210s);
+    const [distributedMics, setS210s] = useState(initialLayout.s210s);
     const [s210Request, setS210Request] = useState({ mode: "auto" });
-    const [audioConfig, setAudioConfig] = useState(emptyAudioConfig);
+    const [audioChoices, setAudioConfig] = useState(emptyAudioConfig);
     const [resetKey, setResetKey] = useState(0);
     const minimum = React.useMemo(() => minimumPickup(roomWidth, roomLength), [roomWidth, roomLength]);
     const [hub, setHub] = useState({ x: 1.5, y: 1 });
-    const [speakers, setSpeakers] = useState(initialLayout.speakers);
-    const [displays, setDisplays] = useState(initialLayout.displays);
-    const [largeScreen, setLargeScreen] = useState(initialLayout.largeScreen);
+    const [wallSpeakers, setSpeakers] = useState(initialLayout.speakers);
+    const [wallDisplays, setDisplays] = useState(initialLayout.displays);
+    const [interactiveScreen, setLargeScreen] = useState(initialLayout.largeScreen);
+    const isProjectionCase = preset === "hall26x15";
+    const displays = isProjectionCase ? caseCeilingDisplays(roomWidth, roomLength, displaySize) : wallDisplays;
+    const largeScreen = isProjectionCase ? { x: roomWidth / 2, y: 0.22, width: 200 * 0.0254 * 16 / Math.sqrt(337) } : interactiveScreen;
+    const room = { width: roomWidth, depth: roomLength, height: roomHeight };
+    const audioConfig = audioProfile(room, audioChoices, qnexModel);
+    const stageOnly = audioConfig.pickupMode === "wireless";
+    const s210s = stageOnly ? stageMics(roomWidth, roomLength) : distributedMics;
+    const calculatedSpeakers = React.useMemo(
+      () => roomIsValid && (audioConfig.speakerModel === EBS630 || preset === "hall26x15") ? reinforcementLayout({ width: roomWidth, depth: roomLength, height: roomHeight }, audioConfig.speakerModel, preset) : null,
+      [roomWidth, roomLength, roomHeight, preset, audioConfig.speakerModel, roomIsValid]
+    );
+    const speakers = calculatedSpeakers || wallSpeakers;
     const [displayPlan, setDisplayPlan] = useState(null);
     const stageWidth = displayPlan ? displayPlan.stageMm / 1e3 : roomWidth;
     const screenContext = {
@@ -3145,9 +3301,9 @@
       setDisplayPlan(next);
       setThreeDError("");
     };
-    function admitRoom(room) {
+    function admitRoom(room2) {
       if (!displayPlan) return true;
-      const fit = DisplayFit.fit(displayPlan, room);
+      const fit = DisplayFit.fit(displayPlan, room2);
       if (fit.status === "blocked") {
         setThreeDError(DisplayEditor.message(fit, lang));
         return false;
@@ -3448,6 +3604,12 @@
       }
       if (!admitRoom(lcsRoom(layout.width, layout.length, roomHeight, layout.hub))) return;
       setPreset(p);
+      setAudioConfig((current) => ({ ...current, pickupMode: void 0, d90: void 0 }));
+      if (p === "hall26x15") {
+        setDisplayPlan(null);
+        setQnexModel("NDP200");
+        setRoomHeight(3.5);
+      }
       setS210Request({ mode: "auto" });
       setRoomWidth(layout.width);
       setRoomLength(layout.length);
@@ -3465,7 +3627,7 @@
         displaySize: layout.displaySize
       });
       setTeacherCam(next.teacherCam);
-      setStudentCams(next.studentCams);
+      setStudentCams(p === "hall26x15" ? next.studentCams.map((m) => ({ ...m, x: caseStudentCameraX(layout.width) })) : next.studentCams);
       setS210s(next.s210s);
       setSpeakers(next.speakers);
       setDisplays(next.displays);
@@ -3474,6 +3636,7 @@
       setDisplaySize(layout.displaySize);
     };
     const handleS210CountChange = (count) => {
+      if (stageOnly) return;
       const newCount = parseInt(count);
       if (!Number.isInteger(newCount) || newCount < 0 || newCount > S210_MAX_COUNT) return;
       setS210Request({ mode: "fixed", count: newCount });
@@ -3504,6 +3667,7 @@
       setPreset("custom");
     };
     const handleAddS210 = () => {
+      if (stageOnly) return;
       if (s210s.length >= S210_MAX_COUNT) return;
       setS210Request({ mode: "fixed", count: s210s.length + 1 });
       const maxId = s210s.length > 0 ? Math.max(...s210s.map((m) => m.id)) : -1;
@@ -3522,11 +3686,13 @@
       setPreset("custom");
     };
     const handleDeleteS210 = (id) => {
+      if (stageOnly) return;
       setS210Request({ mode: "fixed", count: s210s.filter((m) => m.id !== id).length });
       setS210s(s210s.filter((mic) => mic.id !== id));
       setPreset("custom");
     };
     const handleToggleS210Facing = (id) => {
+      if (stageOnly) return;
       const newS210s = s210s.map((mic) => {
         if (mic.id === id) {
           return {
@@ -3595,6 +3761,7 @@
           showSpeakers,
           showDisplays,
           showLargeScreen,
+          preset,
           qnexModel,
           audioConfig,
           s210Request,
@@ -3642,6 +3809,7 @@
       audioPlan,
       audioConfig,
       setAudioConfig,
+      stageOnly,
       s210Request,
       handleReset,
       handleAdoptSuggested,

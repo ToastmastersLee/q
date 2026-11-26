@@ -2075,13 +2075,14 @@
   var EBS630 = "EBS-630";
   var ceilingRadius = (height2, rise = 0) => Math.max(0, height2 - rise - 1.2) * Math.tan(55 * Math.PI / 180);
   function audioProfile(room, options = {}, model = "NDP600") {
+    const ceiling = options.speakerModel === EBS630;
     const compatible = ["NDP200", "NDP600", "NMP311"].includes(model);
-    const wireless = compatible && (options.pickupMode ? options.pickupMode === "wireless" : tieredRoom(room) || options.speakerModel === EBS630);
+    const wireless = ceiling || compatible && (options.pickupMode ? options.pickupMode === "wireless" : tieredRoom(room));
     return {
       ...options,
-      speakerModel: options.speakerModel === EBS630 ? EBS630 : "PS610",
+      speakerModel: ceiling ? EBS630 : "PS610",
       pickupMode: wireless ? "wireless" : "distributed",
-      d90: compatible && (wireless || Boolean(options.d90))
+      d90: wireless || compatible && Boolean(options.d90)
     };
   }
   function stageMics(width2, depth) {
@@ -2580,7 +2581,7 @@
     const zh = lang === "zh";
     const update = (key, field, value) => setAudioConfig((current) => ({ ...current, [key]: { ...current[key], [field]: value } }));
     const inputClass = `${th.inputBg} ${th.inputText} border rounded p-1 w-full`;
-    return /* @__PURE__ */ React.createElement("fieldset", { id: "audio-equipment", className: "lcs-audio-equipment" }, /* @__PURE__ */ React.createElement("legend", null, zh ? "\u6269\u58F0\u4E0E\u5BA2\u6237\u5DF2\u6709\u8BBE\u5907" : "Amplification and customer equipment"), /* @__PURE__ */ React.createElement("label", null, zh ? "\u97F3\u7BB1\u90E8\u7F72" : "Loudspeaker deployment", /* @__PURE__ */ React.createElement("select", { id: "speaker-model", className: inputClass, value: audioConfig.speakerModel, onChange: (e) => setAudioConfig((c) => ({ ...c, speakerModel: e.target.value })) }, /* @__PURE__ */ React.createElement("option", { value: "PS610" }, zh ? "PS610 \u58C1\u6302\u6269\u58F0" : "PS610 wall speakers"), /* @__PURE__ */ React.createElement("option", { value: "EBS-630" }, zh ? "\u5F97\u80DC EBS-630 \u5438\u9876\u6269\u58F0" : "Takstar EBS-630 ceiling speakers"))), /* @__PURE__ */ React.createElement("label", null, zh ? "\u8BDD\u7B52\u7528\u9014" : "Microphone routing", /* @__PURE__ */ React.createElement("select", { id: "pickup-mode", className: inputClass, value: audioConfig.pickupMode, onChange: (e) => setAudioConfig((c) => ({ ...c, pickupMode: e.target.value })) }, /* @__PURE__ */ React.createElement("option", { value: "distributed" }, zh ? "S210 \u5206\u5E03\u62FE\u97F3" : "Distributed S210"), /* @__PURE__ */ React.createElement("option", { value: "wireless", disabled: qnexModel === "SL100" }, zh ? "D90 \u6269\u58F0\uFF0B\u821E\u53F0\u53CC S210 \u5F55\u64AD" : "D90 PA + two stage S210 for recording"))), /* @__PURE__ */ React.createElement("label", null, /* @__PURE__ */ React.createElement(
+    return /* @__PURE__ */ React.createElement("fieldset", { id: "audio-equipment", className: "lcs-audio-equipment" }, /* @__PURE__ */ React.createElement("legend", null, zh ? "\u6269\u58F0\u4E0E\u5BA2\u6237\u5DF2\u6709\u8BBE\u5907" : "Amplification and customer equipment"), /* @__PURE__ */ React.createElement("label", null, zh ? "\u97F3\u7BB1\u90E8\u7F72" : "Loudspeaker deployment", /* @__PURE__ */ React.createElement("select", { id: "speaker-model", className: inputClass, value: audioConfig.speakerModel, onChange: (e) => setAudioConfig((c) => ({ ...c, speakerModel: e.target.value })) }, /* @__PURE__ */ React.createElement("option", { value: "PS610" }, zh ? "PS610 \u58C1\u6302\u6269\u58F0" : "PS610 wall speakers"), /* @__PURE__ */ React.createElement("option", { value: "EBS-630" }, zh ? "\u5F97\u80DC EBS-630 \u5438\u9876\u6269\u58F0" : "Takstar EBS-630 ceiling speakers"))), /* @__PURE__ */ React.createElement("label", null, zh ? "\u8BDD\u7B52\u7528\u9014" : "Microphone routing", /* @__PURE__ */ React.createElement("select", { id: "pickup-mode", disabled: audioConfig.speakerModel === "EBS-630", className: inputClass, value: audioConfig.pickupMode, onChange: (e) => setAudioConfig((c) => ({ ...c, pickupMode: e.target.value })) }, /* @__PURE__ */ React.createElement("option", { value: "distributed" }, zh ? "S210 \u5206\u5E03\u62FE\u97F3" : "Distributed S210"), /* @__PURE__ */ React.createElement("option", { value: "wireless", disabled: qnexModel === "SL100" && audioConfig.speakerModel !== "EBS-630" }, zh ? "D90 \u6269\u58F0\uFF0B\u821E\u53F0\u53CC S210 \u5F55\u64AD" : "D90 PA + two stage S210 for recording"))), /* @__PURE__ */ React.createElement("label", null, /* @__PURE__ */ React.createElement(
       "input",
       {
         id: "use-built-in-amp",

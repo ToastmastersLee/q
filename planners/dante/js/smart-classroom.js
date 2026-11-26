@@ -29,7 +29,7 @@
     item('IRQK-60C','board',[['D02',2.4455,.105,1.697],['D03',5.5545,.105,1.697]]);
     item('SPM-6000F','sequencer',[['Q01',1.78,1.65,.35,'P01']]);
     item('H3C ZX200P-24T2MS-400','switch',[['N01',1.78,1.65,.62,'P01']]);
-    Object.assign(devices.find(d=>d.type==='ifp'),{size:86,panel:{name:'QA1400 Pro',size:86,widthMm:1968,heightMm:1194,depthMm:87}});
+    Object.assign(devices.find(d=>d.type==='ifp'),{size:86,panel:DisplayFit.bind({name:'QA1400 Pro',size:86},'qa1400-pro/86-aviation')});
     const roomName=lang=>lang==='zh'?'某航空培训大楼 · 智慧教室':'Aviation Training Building · Smart Classroom';
     const label=(item,lang)=>item.model + (item.role==='teacher'?(lang==='zh'?' · 教师':' · Teacher'):item.role==='student'?(lang==='zh'?' · 学生':' · Student'):'');
     const key='smart-classroom';
@@ -45,7 +45,7 @@
         }else url.searchParams.set('preset',choice);
         location.assign(url.href);
     }
-    App.smartRoom={key,equipment,roomName,label,route,width,depth,height,door,windows,desks,schedule,devices,
+    App.smartRoom={key,equipment,roomName,label,route,width,depth,height,door,windows,desks,teacherDesk:[4,1.295],schedule,devices,
         active:()=>location.hash==='#room='+key || (!location.hash && new URLSearchParams(location.search).get('room')===key),
         audio:devices.filter(d=>d.type==='m100'||d.type==='dc20'),
         visible:devices.filter(d=>!d.parent)};

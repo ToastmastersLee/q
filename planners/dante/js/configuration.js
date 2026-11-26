@@ -8,7 +8,7 @@
     const s = App.state;
     s.auxDisplays = []; s.equipment = defaults(); s.teachingDevices = []; s.manualAudio = false; s.manualAux = false;
     s.showIFP = true; s.showAuxDisplays = true;
-    const stationHalfWidth = 0.36; // metres in the floor plan
+    const stationHalfWidth = DeviceFootprints.station.widthMm / 2000; // metres in the floor plan
     const markerWidths = { ifp: 90, camera: 32, qnex: 65, station: 2 * stationHalfWidth * App.PPM };
     const markerHeight = 14;
     // Floor-plan metres measured from the left and front walls.
@@ -26,12 +26,13 @@
         })[0];
     }
     function frontPosition(type, retained, length) {
-        const half = type === 'ifp' ? 1 : stationHalfWidth;
+        const standardHalf = DisplayAssets.models['qa1400-pro/86'].widthMm/2000;
+        const half = type === 'ifp' ? standardHalf : stationHalfWidth;
         const obstacles = [...retained, ...s.teachingDevices.filter(d => d.type !== type && ['ifp','station'].includes(d.type) && d.y < 0.8)];
         const candidates = [length / 2, ...Array.from({length:41}, (_,i) => half + 0.05 + (length - 2 * half - 0.1) * i / 40),
-            ...obstacles.flatMap(d => { const gap = half + (d.type === 'ifp' ? (d.panel?.widthMm/2000 || 1) : stationHalfWidth) + 0.08; return [d.x-gap,d.x+gap]; })]
+            ...obstacles.flatMap(d => { const gap = half + (d.type === 'ifp' ? (d.panel?.widthMm/2000 || standardHalf) : stationHalfWidth) + 0.08; return [d.x-gap,d.x+gap]; })]
             .filter(x => x >= half && x <= length-half);
-        const available = candidates.filter(x => obstacles.every(d => Math.abs(x-d.x) >= half + (d.type === 'ifp' ? (d.panel?.widthMm/2000 || 1) : stationHalfWidth) + 0.079));
+        const available = candidates.filter(x => obstacles.every(d => Math.abs(x-d.x) >= half + (d.type === 'ifp' ? (d.panel?.widthMm/2000 || standardHalf) : stationHalfWidth) + 0.079));
         const score = x => retained.length ? Math.min(...retained.map(d => Math.abs(d.x-x))) : type === 'ifp' ? -Math.abs(x-length/2) : -x;
         return (available.length ? available : candidates).sort((a,b) => score(b)-score(a))[0] ?? length/2;
     }
@@ -49,7 +50,7 @@
         }
         d.x = clamp(d.x, s.roomLength); d.y = clamp(d.y, s.roomWidth);
         if (d.type === 'ifp') {
-            const half = (86 * 0.0254 * 16 / Math.sqrt(337) + 0.07) / 2;
+            const half = DisplayAssets.models['qa1400-pro/' + (d.size || 86)].widthMm/2000;
             d.x = s.roomLength > 2 * half + 0.02 ? Math.max(half + 0.01, Math.min(s.roomLength - half - 0.01, d.x)) : s.roomLength / 2;
         }
     }
@@ -88,6 +89,7 @@
         const b = App.bomForPlan(state.roomLength, state.roomWidth, state.devices,
             state.showAuxDisplays === false ? [] : state.auxDisplays);
         const e = state.equipment;
+        b.scheduler = App.hallScheduler(state);
         b.du11 = e.du11Count ?? b.du11;
         const count = e.processorCount ?? (b.channels ? Math.ceil(b.channels / (e.processorModel === 'DP44' ? 4 : 8)) : 0);
         b.processor = count ? { type: e.processorModel, count } : null;
@@ -132,8 +134,11 @@
             g.setAttribute('class', 'device teaching-device'); g.dataset.teachingId = d.id;
             g.setAttribute('transform', `translate(${d.x * App.PPM},${d.y * App.PPM})`);
             const rect = document.createElementNS(svg.namespaceURI, 'rect');
-            const width = d.panel ? d.panel.widthMm * App.PPM / 1000 : markerWidths[d.type];
-            const height=d.panel ? d.panel.depthMm * App.PPM / 1000 : markerHeight;
+            const panel = d.panel ?? (d.type === 'ifp' ? DisplayAssets.models['qa1400-pro/' + d.size] : null);
+            const footprint = d.type === 'station' ? DeviceFootprints.station :
+                d.type === 'qnex' ? DeviceFootprints[d.model] : null;
+            const width = footprint ? footprint.widthMm * App.PPM / 1000 : panel ? panel.widthMm * App.PPM / 1000 : markerWidths[d.type];
+            const height = footprint ? footprint.depthMm * App.PPM / 1000 : panel ? panel.depthMm * App.PPM / 1000 : markerHeight;
             for (const [k, v] of Object.entries({ x: -width / 2, y: -height / 2, width, height, rx: 3, fill: d.type === 'camera' ? '#7c3aed' : '#0072ce' })) rect.setAttribute(k, v);
             const text = document.createElementNS(svg.namespaceURI, 'text');
             text.setAttribute('y', -12); text.setAttribute('text-anchor', 'middle');

@@ -39,7 +39,7 @@
         const zh=lang==='zh';
         const podiumQuantity=list.querySelector('[data-bom-key="qnex"] input');
         const caption=document.createElement('label'); caption.textContent=zh?'讲台数量':'Podium count'; podiumQuantity.before(caption); caption.append(podiumQuantity);
-        for (const {screen,count} of DisplayFit.groups(App.displayContext().plan.screens)) row('screen-'+screen.id,
+        for (const {screen,count} of App.selectedScreenGroups()) row('screen-'+screen.id,
             (screen.zone==='front' ? (zh?'主屏':'Main screen') : display.title)+' · '+DisplayFit.label(screen),count);
         for (const type of ['m100', 'm40', 'dc20']) {
             row(type, App.audioName(type, document.getElementById('langSelect').value, s.showModels) +
@@ -62,7 +62,7 @@
             if (s.tracking) for (const d of App.voice.inventory(s.tracking)) row('voice-'+d.role, App.voice.label(d,lang), d.quantity);
             else row('camera', 'CV870', e.cameraCount, null, null, v => set('cameraCount', v));
         }
-        if(s.tracking && !App.voice.forTracking(s.tracking).small) row('cpl50','CPL50',1);
+        if (b.scheduler) row('cpl50', RoomScheduler.label(lang), 1);
         const warning = document.getElementById('processor-warning');
         if (warning) { warning.textContent = copy.capacity; warning.hidden = b.channels <= (b.processor?.count || 0) * (e.processorModel === 'DP44' ? 4 : 8); }
         App.refreshConfigurationUI?.();

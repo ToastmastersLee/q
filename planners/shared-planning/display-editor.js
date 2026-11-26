@@ -492,6 +492,7 @@
                     id: old?.id || F.nextId(base.screens),
                     zone,
                     size: null,
+                    customDimensions:true,
                     name: inputs.name.value.trim(),
                     widthMm: Number(inputs.widthMm.value),
                     heightMm: Number(inputs.heightMm.value),

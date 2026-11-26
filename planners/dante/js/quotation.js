@@ -6,7 +6,7 @@
             lines:App.smartRoom.schedule.map(row=>line(App.smartRoom.label(row,'en'),row.quantity,row.devices.map(d=>d.id).join(' / '))),
             summary:'Single classroom · 24 seats · teacher and student recording cameras',detail:'NDP200 / LCS810 GEN 2 / Dante'};
         const lines = Quotation.qnexLines(e.qnexModel).map(l => ({ ...l, quantity: l.quantity * e.qnexCount }));
-        if (s.displayPlan) for (const {screen,count} of DisplayFit.groups(s.displayPlan.screens)) {
+        if (s.displayPlan) for (const {screen,count} of App.selectedScreenGroups()) {
             lines.push(line(DisplayFit.quotationName(screen),count,`${screen.widthMm} × ${screen.heightMm} × ${screen.depthMm} mm`));
         }
         else if (s.showIFP) lines.push(line('QA1400 Pro 86-inch', e.ifpCount, '86-inch interactive flat panel for teaching presentations, touch interaction and hybrid learning.'));
@@ -15,7 +15,7 @@
         if (b.processor) lines.push(line(b.processor.type, b.processor.count, 'Dante audio processing for the configured channel count.', false, false));
         if (!s.displayPlan) for (const size of [55, 65, 75]) lines.push(line(`Auxiliary Display / TV ${size}-inch`, b.counts[size], 'Auxiliary classroom display; mounting and signal distribution require selection.'));
         const hall = s.tracking && App.voice.forTracking(s.tracking);
-        if (hall && !hall.small) lines.push(line('CPL50',1,'10.1-inch room scheduling panel at the main entrance.'));
+        if (b.scheduler) lines.push(line('CPL50',1,'10.1-inch room scheduling panel at the main entrance.'));
         if (e.lcsEnabled) {
             lines.push(line('LCS810 GEN2', e.lcsCount, 'K3200N1-D15 recording host for lecture capture and USB hybrid learning. Confirm Dante audio routing and ordered options.'));
             if (s.tracking) {

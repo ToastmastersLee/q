@@ -29,16 +29,17 @@ window.drawMeetingPlan = function (s, svg, showTableSize) {
       overlay += '</g>';
     }
   overlay += '</g>';
-  let out = `<rect x="0" y="0" width="${r.width}" height="${r.depth}" fill="${document.documentElement.dataset.theme === 'dark' ? '#243f50' : '#f8fbfb'}" stroke="#84a8b5" stroke-width=".08"/><rect x="${b.x - b.w / 2}" y="${b.z - b.d / 2}" width="${b.w}" height="${b.d}" rx=".12" fill="#c69d72"/>`;
+  let out = `<rect x="0" y="0" width="${r.width}" height="${r.depth}" fill="${document.documentElement.dataset.theme === 'dark' ? '#243f50' : '#f8fbfb'}" stroke="#84a8b5" stroke-width=".08"/><rect x="${b.x - b.w / 2}" y="${b.z - b.d / 2}" width="${b.w}" height="${b.d}" rx=".12" data-furniture="${FurnitureCatalog.meeting.id}" fill="${FurnitureCatalog.meeting.topColor}"/>`;
   for (let i = 0; i < Math.max(2, Math.floor(b.d / 1.1)); i++) {
     let z = b.z - b.d / 2 + ((i + 0.5) * b.d) / Math.max(2, Math.floor(b.d / 1.1));
     for (let x of [b.x - b.w / 2 - 0.4, b.x + b.w / 2 + 0.4])
-      out += `<rect x="${x - 0.2}" y="${z - 0.25}" width=".4" height=".5" rx=".1" fill="#6b8999"/>`;
+      out += `<rect x="${x - 0.2}" y="${z - 0.25}" width=".4" height=".5" rx=".1" fill="${FurnitureCatalog.meeting.colors.seat}"/>`;
   }
   out += overlay;
+  const ifp=DisplayAssets.models['meeting/generic-ifp'];
   out +=
-    `<rect x="${r.width / 2 - 1}" y=".08" width="2" height=".13" fill="#167b8a"/>` +
-    text(r.width / 2 - .98, .5, M.t('ifp'), .18) +
+    `<rect data-screen-id="ifp" x="${r.width/2 - ifp.widthMm/2000}" y=".0075" width="${ifp.widthMm/1000}" height="${ifp.depthMm/1000}" fill="#167b8a"/>` +
+    text(r.width / 2 - ifp.widthMm/2000 + .02, .5, M.t('ifp'), .18) +
     `<circle cx="${r.width / 2}" cy="${C.mount(r).z}" r=".12" fill="#23465d"/>` +
     text(r.width / 2 + .9, .62, M.t('camera'), .18);
   let dx = s.door === 'left' ? 0 : r.width,

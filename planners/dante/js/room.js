@@ -22,6 +22,17 @@
         const bounds = document.getElementById('roomBounds');
         bounds.setAttribute('width', pxLen);
         bounds.setAttribute('height', pxWid);
+        const desks=document.getElementById('student-desk-footprints');
+        const style=FurnitureCatalog.classroom(state.furnitureStyle);
+        const positions=state.tracking || state.caseId ? [] : App.classroomDeskPositions(len,wid,style);
+        desks.replaceChildren(...positions.map(([x,,z])=>{
+            const rect=document.createElementNS(svgCanvas.namespaceURI,'rect');
+            const width=style.widthMm/1000, depth=style.depthMm/1000;
+            for (const [key,value] of Object.entries({x:(x-width/2)*PPM,y:(z-depth/2)*PPM,
+                width:width*PPM,height:depth*PPM,rx:2,fill:style.topColor,'data-furniture':style.id})) rect.setAttribute(key,value);
+            return rect;
+        }));
+        App.syncFurniture?.();
         const splitLine = document.getElementById('overlay-heightSplit');
         splitLine.setAttribute('x2', pxLen);
         splitLine.setAttribute('y1', state.heightProfile.split * PPM);
@@ -44,6 +55,10 @@
         widthDimText.setAttribute('transform', `rotate(-90 -28 ${pxWid / 2})`);
 
         const doors = App.sideWallDoors(wid);
+        const scheduler = App.hallScheduler(state);
+        const marker = document.getElementById('scheduler-marker');
+        marker.setAttribute('display', scheduler ? 'inline' : 'none');
+        if (scheduler) marker.setAttribute('transform', `translate(${scheduler.x * PPM} ${scheduler.y * PPM})`);
         const doorSize = doors.width * PPM;
         document.querySelectorAll('#doorGroup > g').forEach((door, index) => {
             const hingeY = doors.centers[index] * PPM - doorSize / 2;

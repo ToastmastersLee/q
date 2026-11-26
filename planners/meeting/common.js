@@ -41,8 +41,25 @@ const sidebarCopy = {
   ar: ["الإعداد", "التغطية", "العرض", "أبعاد الطاولة", "إعادة ضبط أجهزة الطاولة"],
 };
 function t(k){if(sidebarKeys.includes(k))return sidebarCopy[lang][sidebarKeys.indexOf(k)];if(k==='camera')return 'CV810 Gen 2';let i=keys.indexOf(k);return i<0?((editorKeys.includes(k)?editorCopy[lang][editorKeys.indexOf(k)]:null)||(k==='s350Count'?quantityCopy[lang]:null)||(k==='penCount'?penCopy[lang]:null)||(k==='smartpen'?'IQ SmartPen':null)||(uiExtra[lang]||uiExtra.en)[k]||qualityCopy[lang][qualityKeys.indexOf(k)]||(extra[lang]||extra.en)[extraKeys.indexOf(k)]||k):(texts[lang]||texts.en)[i]||k} function setLang(l){lang=langs.includes(l)?l:'en'; document.documentElement.lang=lang; document.documentElement.dir=lang==='ar'?'rtl':'ltr'; document.querySelectorAll('[data-t]').forEach(e=>e.textContent=t(e.dataset.t)); document.title=t('title'); const sel=document.querySelector('#language');if(sel)sel.value=lang;}
-function roomTable(r){return {w:Math.min(2.2,r.width-3),d:Math.min(5,r.depth-3),x:r.width/2,z:r.depth/2+.25}}
-function resizeLayout(s,room){const next=structuredClone(s),old=roomTable(s.room),b=roomTable(room);next.room=room;for(const id of Object.keys(s.devices).filter(id=>['laptop','s350','s350b'].includes(id))){const q=s.devices[id];next.devices[id]={x:b.x+(q.x-old.x)*(b.w-.5)/(old.w-.5),z:b.z+(q.z-old.z)*(b.d-.5)/(old.d-.5)}}return next}
+function roomTable(r){return FurnitureCatalog.roomTable(r)}
+function resizeLayout(s, room) {
+  const next = structuredClone(s);
+  const old = roomTable(s.room), table = roomTable(room);
+  next.room = room;
+  function scalePoint(value, oldCenter, oldSize, center, size) {
+    const scaled = center + (value - oldCenter) * (size - .5) / (oldSize - .5);
+    // Use the same physical stops as dragging. Scaling an exact tabletop edge can round past it.
+    return Math.max(center - size / 2 + .25, Math.min(center + size / 2 - .25, scaled));
+  }
+  for (const id of ['laptop', 's350', 's350b']) {
+    const point = s.devices[id];
+    if (point) next.devices[id] = {
+      x: scalePoint(point.x, old.x, old.w, table.x, table.w),
+      z: scalePoint(point.z, old.z, old.d, table.z, table.d),
+    };
+  }
+  return next;
+}
 function resetLayout(s){const next=structuredClone(s),b=roomTable(s.room);next.devices={...next.devices,laptop:{x:b.x-.4*(b.w-.5)/1.7,z:b.z-.25*(b.d-.5)/4.5},s350:{x:b.x,z:b.z-b.d*.25}};if(next.devices.s350b)next.devices.s350b=MeetingCoverage.secondMic(s.room,next.devices.s350);return next}
 function validate(s){if(!s||s.version!==1||!s.room||!s.devices||!['left','right'].includes(s.door))return 'snapshot';if(s.doorCount!==undefined&&![1,2].includes(s.doorCount))return 'snapshot';let r=s.room;if(![r.width,r.depth,r.height].every(Number.isFinite)||r.width<4||r.width>20||r.depth<5||r.depth>30||r.height<2.4||r.height>4.5)return 'invalid';if(!s.devices.laptop||!s.devices.s350)return 'snapshot';
 if(s.s350Count!==undefined&&![0,1,2].includes(s.s350Count))return 'snapshot';

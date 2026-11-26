@@ -10,6 +10,7 @@
         if(size && !App.admitDisplayRoom({width:size[0],depth:size[1],height:size[2]})){
             document.getElementById('presetSelect').value='custom';return false;
         }
+        state.namedHall = scenario === 'large' || scenario === 'step';
         if (scenario === 'medium') {
             state.roomLength = 8.0;
             state.roomWidth = 10.0;

@@ -64,12 +64,29 @@
     App.refreshHeightUI = refreshHeightUI;
 
     window.addEventListener('DOMContentLoaded', () => {
+        const picker=document.getElementById('furniture-style');
+        function syncFurniture() {
+            const lang=document.getElementById('langSelect').value;
+            const fixed=App.smartRoom.active() || Boolean(state.tracking) || state.caseId === 'hall26x15';
+            const style=App.smartRoom.active()?FurnitureCatalog.smart.id:state.furnitureStyle || FurnitureCatalog.standard.id;
+            document.getElementById('furniture-style-field').hidden=fixed;
+            document.getElementById('furniture-style-label').textContent=FurnitureCatalog.pickerLabels[lang] || FurnitureCatalog.pickerLabels.en;
+            if(picker.dataset.language!==lang) {
+                picker.replaceChildren(...[FurnitureCatalog.standard,FurnitureCatalog.smart].map(item=>new Option(item.label[lang] || item.label.en,item.id)));
+                picker.dataset.language=lang;
+            }
+            picker.value=style;
+        }
+        App.syncFurniture=syncFurniture;
+        syncFurniture();
+        picker.addEventListener('change',()=>{state.furnitureStyle=picker.value;renderRoom();});
+        document.getElementById('langSelect').addEventListener('change',syncFurniture);
         // Init multi-language support (English by default)
         changeLanguage('en');
 
         document.getElementById('t_themeBtn').addEventListener('click', toggleTheme);
         document.getElementById('langSelect').addEventListener('change', (e) => changeLanguage(e.target.value));
-        document.getElementById('presetSelect').addEventListener('change', (e) => applyScenario(e.target.value));
+        document.getElementById('presetSelect').addEventListener('change', (e) => {applyScenario(e.target.value);syncFurniture();});
         document.getElementById('show-models').addEventListener('change', (event) => {
             state.showModels = event.target.checked;
             changeLanguage(document.getElementById('langSelect').value);
@@ -100,6 +117,7 @@
         // Dimensions sliders input listeners
         document.getElementById('lengthSlider').addEventListener('input', (e) => {
             if (!App.admitDisplayRoom({width:Number(e.target.value)})) { e.target.value=state.roomLength;return; }
+            state.namedHall = false;
             state.roomLength = parseFloat(e.target.value);
             document.getElementById('lengthVal').textContent = state.roomLength.toFixed(1) + 'm';
             document.getElementById('presetSelect').value = 'custom';
@@ -108,6 +126,7 @@
 
         document.getElementById('widthSlider').addEventListener('input', (e) => {
             if (!App.admitDisplayRoom({depth:Number(e.target.value)})) { e.target.value=state.roomWidth;return; }
+            state.namedHall = false;
             state.roomWidth = parseFloat(e.target.value);
             document.getElementById('widthVal').textContent = state.roomWidth.toFixed(1) + 'm';
             document.getElementById('presetSelect').value = 'custom';

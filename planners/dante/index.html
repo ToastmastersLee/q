@@ -49,6 +49,11 @@
             </select>
         </div>
 
+        <div data-settings-category="room" class="control-group" id="furniture-style-field">
+            <label for="furniture-style" class="group-title" id="furniture-style-label">Student desks</label>
+            <select class="custom-select" id="furniture-style"></select>
+        </div>
+
         <!-- Room Config Card -->
         <div data-settings-category="room" class="control-group">
             <label id="t_roomConfigLabel" class="group-title">📐 Room Dimensions</label>
@@ -228,6 +233,7 @@
 
             <!-- Room Bounds Rectangle -->
             <rect id="roomBounds" x="0" y="0" width="500" height="400" fill="var(--room-fill)" stroke="var(--room-stroke)" stroke-width="3" />
+            <g id="student-desk-footprints" opacity=".26" pointer-events="none"></g>
             <line id="overlay-heightSplit" x1="0" x2="500" y1="250" y2="250" stroke="#f59e0b" stroke-width="2" stroke-dasharray="8 5" display="none" pointer-events="none" />
 
             <g id="audioCoverageLayer" pointer-events="none" stroke-width="1.5">
@@ -263,6 +269,10 @@
                 <g><use href="#doorSwing"/><text>Door</text></g>
                 <g><use href="#doorSwing"/><text>Door</text></g>
             </g>
+            <g id="scheduler-marker" display="none" pointer-events="none">
+                <rect width="6" height="12" x="1" y="-6" rx="2" fill="#224c52" stroke="#76d9bd"/>
+                <text x="-5" y="4" font-size="10" font-weight="bold" text-anchor="end" fill="var(--text)">CPL50</text>
+            </g>
         </svg>
 
         <details class="instruction"><summary data-config-copy="instructions">Instructions</summary><div>
@@ -287,37 +297,41 @@
         </div>
     </div>
 
-    <script defer src="js/planning-core.js?v=20261120-display-layout"></script>
+    <script defer src="js/planning-core.js?v=20261126-cpl50"></script>
     <script defer src="js/core.js?v=20261026-quantities"></script>
     <script defer src="js/presentation.js?v=20261026-quantities"></script>
+    <script defer src="../shared-planning/catalog/devices/footprints.js"></script>
+    <script defer src="../shared-planning/catalog/furniture/styles.js"></script>
+    <script defer src="../shared-planning/room-scheduler.js"></script>
+    <script defer src="../shared-planning/catalog/displays/profiles.js"></script>
     <script defer src="../shared-planning/display-fit.js?v=20261122-hall115"></script>
     <script defer src="../shared-planning/display-editor.js?v=20261121-small121"></script>
     <script defer src="js/display-layout.js?v=20261121-small121"></script>
-    <script defer src="js/configuration.js?v=20261120-lectern-position"></script>
+    <script defer src="js/configuration.js?v=20261126-cpl50"></script>
     <script defer src="js/configuration-copy.js?v=20261120-device-sidebar"></script>
     <script defer src="js/audio-layout.js?v=20261026-quantities"></script>
     <script defer src="js/audio-controls.js?v=20261026-quantities"></script>
     <script defer src="js/voice-tracking.js?v=stage-three-1"></script>
     <script defer src="js/smart-classroom.js"></script>
     <script defer src="js/voice-controls.js?v=stage-three-1"></script>
-    <script defer src="js/plan-snapshot.js?v=20261121-small121"></script>
+    <script defer src="js/plan-snapshot.js?v=20261126-cpl50"></script>
     <script defer src="js/locales-en-zh.js?v=20261026-quantities"></script>
     <script defer src="js/locales-hu-it.js?v=20261026-quantities"></script>
     <script defer src="js/locales-es-ja.js?v=20261026-quantities"></script>
     <script defer src="js/locales-ko-ar.js?v=20261026-quantities"></script>
     <script defer src="js/i18n.js?v=20261120-plan-guides"></script>
     <script defer src="js/displays.js?v=20261120-display-layout"></script>
-    <script defer src="js/room.js?v=smart-landing"></script>
+    <script defer src="js/room.js?v=20261126-cpl50"></script>
     <script defer src="js/devices.js?v=20261120-coverage-legend"></script>
     <script defer src="js/coverage.js?v=20261026-quantities"></script>
     <script defer src="js/recommend-mics.js?v=20261026-quantities"></script>
     <script defer src="js/recommend-speakers.js?v=20261026-quantities"></script>
     <script defer src="js/recommendation.js?v=20261026-quantities"></script>
-    <script defer src="js/presets.js?v=20261120-display-layout"></script>
-    <script defer src="js/bom.js?v=smart-landing"></script>
+    <script defer src="js/presets.js?v=20261126-cpl50"></script>
+    <script defer src="js/bom.js?v=20261126-cpl50"></script>
     <script defer src="js/interactions.js?v=20261121-voice"></script>
-    <script defer src="js/main.js?v=smart-landing"></script>
-<script defer src="js/quotation.js?v=voice-ptz-1"></script>
+    <script defer src="js/main.js?v=20261126-cpl50"></script>
+<script defer src="js/quotation.js?v=20261126-cpl50"></script>
 <script defer src="js/workspace.js?v=20261120-settings-groups"></script>
 <script defer src="js/voice-plan-view.js?v=20261122-voice-area"></script>
 <script defer src="js/smart-plan-view.js"></script>

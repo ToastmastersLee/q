@@ -7,14 +7,14 @@
             rows:10, seatsPerBank:5, firstRow:4.3, pitch:1.5, riser:.115, seatPitch:1.03,
             bankStarts:[1.35,8.47], zoneLeft:[.52,7.7], zoneWidth:5.7, desks:[3.41,10.53], deskWidth:5.12,
             micX:[3.65,10.27], micY:[6.6,15.4], speakerX:[1.15,6.96,12.77], speakerY:[2.9,8.1,13.25,18.5],
-            screenX:[3.1,10.82], led:{name:'LE163MD 163″ LED',widthMm:3620,heightMm:2030,depthMm:62.5}
+            screenX:[3.1,10.82], led:'le163md'
         },
         small: {
             small:true, length:13.42, width:12, height:3.05, rear:2.51, defaultCount:2, lectern:{x:7.85,y:1.05},
             platform:{length:4,depth:1.98}, rows:6, seatsPerBank:4, firstRow:3.15, pitch:1.36, riser:.065, seatPitch:1.12,
             bankStarts:[1.78,8.28], zoneLeft:[1.08,7.58], zoneWidth:4.76, desks:[3.46,9.96], deskWidth:4.5,
             micX:[3.46,9.96], micY:[6.5], speakerX:[1.2,12.22], speakerY:[2,4.7,7.5,10.4],
-            screenX:[3.36,10.06], led:{name:'LE110ML 110″ LED',widthMm:2440,heightMm:1370,depthMm:100}
+            screenX:[3.36,10.06], led:'le110ml'
         }
     };
     const en = ['Student Voice Tracking','Student cameras','Speaking seat','Panorama','Cycle zones','Stop','End speech','Student close-up','Teacher','Student panorama','Tracking controller','Simulated output','Seat'];
@@ -143,9 +143,9 @@
             grid('m100', config.micX, config.micY);
             grid('dc20', config.speakerX, config.speakerY);
             const center=DisplayFit.standard('front',86,'hall-ifp',length/2,0.15);
-            if(!config.small) Object.assign(center,{widthMm:1968,heightMm:1194,depthMm:87});
+            if(!config.small) Object.assign(center,DisplayFit.bind(center,'qa1400-pro/86-aviation'));
             const displayPlan = {stageMm:Math.round(length*1000), screens:[center,
-                ...config.screenX.map((x,i) => ({id:'hall-led-'+i, zone:'front', size:null, ...config.led, offsetMm:0, x, y:0.15}))]};
+                ...config.screenX.map((x,i) => DisplayFit.bind({id:'hall-led-'+i, zone:'front', size:null, offsetMm:0, x, y:0.15},config.led))]};
             return {roomLength:length, roomWidth:width, height,
                 heightProfile:{mode:config.small?'split':'uniform',front:height,rear:config.rear,split:width/2,drop:0,manualPickup:null,manualPA:null},
                 equipment, devices, displayPlan, auxDisplays:[], showIFP:true, showAuxDisplays:true,
@@ -173,7 +173,7 @@
             const end = !config.small && row === rows-1 ? width : center + config.pitch / 2;
             return {start, end, top: .03 + row * config.riser};
         }
-        return {...config, tier, id, menuName, hallName, configurationName, teacherField, seats, seatById, colors, zones, zoneFor, shot, inventory, create, valid, hall, words, label};
+        return {...config, led:DisplayAssets.models[config.led], tier, id, menuName, hallName, configurationName, teacherField, seats, seatById, colors, zones, zoneFor, shot, inventory, create, valid, hall, words, label};
     }
     const halls = {large:makeHall('large', configs.large), small:makeHall('small', configs.small)};
     // v6 snapshots without a hall identifier belong to the original large hall.

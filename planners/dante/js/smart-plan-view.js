@@ -32,14 +32,19 @@
         draw('path',{d:'M0 .44 h1.2 a1.2 1.2 0 0 1 -1.2 1.2',fill:'none',stroke:'#cdaa76','stroke-width':.025});
         label(W/2,-.55,zh?'教学墙 · 智慧教室':'Teaching wall · Smart Classroom',.28);
         label(W/2,D+.5,'8.00 × 10.23 × 3.05 m  ·  '+(zh?'24 席':'24 seats'));
-        for(const [x,y] of room.desks){
-            rect(x-.8,y-.4,1.6,.8,'#c5aa80',{rx:.05,'data-smart-desk':1});
-            for(const dx of [-.39,.39])rect(x+dx-.21,y+.42,.42,.38,'#647c7b',{rx:.07,'data-smart-seat':1});
+        const studentDesk=FurnitureCatalog.smart, deskW=studentDesk.widthMm/1000,deskD=studentDesk.depthMm/1000;
+ for(const [x,y] of room.desks){
+            rect(x-deskW/2,y-deskD/2,deskW,deskD,studentDesk.topColor,{rx:.05,'data-smart-desk':1});
+            for(const dx of [-studentDesk.seatOffsetX,studentDesk.seatOffsetX])rect(x+dx-.21,y+.42,.42,.38,'#647c7b',{rx:.07,'data-smart-seat':1});
         }
-        rect(3.275,.95,1.45,.68,'#c5aa80');rect(2.8,9.72,2.4,.42,'#bcb7a9');
+        const teacher=FurnitureCatalog.teacher,tw=teacher.widthMm/1000,td=teacher.depthMm/1000;
+        rect(room.teacherDesk[0]-tw/2,room.teacherDesk[1]-td/2,tw,td,teacher.topColor,{'data-furniture':teacher.id});
+        rect(2.8,9.72,2.4,.42,'#bcb7a9');
         for(const d of room.visible){
-            const w=d.type==='ifp'?1.968:d.type==='board'?1.141:d.type==='podium'?.87:0;
-            const tag=w?rect(d.x-w/2,d.y-.06,w,d.type==='podium'?.609:.12,'#366b74'):
+            const size=d.panel ?? DeviceFootprints[d.type==='station'?'station':d.model];
+            const centre=d.y+(size?.centreOffsetMm ?? 0)/1000;
+            const tag=size?rect(d.x-size.widthMm/2000,centre-size.depthMm/2000,
+                size.widthMm/1000,size.depthMm/1000,'#366b74'):
                 draw('circle',{cx:d.x,cy:d.y,r:.13,fill:d.type==='camera'?'#bc703f':'#207e78'});
             tag.setAttribute('data-smart-device',d.id);
             const text=room.label(d,lang); draw('title',{},tag,text);

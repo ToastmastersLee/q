@@ -125,12 +125,22 @@
         };
     }
 
+  App.classroomDeskPositions=function(width,depth,style) {
+    const last=depth-.6-style.rearExtent;
+    const first=Math.min(3,last);
+    if (first-style.depthMm/2000<1.4 || width<style.widthMm/1000+.8) return [];
+    return FurnitureCatalog.rows(width,depth,first,last);
+  };
+
     App.coverageForPlan = coverageForPlan;
     App.DISPLAY_RULES = DISPLAY_RULES;
     App.radiiForHeight = radiiForHeight;
     App.m100RadiiForHeight = m100RadiiForHeight;
     App.radiiForDevice = radiiForDevice;
     App.heightAt = heightAt;
+    App.hallScheduler = (room, side) => !room.smart && RoomScheduler.forRoom(
+        room.roomLength ?? room.length, room.roomWidth ?? room.width,
+        Boolean(room.namedHall || room.tracking || room.caseId), side);
     App.sideWallDoors = sideWallDoors;
     App.auxiliaryDisplaysForWidth = auxiliaryDisplaysForWidth;
     App.bomForPlan = bomForPlan;

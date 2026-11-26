@@ -114,6 +114,11 @@
             lang: document.getElementById('langSelect').value,
         };
     };
+    App.selectedScreenGroups = function () {
+        const { showIFP, showAuxDisplays } = App.state;
+        const { plan } = App.displayContext();
+        return F.groups(plan.screens.filter(screen => screen.zone === 'front' ? showIFP : showAuxDisplays));
+    };
     App.applyScreenEntries = function () {
         const s = App.state;
         if (!s.displayPlan) return;

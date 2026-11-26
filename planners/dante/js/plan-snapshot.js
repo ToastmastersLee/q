@@ -9,7 +9,7 @@
         if (!input || typeof input !== 'object') fail();
         if (![1, 2, 3, 4, 5, 6].includes(input.version)) fail('snapshotVersion');
         const { length, width, height } = input;
-        const displayPlan = input.version >= 5 ? input.displayPlan : null;
+        const displayPlan = input.version >= 5 ? DisplayFit.resolvePlan(input.displayPlan) : null;
         if (input.version>=5 && !DisplayFit.valid(displayPlan)) fail();
         const panels=new Map((displayPlan?.screens || []).map(p=>[p.id,p]));
         if (!number(length, 2, 40) || !number(width, 2, 40) || !number(height, 2, 4)) fail();
@@ -41,6 +41,7 @@
         if (!input.show || showKeys.some(key => typeof input.show[key] !== 'boolean') || typeof input.showModels !== 'boolean') fail();
         if (!['en', 'zh', 'hu', 'it', 'es', 'ja', 'ko', 'ar'].includes(input.language) &&
             !(input.version === 6 && ['mn','fr'].includes(input.language))) fail();
+        if (input.furnitureStyle !== undefined && ![FurnitureCatalog.standard.id,FurnitureCatalog.smart.id].includes(input.furnitureStyle)) fail();
         let heightProfile;
         if (input.version >= 2) {
             const p = input.heightProfile;
@@ -90,7 +91,7 @@
             audioLayout = { mode:a.mode, counts:actual };
         }
         if (displayPlan && (!equipment || panels.size!==displays.length+teachingDevices.filter(d=>d.type==='ifp').length)) fail();
-        return { ...(tracking ? {tracking} : {}), ...(displayPlan?{displayPlan,screenVisibility:{front:input.screenVisibility?.front!==false,side:input.screenVisibility?.side!==false}}:{}), version: input.version, length, width, height, devices, displays,
+        return { ...(input.furnitureStyle && {furnitureStyle:input.furnitureStyle}), ...(input.namedHall === true ? {namedHall:true} : {}), ...(tracking ? {tracking} : {}), ...(displayPlan?{displayPlan,screenVisibility:{front:input.screenVisibility?.front!==false,side:input.screenVisibility?.side!==false}}:{}), version: input.version, length, width, height, devices, displays,
             radii: Object.fromEntries(radiusKeys.map(key => [key, input.radii[key]])),
             show: Object.fromEntries(showKeys.map(key => [key, input.show[key]])),
             language: input.language, showModels: input.showModels, ...(heightProfile ? { heightProfile } : {}),
@@ -102,7 +103,7 @@
             const fit=DisplayFit.fit(state.displayPlan,App.displayContext().room,{fixed:true});
             if(fit.status==='blocked') fail('screenSpace');
         }
-        return validateSnapshot({ version: state.tracking ? 6 : state.displayPlan ? 5 : 4, tracking:state.tracking, displayPlan:state.displayPlan,screenVisibility:{front:state.showIFP,side:state.showAuxDisplays}, audioLayout:App.appliedAudioRequest(state), length: state.roomLength, width: state.roomWidth, height: state.height,
+        return validateSnapshot({ furnitureStyle:state.furnitureStyle, namedHall:state.namedHall, version: state.tracking ? 6 : state.displayPlan ? 5 : 4, tracking:state.tracking, displayPlan:state.displayPlan,screenVisibility:{front:state.showIFP,side:state.showAuxDisplays}, audioLayout:App.appliedAudioRequest(state), length: state.roomLength, width: state.roomWidth, height: state.height,
             devices: state.devices, displays: !state.displayPlan && state.showAuxDisplays === false ? [] : state.auxDisplays, radii: state.radii, show: state.show,
             language, showModels: state.showModels === true, heightProfile: state.heightProfile || {mode:"uniform",front:state.height,rear:state.height,split:state.roomWidth/2,drop:0,manualPickup:null,manualPA:null},
             equipment: state.equipment ? {...state.equipment, ifpCount:!state.displayPlan && state.showIFP === false ? 0 : state.equipment.ifpCount} : undefined,

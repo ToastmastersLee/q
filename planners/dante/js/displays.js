@@ -51,7 +51,8 @@
             const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
             if (device) { group.setAttribute('class','device'); group.dataset.auxId = device.id; }
             const pxY = y * PPM;
-            const rectWidth = device?.panel ? device.panel.widthMm*PPM/1000 : auxiliary ? 10 : screenWidth;
+            const spec = device?.panel ?? DisplayAssets.models['auxiliary-tv/' + device?.size];
+            const rectWidth = spec ? spec.widthMm*PPM/1000 : screenWidth;
             const pxX = auxiliary ? x * PPM - rectWidth/2 : screenX;
             const coverage = document.createElementNS('http://www.w3.org/2000/svg', 'line');
             coverage.setAttribute('x1', pxX + rectWidth / 2);
@@ -66,9 +67,9 @@
 
             const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
             rect.setAttribute('x', pxX);
-            rect.setAttribute('y', device?.panel ? pxY-device.panel.depthMm*PPM/2000 : pxY);
+            rect.setAttribute('y', spec ? pxY-spec.depthMm*PPM/2000 : pxY);
             rect.setAttribute('width', rectWidth);
-            rect.setAttribute('height', device?.panel ? device.panel.depthMm*PPM/1000 : screenHeight);
+            rect.setAttribute('height', spec ? spec.depthMm*PPM/1000 : screenHeight);
             rect.setAttribute('rx', '3');
             rect.setAttribute('fill', 'rgba(245, 158, 11, 0.28)');
             rect.setAttribute('stroke', accent);

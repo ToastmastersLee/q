@@ -67,13 +67,14 @@
     }
     async function exportPlan(plan) {
         if (!plan || ![plan.width,plan.depth].every(n=>Number.isFinite(n)&&n>0) || plan.lines.some(l=>!Number.isFinite(l.quantity)||l.quantity<0)) throw new Error('Invalid plan');
+        const proposalTitle = plan.projectTitle || plan.title;
         const wb = new ExcelJS.Workbook(); wb.calcProperties.fullCalcOnLoad = true;
         const ws = wb.addWorksheet(plan.title.slice(0,31), {views:[{state:'normal',showGridLines:false}]});
         const widths=[20.9,33.6,50.3,18.6,18.6,14.5,17.3]; widths.forEach((v,i)=>ws.getColumn(i+1).width=v);
         [18,14.25,14.25,14.25,45,55,160,160,45].forEach((v,i)=>ws.getRow(i+1).height=v);
         for(let r=1;r<=6;r++) ws.mergeCells(r,1,r,7);
         ws.mergeCells('A7:C8'); ws.mergeCells('D7:G8'); ws.mergeCells('A9:C9');
-        ['IQ HOLDING (HK) LIMITED','IQ & Q-NEX Smart Education Solutions','6th Building, Pioneer Park I, Fuzhou High-technology Base, Shangjie Town, Minhou County, Fuzhou, China','TEL: 86-591-38202660   FAX: 86-591-38203003   WEB: WWW.IQBOARD.NET',`Quotation Proposal: ${plan.title}`,`Solution Description\n${plan.summary}`].forEach((v,i)=>ws.getCell(i+1,1).value=v);
+        ['IQ HOLDING (HK) LIMITED','IQ & Q-NEX Smart Education Solutions','6th Building, Pioneer Park I, Fuzhou High-technology Base, Shangjie Town, Minhou County, Fuzhou, China','TEL: 86-591-38202660   FAX: 86-591-38203003   WEB: WWW.IQBOARD.NET',`Quotation Proposal: ${proposalTitle}`,`Solution Description\n${plan.summary}`].forEach((v,i)=>ws.getCell(i+1,1).value=v);
         ws.getCell('A7').value=plan.detail;
         const image=await capture3D(plan);
         const columnPx=c=>Math.floor(ws.getColumn(c).width*7+5);
@@ -106,7 +107,8 @@
         ws.getRow(9).font={bold:true}; ws.getRow(9).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFDCE6F1'}};
         const bytes=await wb.xlsx.writeBuffer();
         const date=new Date(),stamp=`${date.getFullYear()}${String(date.getMonth()+1).padStart(2,'0')}${String(date.getDate()).padStart(2,'0')}`;
-        const name=`Proposal for ${plan.title} from IQ-Q-NEX ${stamp}.xlsx`;
+        const fileTitle = Array.from(proposalTitle.replace(/[<>:"/\\|?*\u0000-\u001f]/g, '-')).slice(0, 120).join('');
+        const name=`Proposal for ${fileTitle} from IQ-Q-NEX ${stamp}.xlsx`;
         const url=URL.createObjectURL(new Blob([bytes],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}));
         const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
         return {name,lines};
